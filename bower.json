@@ -1,0 +1,17 @@
+{
+  "name": "zurikato-web",
+  "description": "A starter project for AngularJS",
+  "version": "0.0.0",
+  "homepage": "https://github.com/alecoexposito/zurikato-web",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "angular": "1.5.x",
+    "angular-animate": "1.5.x",
+    "angular-mocks": "1.5.x",
+    "angular-resource": "1.5.x",
+    "angular-route": "1.5.x",
+    "bootstrap": "4.0.0",
+    "jquery": "2.2.x"
+  }
+}
