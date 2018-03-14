@@ -2,37 +2,23 @@
 <html lang="en" ng-app="phonecatApp">
   <head>
     <meta charset="utf-8">
-    <title>Google Phone Gallery</title>
+    <title>Zurikato Web</title>
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
     <link rel="stylesheet" href="app.css" />
     <link rel="stylesheet" href="app.animations.css" />
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="#">Zurikato Web</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="#!login">Login</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#!devices">Devices</a>
-          </li>
-        </ul>
-      </div>
-    </nav>
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="core/css/custom-styles.css" />
   </head>
   <body>
 
-    <div class="view-container">
-      <div ng-view class="view-frame"></div>
-    </div>
+    <!--<div class="view-container">-->
+    <div ng-view></div>
+    <!--</div>-->
 
   </body>
   <footer>
     <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/bootstrap/assets/js/vendor/popper.min.js"></script>
     <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
     <script src="bower_components/angular/angular.js"></script>
     <script src="bower_components/angular-animate/angular-animate.js"></script>
@@ -61,21 +47,7 @@
     <script type="text/javascript" src="http://189.207.202.64:3001/socketcluster.min.js"></script>
     <script type="text/javascript">
       $(document).ready(function(){
-          var options = {
-              hostname: "189.207.202.64",
-              port: 3001
-          };
-          var socket = socketCluster.connect(options);
-          socket.on('connect', function () {
-              console.log('CONNECTED');
-              console.log(socket.state);
-          });
 
-//          socket.listen(3001, "189.207.202.64");
-          // Listen to an event called 'rand' from the server
-          socket.on('message', function (data) {
-              console.log('data: ' + data.toString());
-          });
       });
     </script>
   </footer>

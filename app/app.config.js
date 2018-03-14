@@ -16,6 +16,6 @@ angular.
         when('/devices', {
           template: '<device-list></device-list>'
         }).
-        otherwise('/phones');
+        otherwise('/devices');
     }
   ]);
