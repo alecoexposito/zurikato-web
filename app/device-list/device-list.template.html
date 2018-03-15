@@ -55,14 +55,22 @@
             </ul>
             </div>
           </custom-control>
-
+          <marker position="[19.277615555555556, -99.57464]" title="Begin"></marker>
           <directions
                   draggable="false"
                   travel-mode="DRIVING"
-                  waypoints='{{$ctrl.wayPoints}}'
-                  origin="19.279795555555555,-99.57428444444444"
-                  destination="19.290613333333333,-99.59093333333334">
+                  suppress-markers="true"
+                  origin="19.277615555555556,-99.57464"
+                  destination="19.26966,-99.57630222222222">
           </directions>
+          <directions
+                  draggable="false"
+                  travel-mode="DRIVING"
+                  suppress-markers="true"
+                  origin="19.26966,-99.57630222222222"
+                  destination="19.2577,-99.57401777777778">
+          </directions>
+          <marker position="[19.2577, -99.57401777777778]" title="End"></marker>
 
           <!--<directions draggable="true" panel="directions-panel" travel-mode="DRIVING" waypoints="[{&quot;location&quot;:{&quot;lat&quot;:44.32384807250689,&quot;lng&quot;:-78.079833984375},&quot;stopover&quot;:true},{&quot;location&quot;:{&quot;lat&quot;:44.55916341529184,&quot;lng&quot;:-76.17919921875},&quot;stopover&quot;:true}]" origin="toronto" destination="ottawa">-->
           <!--</directions>-->
