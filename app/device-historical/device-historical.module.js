@@ -1,7 +1,7 @@
 'use strict';
 
 // Define the `phoneList` module
-angular.module('deviceList', [
+angular.module('deviceHistorical', [
     'core.device',
     'ngMap',
 ]);

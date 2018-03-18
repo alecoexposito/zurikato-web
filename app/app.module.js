@@ -9,4 +9,5 @@ angular.module('phonecatApp', [
   'phoneDetail',
   'phoneList',
   'deviceList',
+  'deviceHistorical'
 ]);

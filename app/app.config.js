@@ -16,6 +16,9 @@ angular.
         when('/devices', {
           template: '<device-list></device-list>'
         }).
+        when('/device/:deviceId/historical', {
+            template: '<device-historical></device-historical>'
+        }).
         otherwise('/devices');
     }
   ]);
