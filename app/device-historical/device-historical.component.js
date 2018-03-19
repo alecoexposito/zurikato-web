@@ -54,7 +54,7 @@ angular.module('deviceHistorical').component('deviceHistorical', {
 
                 $timeout(function() {
                         self.drawHistorical(historical, pos + 1);
-                }, 800);
+                }, 500);
             }
             var historical = $http.get('http://189.207.202.64:3007/api/v1/devices/' + $routeParams.deviceId + '/history?start_date=' + $routeParams.start + '&end_date=' + $routeParams.end)
             historical.then(function(result) {
