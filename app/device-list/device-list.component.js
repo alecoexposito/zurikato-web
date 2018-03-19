@@ -6,10 +6,10 @@ angular.module('deviceList').component('deviceList', {
     controller: ['Device', '$http', 'NgMap',
         function DeviceListController(Device, $http, NgMap) {
             var self = this;
-            self.wayPoints = [
-                { location: { lat:19.28765111111111, lng: -99.58733333333333}, stopover: true},
-                { location: { lat:19.289728888888888, lng: -99.59220444444445}, stopover: true}
-            ];
+            self.start = null;
+            self.end = null;
+            self.currentIdDevice = null;
+            self.currentImei = null;
             this.googleMapsUrl = "https://maps.googleapis.com/maps/api/js?key=AIzaSyBHsRJFKmB3_E_DGrluQKMRIYNdT8v8CwI";
             self.getMap = function getMap() {
                 NgMap.getMap().then(function (map) {
@@ -19,20 +19,70 @@ angular.module('deviceList').component('deviceList', {
                     return map;
                 });
             };
+            self.markerOptionClick = function markerOptionClick() {
+                var invoker = $('div[data-toolbar="device-menu-options"].pressed');
+                self.currentIdDevice = invoker.parent().attr("id-device");
+                self.currentImei = invoker.parent().attr("imei");
+                var m = self.findMarkerByImei(self.currentImei);
+                var lat = m.getPosition().lat();
+                var lng = m.getPosition().lng();
+                self.map.panTo(new google.maps.LatLng(lat, lng));
+            };
+            $('#myModal').on('shown.bs.modal', function (e) {
+                var invoker = $('div[data-toolbar="device-menu-options"].pressed');
+                self.currentIdDevice = invoker.parent().attr("id-device");
+                self.currentImei = invoker.parent().attr("imei");
+
+                $('#historical-dates').daterangepicker({
+                    timePicker: true,
+                    "timePicker24Hour": true,
+                    "autoApply": true,
+                    locale: {
+                        format: 'MM/DD/YYYY H:mm '
+                    },
+                    "ranges": {
+                        'Last half hour': [moment().subtract(30, 'minutes'), moment()],
+                        'Last hour': [moment().subtract(1, 'hours'), moment()],
+                        'Last three hours': [moment().subtract(3, 'hours'), moment()],
+                        'Today': [moment(), moment()],
+                        'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                        // 'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    },
+                    "alwaysShowCalendars": true,
+                    "startDate": moment().subtract(3, 'hours'),
+                    "endDate": new Date()
+                }, function(start, end, label) {
+                    console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
+                    self.start = start;
+                    self.end = end;
+                    $("#modal-historical").attr("href", '#!device/' + self.currentIdDevice + '/historical/' + self.start.format("YYYY-MM-DD H:mm") + '/' + self.end.format("YYYY-MM-DD H:mm"));
+                });
+                var drp = $('#historical-dates').data('daterangepicker');
+                self.start = drp.startDate;
+                self.end = drp.endDate;
+                $("#modal-historical").attr("href", '#!device/' + self.currentIdDevice + '/historical/' + self.start.format("YYYY-MM-DD H:mm") + '/' + self.end.format("YYYY-MM-DD H:mm"));
+
+            })
+            self.showRangeModal = function showRangeModal() {
+            };
             self.displayHideMenu = function displayHideMenu() {
+                $('div[data-toolbar="device-menu-options"]').toolbar({
+                    content: '#device-menu-options',
+                    position: 'right',
+                    event: 'click',
+                    hideOnClick: true
+                });
                 $("#left-menu").toggle("fast");
-            }
+            };
+            self.centerMarkerClick = function centerMarkerClick() {
+
+            };
             self.findMarkerByImei = function findMarkerByImei(imei) {
-                var markers = self.map.markers;
-                console.log(markers);
-                if(markers == undefined)
+                var m = self.markers[imei];
+                if(m == undefined)
                     return false;
-                for (var k = 0; k < markers.length; k++) {
-                    var m = markers[k];
-                    if(m.imei = imei)
-                        return m;
-                }
-                return false;
+                else
+                    return m;
             };
             self.getMap();
 
@@ -80,14 +130,13 @@ angular.module('deviceList').component('deviceList', {
                         }
                     });
                 }
+
             });
             var historical = $http.get('http://189.207.202.64:3007/api/v1/devices/1/history?start_date=2018-03-15%2011:20:00&end_date=2018-03-15%2014:20:00')
             historical.then(function(result) {
                 var historics = result.data;
                 var coordinates = [];
                 var location = {};
-                var division = historics.length/23 + 1;
-                console.log(division);
                 for(var j = 0; j < historics.length; j++){
                     var org = "";
                     var dest =  "";
