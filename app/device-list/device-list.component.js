@@ -132,46 +132,6 @@ angular.module('deviceList').component('deviceList', {
                 }
 
             });
-            var historical = $http.get('http://189.207.202.64:3007/api/v1/devices/1/history?start_date=2018-03-15%2011:20:00&end_date=2018-03-15%2014:20:00')
-            historical.then(function(result) {
-                var historics = result.data;
-                var coordinates = [];
-                var location = {};
-                for(var j = 0; j < historics.length; j++){
-                    var org = "";
-                    var dest =  "";
-                    // if(j > 0){
-                    //     org = coordinates[coordinates.length - 1].destination;
-                    //     dest = historics[j].lat + ", " + historics[j].lng;
-                    // }else{
-                    //     org = historics[j].lat + ", " + historics[j].lng;
-                    //     dest = historics[j+1].lat + ", " + historics[j+1].lng;
-                    // }
-                    // alert(org + " -- " + dest);
-                    if(historics[j].lat === undefined)
-                        continue;
-                    // location = {
-                    //     lat: parseFloat(historics[j].lat),
-                    //     lng: parseFloat(historics[j].lng)
-                    // };
-
-                    var point = [parseFloat(historics[j].lat), parseFloat(historics[j].lng)];
-                    coordinates.push(point);
-
-                    // if(coordinates.length > 1 && direction.origin == direction.destination){
-                    //     console.log("equalssssss");
-                    //     continue;
-                    // }
-                    // coordinates.push({location: location, stopover: true});
-                }
-
-
-                // self.originLocation = historics[0].lat + ", " + historics[0].lng;
-                // self.destinationLocation = historics[historics.length-1].lat + ", " + historics[historics.length-1].lng;
-                self.coordinates = coordinates;
-                // console.log(self.coordinates);
-                // console.log(self.wayPoints);
-            });
         }
     ]
 });
