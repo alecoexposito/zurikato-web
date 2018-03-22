@@ -53,7 +53,7 @@ angular.module('deviceList').component('deviceList', {
                     "autoApply": true,
                     locale: {
                         format: 'MM/DD/YYYY H:mm ',
-                        applyLabel: '<i class="fa fa-chart-line"></i> Go'
+                        applyLabel: '<i class="fa fa-arrow-right"></i> Go'
                     },
                     // "ranges": {
                     //     // 'Last half hour': [moment().subtract(30, 'minutes'), moment()],
