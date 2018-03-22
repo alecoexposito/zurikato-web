@@ -9,11 +9,17 @@
           </button>
         </div>
         <div class="modal-body">
-          <input id="historical-dates" type="text" class="form-control" />
+          <button ng-click="$ctrl.historicalRangeClick('today')" class="btn btn-small btn-primary"><i class="fa fa-calendar-check"></i> Today</button>
+          <button ng-click="$ctrl.historicalRangeClick('yesterday')" class="btn btn-small btn-primary" href=""><i class="fa fa-calendar"></i> Yesterday</button>
+          <button id="historical-custom" class="btn btn-small btn-primary" ng-click="$ctrl.historicalCustomClick()">
+            <i class="fa fa-road"></i> Custom
+          </button>
+
+          <input id="historical-dates" type="text" class="form-control mt-1" style="display: none;"/>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <a id="modal-historical" target="_blank" href="" class="btn btn-primary"><i class="fa fa-road"> Watch historical</i></a>
+          <!--<a id="modal-historical" target="_blank" href="" class="btn btn-primary"><i class="fa fa-road"> Watch historical</i></a>-->
         </div>
       </div>
     </div>
@@ -67,7 +73,7 @@
             <ul class="list-group">
               <li class="list-group-item"><h6>Devices</h6></li>
               <li class="list-group-item" ng-repeat="device in $ctrl.devices" id-device="{{device.idDevice}}" imei="{{device.auth_device}}">
-                {{device.label}}({{device.device_model.label}})
+                <span ng-click="$ctrl.markerOptionClick(device.auth_device)" style="cursor: pointer; width: 100%;">{{device.label}}({{device.device_model.label}})</span>
                 <div data-toolbar="device-menu-options" id="{{device.idDevice}}" class="float-right  mt-2 ml-2 test-toolbar" data-toolbar-style="dark">
                   <i class="fa fa-cog" style="font-size: 12px; cursor: pointer;"></i>
                 </div>

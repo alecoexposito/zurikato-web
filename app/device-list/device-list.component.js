@@ -10,6 +10,9 @@ angular.module('deviceList').component('deviceList', {
             self.end = null;
             self.currentIdDevice = null;
             self.currentImei = null;
+            self.todayStart = moment().set({hour:0,minute:0,second:0,millisecond:0});
+            self.yesterdayStart = moment().subtract(1, 'days').set({hour:0,minute:0,second:0,millisecond:0});
+            self.yesterdayEnd = moment().subtract(1, 'days').set({hour:23,minute:59,second:0,millisecond:0});
             this.googleMapsUrl = "https://maps.googleapis.com/maps/api/js?key=AIzaSyBHsRJFKmB3_E_DGrluQKMRIYNdT8v8CwI";
             self.getMap = function getMap() {
                 NgMap.getMap().then(function (map) {
@@ -19,10 +22,19 @@ angular.module('deviceList').component('deviceList', {
                     return map;
                 });
             };
-            self.markerOptionClick = function markerOptionClick() {
+            self.getCurrentDate = function getCurrentDate() {
+                return moment();
+            };
+            self.markerOptionClick = function markerOptionClick(param) {
                 var invoker = $('div[data-toolbar="device-menu-options"].pressed');
-                self.currentIdDevice = invoker.parent().attr("id-device");
-                self.currentImei = invoker.parent().attr("imei");
+                console.log(invoker.length);
+                if (invoker.length > 0) {
+                    console.log("setting currentIdDevice");
+                    self.currentIdDevice = invoker.parent().attr("id-device");
+                    self.currentImei = invoker.parent().attr("imei");
+                } else {
+                    self.currentImei = param;
+                }
                 var m = self.findMarkerByImei(self.currentImei);
                 var lat = m.getPosition().lat();
                 var lng = m.getPosition().lng();
@@ -31,39 +43,60 @@ angular.module('deviceList').component('deviceList', {
             $('#myModal').on('shown.bs.modal', function (e) {
                 var invoker = $('div[data-toolbar="device-menu-options"].pressed');
                 self.currentIdDevice = invoker.parent().attr("id-device");
+                console.log("current id device: " + self.currentIdDevice);
                 self.currentImei = invoker.parent().attr("imei");
 
-                $('#historical-dates').daterangepicker({
+                $('#historical-custom').daterangepicker({
+                    opens: "center",
                     timePicker: true,
                     "timePicker24Hour": true,
                     "autoApply": true,
                     locale: {
-                        format: 'MM/DD/YYYY H:mm '
+                        format: 'MM/DD/YYYY H:mm ',
+                        applyLabel: '<i class="fa fa-chart-line"></i> Go'
                     },
-                    "ranges": {
-                        'Last half hour': [moment().subtract(30, 'minutes'), moment()],
-                        'Last hour': [moment().subtract(1, 'hours'), moment()],
-                        'Last three hours': [moment().subtract(3, 'hours'), moment()],
-                        'Today': [moment(), moment()],
-                        'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-                        // 'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                    },
+                    // "ranges": {
+                    //     // 'Last half hour': [moment().subtract(30, 'minutes'), moment()],
+                    //     // 'Last hour': [moment().subtract(1, 'hours'), moment()],
+                    //     // 'Last three hours': [moment().subtract(3, 'hours'), moment()],
+                    //     'Today': [moment().set({hour:0,minute:0,second:0,millisecond:0}), moment()],
+                    //     'Yesterday': [moment().subtract(1, 'days').set({hour:0,minute:0,second:0,millisecond:0} ), moment().set({hour:23,minute:59,second:0,millisecond:0}).subtract(1, 'days')],
+                    //     // 'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    // },
                     "alwaysShowCalendars": true,
                     "startDate": moment().subtract(3, 'hours'),
-                    "endDate": new Date()
+                    "endDate": moment()
                 }, function(start, end, label) {
-                    console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')');
+                    console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
                     self.start = start;
                     self.end = end;
-                    $("#modal-historical").attr("href", '#!device/' + self.currentIdDevice + '/historical/' + self.start.format("YYYY-MM-DD H:mm") + '/' + self.end.format("YYYY-MM-DD H:mm"));
+                    window.open('#!device/' + self.currentIdDevice + '/historical/' + self.start.format("YYYY-MM-DD H:mm") + '/' + self.end.format("YYYY-MM-DD H:mm"),'_blank');
+                    // $("#modal-historical").attr("href", '#!device/' + self.currentIdDevice + '/historical/' + self.start.format("YYYY-MM-DD H:mm") + '/' + self.end.format("YYYY-MM-DD H:mm"));
+                    $('#myModal').modal('hide');
                 });
-                var drp = $('#historical-dates').data('daterangepicker');
+                var drp = $('#historical-custom').data('daterangepicker');
                 self.start = drp.startDate;
                 self.end = drp.endDate;
-                $("#modal-historical").attr("href", '#!device/' + self.currentIdDevice + '/historical/' + self.start.format("YYYY-MM-DD H:mm") + '/' + self.end.format("YYYY-MM-DD H:mm"));
+                // $("#modal-historical").attr("href", '#!device/' + self.currentIdDevice + '/historical/' + self.start.format("YYYY-MM-DD H:mm") + '/' + self.end.format("YYYY-MM-DD H:mm"));
 
             })
             self.showRangeModal = function showRangeModal() {
+            };
+            self.historicalRangeClick = function historicalRangeClick(range) {
+                if(range == "today"){
+                    self.start = moment().set({hour:0,minute:0,second:0,millisecond:0});
+                    self.end = moment();
+                }else {
+                    self.start = moment().subtract(1, 'days').set({hour:0,minute:0,second:0,millisecond:0});
+                    self.end = moment().subtract(1, 'days').set({hour:23,minute:59,second:0,millisecond:0});
+                }
+                var linkUrl = '#!device/' + self.currentIdDevice + '/historical/' + self.start.format("YYYY-MM-DD H:mm") + '/' + self.end.format("YYYY-MM-DD H:mm");
+                $('#myModal').modal('hide');
+                window.open(linkUrl, '_blank');
+            };
+            self.historicalCustomClick = function historicalCustomClick() {
+                // $('#historical-dates').show("fast");
+                $('#historical-custom').data('daterangepicker').toggle();
             };
             self.displayHideMenu = function displayHideMenu() {
                 $('div[data-toolbar="device-menu-options"]').toolbar({
