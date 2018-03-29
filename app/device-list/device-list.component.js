@@ -148,7 +148,8 @@ angular.module('deviceList').component('deviceList', {
                         map: self.map,
                         title: device.label,
                         id: device.idDevice,
-                        imei: device.auth_device
+                        imei: device.auth_device,
+                        icon: "/img/car-marker48.png",
                     });
                     self.markers[device.auth_device] = m;
 
