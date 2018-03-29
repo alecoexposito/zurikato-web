@@ -4,7 +4,7 @@ angular.
   module('core.device').
   factory('Device', ['$resource',
     function($resource) {
-      return $resource('http://189.207.202.64:3007/api/v1/users/2/devices', {}, {
+      return $resource('http://189.207.202.64:3007/api/v1/users/3/devices', {}, {
         query: {
           method: 'GET',
           // params: {phoneId: 'phones'},
