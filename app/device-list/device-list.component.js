@@ -84,11 +84,11 @@ angular.module('deviceList').component('deviceList', {
             };
             self.historicalRangeClick = function historicalRangeClick(range) {
                 if(range == "today"){
-                    self.start = moment().set({hour:0,minute:0,second:0,millisecond:0});
-                    self.end = moment();
+                    self.start = moment.utc().set({hour:0,minute:0,second:0,millisecond:0});
+                    self.end = moment.utc();
                 }else {
-                    self.start = moment().subtract(1, 'days').set({hour:0,minute:0,second:0,millisecond:0});
-                    self.end = moment().subtract(1, 'days').set({hour:23,minute:59,second:0,millisecond:0});
+                    self.start = moment.utc().subtract(1, 'days').set({hour:0,minute:0,second:0,millisecond:0});
+                    self.end = moment.utc().subtract(1, 'days').set({hour:23,minute:59,second:0,millisecond:0});
                 }
                 var linkUrl = '#!device/' + self.currentIdDevice + '/historical/' + self.start.format("YYYY-MM-DD H:mm") + '/' + self.end.format("YYYY-MM-DD H:mm");
                 $('#myModal').modal('hide');
