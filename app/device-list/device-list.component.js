@@ -3,9 +3,10 @@
 // Register `deviceList` component, along with its associated controller and template
 angular.module('deviceList').component('deviceList', {
     templateUrl: 'device-list/device-list.template.html',
-    controller: ['Device', '$http', 'NgMap',
-        function DeviceListController(Device, $http, NgMap) {
+    controller: ['Device', '$http', 'NgMap', '$localStorage',
+        function DeviceListController(Device, $http, NgMap, $localStorage) {
             var self = this;
+            self.currentUser = $localStorage.currentUser;
             self.start = null;
             self.end = null;
             self.currentIdDevice = null;
@@ -140,7 +141,7 @@ angular.module('deviceList').component('deviceList', {
             // });
 
             self.markers = [];
-            this.devices = Device.query(function(devices){
+            this.devices = Device.query({userId: $localStorage.currentUser.id}, function(devices){
                 for(var i = 0; i < devices.length; i++){
                     var device = devices[i];
                     var m = new google.maps.Marker({

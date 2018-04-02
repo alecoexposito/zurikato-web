@@ -54,7 +54,7 @@
            map-lazy-load-params="{{$ctrl.googleMapsUrl}}">
         <ng-map center="[{{$ctrl.devices[0].peripheral_gps_data[0].lat}}, {{$ctrl.devices[0].peripheral_gps_data[0].lng}}]" zoom="10">
           <custom-control id="triguer-control" position="LEFT" index="2" class="ml-3 mb-3" on-click="$ctrl.displayHideMenu()" >
-            <button id='trigger' class="btn btn-secondary btn-small"><i class="fa fa-bars"></i></button>
+            <button id='trigger' class="btn btn-secondary btn-small"><i class="fa fa-bars"></i> </button>
           </custom-control>
           <custom-control id="right-menu" position="TOP_RIGHT" index="1">
             <div class="mr-3 mt-3">
