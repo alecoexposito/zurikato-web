@@ -4,7 +4,7 @@ angular.
   module('core.device').
   factory('Device', ['$resource', '$localStorage',
     function($resource, $localStorage) {
-      return $resource('http://189.207.202.64:3007/api/v1/users/:userId/groups', {}, {
+      return $resource('http://189.207.202.64:3007/api/v1/users/:userId/devices', {}, {
         query: {
           method: 'GET',
           isArray: true,
