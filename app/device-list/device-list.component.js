@@ -85,13 +85,13 @@ angular.module('deviceList').component('deviceList', {
             };
             self.historicalRangeClick = function historicalRangeClick(range) {
                 if(range == "today"){
-                    self.start = moment.utc().set({hour:0,minute:0,second:0,millisecond:0});
-                    self.end = moment.utc();
+                    self.start = moment().set({hour:0,minute:0,second:0,millisecond:0}).utc();
+                    self.end = moment().utc();
                 }else {
-                    self.start = moment.utc().subtract(1, 'days').set({hour:0,minute:0,second:0,millisecond:0});
-                    self.end = moment.utc().subtract(1, 'days').set({hour:23,minute:59,second:0,millisecond:0});
+                    self.start = moment().subtract(1, 'days').set({hour:0,minute:0,second:0,millisecond:0}).utc();
+                    self.end = moment().subtract(1, 'days').set({hour:23,minute:59,second:0,millisecond:0}).utc();
                 }
-                var linkUrl = '#!device/' + self.currentIdDevice + '/historical/' + self.start.format("YYYY-MM-DD H:mm") + '/' + self.end.format("YYYY-MM-DD H:mm");
+                var linkUrl = '#!device/' + self.currentIdDevice + '/historical/' + moment(self.start).utc().format("YYYY-MM-DD H:mm") + '/' + moment(self.end).utc().format("YYYY-MM-DD H:mm");
                 $('#myModal').modal('hide');
                 window.open(linkUrl, '_blank');
             };
