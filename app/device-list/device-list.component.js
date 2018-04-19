@@ -15,6 +15,56 @@ angular.module('deviceList').component('deviceList', {
             self.yesterdayStart = moment().subtract(1, 'days').set({hour:0,minute:0,second:0,millisecond:0});
             self.yesterdayEnd = moment().subtract(1, 'days').set({hour:23,minute:59,second:0,millisecond:0});
             this.googleMapsUrl = "https://maps.googleapis.com/maps/api/js?key=AIzaSyBHsRJFKmB3_E_DGrluQKMRIYNdT8v8CwI";
+
+            self.groups = [];
+            var groupsQuery = $http.get('http://189.207.202.64:3007/api/v1/users/' + $localStorage.currentUser.id + '/groups');
+            groupsQuery.then(function(result) {
+                // self.groups = result.data;
+                for(var i = 0; i < result.data.length; i++) {
+                    // console.log(result.data[i]);
+                    self.addToGroups(result.data[i]);
+                }
+                console.log(self.groups);
+            });
+
+            self.addToGroups = function addToGroups(data) {
+                for(var j = 0; j < self.groups.length; j++) {
+                    var g = self.groups [j];
+                    var groupId = data.group_id != undefined ? data.group_id : -1;
+                    if(g.group_id == groupId) {
+                        g.devices.push({
+                            id: data.device_id,
+                            label: data.device_label,
+                            auth_device: data.auth_device
+                        });
+                        return;
+                    }
+                }
+                groupId = -1;
+                if(data.group_id != undefined) {
+                    groupId = data.group_id;
+                    self.groups.unshift({
+                        group_id: groupId,
+                        group_label: groupId == -1 ? 'No Group' : data.group_label,
+                        devices: [{
+                            id: data.device_id,
+                            label: data.device_label,
+                            auth_device: data.auth_device
+                        }]
+                    });
+                } else
+                    self.groups.push({
+                        group_id: groupId,
+                        group_label: groupId == -1 ? 'No Group' : data.group_label,
+                        devices: [{
+                            id: data.device_id,
+                            label: data.device_label,
+                            auth_device: data.auth_device
+                        }]
+                    });
+
+            };
+
             self.getMap = function getMap() {
                 NgMap.getMap().then(function (map) {
                     // console.log(map.getCenter());
@@ -122,6 +172,7 @@ angular.module('deviceList').component('deviceList', {
 
             // web sockets code
             self.options = {
+                secure: false,
                 hostname: "189.207.202.64",
                 port: 3001
             };
@@ -129,6 +180,7 @@ angular.module('deviceList').component('deviceList', {
             //     hostname: "189.207.202.64",
             //     port: 3001
             // };
+            console.log("Trying to connect");
             var socket = socketCluster.connect(self.options);
             socket.on('connect', function () {
                 console.log('CONNECTED');
@@ -144,6 +196,10 @@ angular.module('deviceList').component('deviceList', {
             this.devices = Device.query({userId: $localStorage.currentUser.id}, function(devices){
                 for(var i = 0; i < devices.length; i++){
                     var device = devices[i];
+                    if(device.peripheral_gps_data[0] == undefined)
+                        continue;
+                    self.initialLatitude = device.peripheral_gps_data[0].lat;
+                    self.initialLongitude = device.peripheral_gps_data[0].lng;
                     var m = new google.maps.Marker({
                         position: new google.maps.LatLng(device.peripheral_gps_data[0].lat,device.peripheral_gps_data[0].lng),
                         map: self.map,

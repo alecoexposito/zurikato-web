@@ -52,7 +52,7 @@
       <!--Body content-->
       <div class="index-map" map-lazy-load="https://maps.google.com/maps/api/js"
            map-lazy-load-params="{{$ctrl.googleMapsUrl}}">
-        <ng-map center="[{{$ctrl.devices[0].peripheral_gps_data[0].lat}}, {{$ctrl.devices[0].peripheral_gps_data[0].lng}}]" zoom="10">
+        <ng-map center="[{{$ctrl.initialLatitude}}, {{$ctrl.initialLongitude}}]" zoom="10">
           <custom-control id="triguer-control" position="LEFT" index="2" class="ml-3 mb-3" on-click="$ctrl.displayHideMenu()" >
             <button id='trigger' class="btn btn-secondary btn-small"><i class="fa fa-bars"></i> </button>
           </custom-control>
@@ -69,12 +69,24 @@
           <custom-control id="left-menu-control" position="LEFT" index="1">
             <div id="left-menu">
             <ul class="list-group" style="overflow-y: scroll; max-height: 500px">
-              <li class="list-group-item"><h6>Devices</h6></li>
-              <li class="list-group-item" ng-repeat="device in $ctrl.devices" id-device="{{device.idDevice}}" imei="{{device.auth_device}}">
-                <span ng-click="$ctrl.markerOptionClick(device.auth_device)" style="cursor: pointer; width: 100%;">{{device.label}}({{device.device_model.label}})</span>
-                <div data-toolbar="device-menu-options" id="{{device.idDevice}}" class="float-right  mt-2 ml-2 test-toolbar" data-toolbar-style="dark">
-                  <i class="fa fa-cog" style="font-size: 12px; cursor: pointer;"></i>
+              <li class="list-group-item"><h6>Groups</h6></li>
+              <ul class="list-group" ng-repeat="group in $ctrl.groups" id="{{group.group_id}}">
+                <a class="text-muted" style="text-decoration: none;" data-toggle="collapse" href=".group-{{group.group_id}}"><li class="list-group-item"><h6>{{group.group_label}}</h6></li></a>
+                <div class="collapse group-{{group.group_id}}">
+                  <li class="list-group-item " ng-repeat="device in group.devices" id-device="{{device.id}}" imei="{{device.auth_device}}">
+                    <span ng-click="$ctrl.markerOptionClick(device.auth_device)" style="cursor: pointer; width: 100%;">{{device.label}} ({{device.auth_device}})</span>
+                    <div data-toolbar="device-menu-options" id="{{device.id}}" class="float-right  mt-2 ml-2 test-toolbar" data-toolbar-style="dark">
+                      <i class="fa fa-cog" style="font-size: 12px; cursor: pointer;"></i>
+                    </div>
+                  </li>
                 </div>
+              </ul>
+              <!--<li class="list-group-item" ng-repeat="device in $ctrl.devices" id-device="{{device.idDevice}}" imei="{{device.auth_device}}">-->
+                <!--<span ng-click="$ctrl.markerOptionClick(device.auth_device)" style="cursor: pointer; width: 100%;">{{device.label}}({{device.device_model.label}})</span>-->
+                <!--<div data-toolbar="device-menu-options" id="{{device.idDevice}}" class="float-right  mt-2 ml-2 test-toolbar" data-toolbar-style="dark">-->
+                  <!--<i class="fa fa-cog" style="font-size: 12px; cursor: pointer;"></i>-->
+                <!--</div>-->
+              <!--</li>-->
 
                   <!--<a target="_blank" href="#!/device/{{device.idDevice}}/historical" class="btn btn-secondary btn-small" style="border-radius: 25px"><i class="fa fa-map"></i></a>-->
                 <!--<p>Id: {{device.idDevice}}</p>-->
@@ -82,7 +94,6 @@
                 <!--<p>Label: {{device.label}}</p>-->
                 <!--<p>Model: {{device.device_model.label}}</p>-->
                 <!--<p>Coordenates: Lat: {{device.peripheral_gps_data[0].lat}} Long: {{device.peripheral_gps_data[0].lng}}</p>-->
-              </li>
               <!--<li class="list-group-item">Cras justo odio</li>-->
               <!--<li class="list-group-item">Dapibus ac facilisis in</li>-->
               <!--<li class="list-group-item">Morbi leo risus</li>-->

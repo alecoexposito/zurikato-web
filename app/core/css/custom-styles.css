@@ -25,3 +25,11 @@ ng-map {width:100%; height:100%;position: absolute;}
 /*ngmap {*/
     /*width: 100%;*/
 /*}*/
+
+/*.collapse {*/
+    /*display: none !important;*/
+/*}*/
+
+/*.collapse.show {*/
+    /*display: block !important;*/
+/*}*/
