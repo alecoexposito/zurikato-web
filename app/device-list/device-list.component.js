@@ -69,6 +69,7 @@ angular.module('deviceList').component('deviceList', {
                 NgMap.getMap().then(function (map) {
                     // console.log(map.getCenter());
                     // console.log('shapes', map.shapes);
+                    console.log("here we get the map: ", map);
                     self.map = map;
                     return map;
                 });
