@@ -70,7 +70,10 @@ angular.module('deviceList').component('deviceList', {
                     // console.log(map.getCenter());
                     // console.log('shapes', map.shapes);
                     self.map = map;
-                    console.log("here we get the map: ", self.map);
+                    if(self.devices.length > 0) {
+                        self.initializeMarkers(self.devices);
+                    }
+                    console.log("map initialized");
                     return map;
                 });
             };
@@ -194,7 +197,15 @@ angular.module('deviceList').component('deviceList', {
             // });
 
             self.markers = [];
+            self.markersInitialized = false;
             this.devices = Device.query({userId: $localStorage.currentUser.id}, function(devices){
+                if(self.map != undefined)
+                    self.initializeMarkers(devices);
+
+
+            });
+
+            self.initializeMarkers = function initializeMarkers(devices) {
                 for(var i = 0; i < devices.length; i++){
                     var device = devices[i];
                     if(device.peripheral_gps_data[0] == undefined)
@@ -204,7 +215,7 @@ angular.module('deviceList').component('deviceList', {
                     console.log("going to create the marker: ", self.map);
                     var m = new google.maps.Marker({
                         position: new google.maps.LatLng(device.peripheral_gps_data[0].lat,device.peripheral_gps_data[0].lng),
-                        map: self.getMap(),
+                        map: self.map,
                         title: device.label,
                         id: device.idDevice,
                         imei: device.auth_device,
@@ -223,8 +234,8 @@ angular.module('deviceList').component('deviceList', {
                         }
                     });
                 }
-
-            });
+                self.markersInitialized = true;
+            };
         }
     ]
 });
