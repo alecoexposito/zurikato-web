@@ -202,7 +202,7 @@ angular.module('deviceList').component('deviceList', {
                     self.initialLongitude = device.peripheral_gps_data[0].lng;
                     var m = new google.maps.Marker({
                         position: new google.maps.LatLng(device.peripheral_gps_data[0].lat,device.peripheral_gps_data[0].lng),
-                        map: self.map,
+                        map: self.getMap(),
                         title: device.label,
                         id: device.idDevice,
                         imei: device.auth_device,
