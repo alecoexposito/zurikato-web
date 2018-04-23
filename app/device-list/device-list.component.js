@@ -69,8 +69,8 @@ angular.module('deviceList').component('deviceList', {
                 NgMap.getMap().then(function (map) {
                     // console.log(map.getCenter());
                     // console.log('shapes', map.shapes);
-                    console.log("here we get the map: ", map);
                     self.map = map;
+                    console.log("here we get the map: ", self.map);
                     return map;
                 });
             };
@@ -201,6 +201,7 @@ angular.module('deviceList').component('deviceList', {
                         continue;
                     self.initialLatitude = device.peripheral_gps_data[0].lat;
                     self.initialLongitude = device.peripheral_gps_data[0].lng;
+                    console.log("going to create the marker: ", self.map);
                     var m = new google.maps.Marker({
                         position: new google.maps.LatLng(device.peripheral_gps_data[0].lat,device.peripheral_gps_data[0].lng),
                         map: self.getMap(),
