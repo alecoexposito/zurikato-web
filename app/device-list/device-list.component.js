@@ -225,7 +225,7 @@ angular.module('deviceList').component('deviceList', {
 
                     console.log("matching device: " + devices[i].auth_device);
                     var g = socket.subscribe(devices[i].auth_device);
-                    var alarmsSocket = socket.subscribe("alarms_"devices[i].auth_device);
+                    var alarmsSocket = socket.subscribe("alarms_" + devices[i].auth_device);
                     g.watch(function(data) {
                         console.log(data);
                         var m = self.markers[data.device_id];
