@@ -225,6 +225,7 @@ angular.module('deviceList').component('deviceList', {
 
                     console.log("matching device: " + devices[i].auth_device);
                     var g = socket.subscribe(devices[i].auth_device);
+                    var alarmsSocket = socket.subscribe("alarms_"devices[i].auth_device);
                     g.watch(function(data) {
                         console.log(data);
                         var m = self.markers[data.device_id];
@@ -232,6 +233,11 @@ angular.module('deviceList').component('deviceList', {
                         if(m != undefined) {
                             m.setPosition(new google.maps.LatLng( data.latitude,data.longitude));
                         }
+                    });
+
+                    alarmsSocket.watch(function(data) {
+                        console.log("entro una alarma!!!!");
+                        console.log(data);
                     });
                 }
                 self.markersInitialized = true;
