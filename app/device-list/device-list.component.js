@@ -166,12 +166,13 @@ angular.module('deviceList').component('deviceList', {
 
             };
             self.findMarkerByImei = function findMarkerByImei(imei) {
-                var m = self.markers[imei];
+                var m = $localStorage.markers[imei];
                 if(m == undefined)
                     return false;
                 else
                     return m;
             };
+
             self.getMap();
 
             // web sockets code
@@ -196,7 +197,7 @@ angular.module('deviceList').component('deviceList', {
             //     console.log(socketBB.state);
             // });
 
-            self.markers = [];
+            $localStorage.markers = [];
             self.markersInitialized = false;
             this.devices = Device.query({userId: $localStorage.currentUser.id}, function(devices){
                 if(self.map != undefined)
@@ -221,14 +222,14 @@ angular.module('deviceList').component('deviceList', {
                         imei: device.auth_device,
                         icon: "/img/car-marker48.png",
                     });
-                    self.markers[device.auth_device] = m;
+                    $localStorage.markers[device.auth_device] = m;
 
                     console.log("matching device: " + devices[i].auth_device);
                     var g = socket.subscribe(devices[i].auth_device);
                     var alarmsSocket = socket.subscribe("alarms_" + devices[i].auth_device);
                     g.watch(function(data) {
                         console.log(data);
-                        var m = self.markers[data.device_id];
+                        var m = $localStorage.markers[data.device_id];
                         console.log(m);
                         if(m != undefined) {
                             m.setPosition(new google.maps.LatLng( data.latitude,data.longitude));

@@ -5,7 +5,7 @@
         .module('phonecatApp')
         .controller('Login.IndexController', Controller);
 
-    function Controller($location, AuthenticationService) {
+    function Controller($location, AuthenticationService, $localStorage) {
         var vm = this;
 
         vm.login = login;
@@ -14,7 +14,8 @@
 
         function initController() {
             // reset login status
-
+            // console.log(Object.keys($localStorage.markers));
+            clearMarkers();
             AuthenticationService.Logout();
         }
 
@@ -28,6 +29,16 @@
                     vm.loading = false;
                 }
             });
+        }
+
+       function clearMarkers() {
+           Object.keys($localStorage.markers).forEach(function(key, index) {
+               this[key].setMap(null);
+               delete this[key];
+
+           }, $localStorage.markers);
+           console.log("markers cleared ");
+           // console.log($localStorage.markers);
         }
     }
 })();
