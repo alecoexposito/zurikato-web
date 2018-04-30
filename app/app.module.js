@@ -10,5 +10,6 @@ angular.module('phonecatApp', [
   'phoneList',
   'deviceList',
   'deviceHistorical',
-  'ngStorage'
+  'deviceAlarm',
+  'ngStorage',
 ]);

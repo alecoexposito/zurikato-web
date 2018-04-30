@@ -161,9 +161,19 @@ angular.module('deviceList').component('deviceList', {
                     hideOnClick: true
                 });
                 $("#left-menu").toggle("fast");
+                console.log("opening alarm window");
             };
             self.centerMarkerClick = function centerMarkerClick() {
 
+            };
+            self.openAlarm = function openAlarm(alarm) {
+                var alarmType = alarm.device_info;
+                var imei = alarm.device_id;
+                var latitude = alarm.latitude;
+                var longitude = alarm.longitude;
+                console.log("opening tab: ", latitude);
+                var linkUrl = '#!device/alarm/' + latitude + "/" + longitude + "/" + imei;
+                window.open(linkUrl, '_blank');
             };
             self.findMarkerByImei = function findMarkerByImei(imei) {
                 var m = $localStorage.markers[imei];
@@ -239,6 +249,7 @@ angular.module('deviceList').component('deviceList', {
                     alarmsSocket.watch(function(data) {
                         console.log("entro una alarma!!!!");
                         console.log(data);
+                        self.openAlarm(data);
                     });
                 }
                 self.markersInitialized = true;

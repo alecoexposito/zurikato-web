@@ -19,6 +19,9 @@ angular.
         when('/device/:deviceId/historical/:start/:end', {
             template: '<device-historical></device-historical>'
         }).
+        when('/device/alarm/:latitude/:longitude/:imei', {
+            template: '<device-alarm></device-alarm>'
+        }).
         when('/login', {
           templateUrl: 'login/index.view.html',
           controller: 'Login.IndexController',

@@ -44,8 +44,19 @@ angular.module('deviceHistorical').component('deviceHistorical', {
             self.drawHistorical = function drawHistorical(historical, pos){
 
                 var len = historical.length;
-                if(pos == len)
+                if(pos == len) {
+                    var lastPos = len - 1;
+                    var endMarker = new google.maps.Marker({
+                        position: new google.maps.LatLng(parseFloat(historical[lastPos].lat),parseFloat(historical[lastPos].lng)),
+                        map: self.map,
+                        label: 'B',
+                        // id: device.idDevice,
+                        // imei: device.auth_device,
+                        // icon: "/img/car-marker48.png",
+                    });
                     return;
+
+                }
 
                 var point = [parseFloat(historical[pos].lat), parseFloat(historical[pos].lng)];
                 self.coordinates.push(point);
@@ -64,6 +75,15 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                     return;
                 }
                 self.drawHistorical(historics, 0);
+                var beginMarker = new google.maps.Marker({
+                    position: new google.maps.LatLng(parseFloat(historics[0].lat),parseFloat(historics[0].lng)),
+                    map: self.map,
+                    label: 'A',
+                    // id: device.idDevice,
+                    // imei: device.auth_device,
+                    // icon: "/img/car-marker48.png",
+                });
+
             });
         }
     ]
