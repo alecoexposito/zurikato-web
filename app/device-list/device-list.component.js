@@ -167,13 +167,15 @@ angular.module('deviceList').component('deviceList', {
 
             };
             self.openAlarm = function openAlarm(alarm) {
+                console.log("in method: ", alarm);
                 var alarmType = alarm.device_info;
                 var imei = alarm.device_id;
                 var latitude = alarm.latitude;
                 var longitude = alarm.longitude;
                 console.log("opening tab: ", latitude);
                 var linkUrl = '#!device/alarm/' + latitude + "/" + longitude + "/" + imei;
-                window.open(linkUrl, '_blank');
+                console.log(linkUrl);
+                var w = window.open(linkUrl, 'newwindow', 'width=1024,height=768');
             };
             self.findMarkerByImei = function findMarkerByImei(imei) {
                 var m = $localStorage.markers[imei];
