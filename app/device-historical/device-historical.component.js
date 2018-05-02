@@ -81,7 +81,7 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                     label: 'A',
                     // id: device.idDevice,
                     // imei: device.auth_device,
-                    icon: "/img/car-marker48.png",
+                    // icon: "/img/car-marker48.png",
                 });
 
             });
