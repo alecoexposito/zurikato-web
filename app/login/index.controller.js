@@ -32,8 +32,11 @@
         }
 
        function clearMarkers() {
+            if($localStorage.markers == undefined)
+                return;
            Object.keys($localStorage.markers).forEach(function(key, index) {
                this[key].setMap(null);
+
                delete this[key];
 
            }, $localStorage.markers);
