@@ -46,6 +46,8 @@
         }
 
         function clearDevices() {
+            if($localStorage.devices == undefined)
+                return;
             for (var k = 0; k < $localStorage.devices.length; k++) {
                 var d = $localStorage.devices[k];
                 vm.socket.unsubscribe(d.auth_device);
