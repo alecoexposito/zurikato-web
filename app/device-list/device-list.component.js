@@ -250,8 +250,9 @@ angular.module('deviceList').component('deviceList', {
                     self.initialLatitude = device.peripheral_gps_data[0].lat;
                     self.initialLongitude = device.peripheral_gps_data[0].lng;
                     console.log("going to create the marker: ", self.map);
-                    var local = moment.utc(device.peripheral_gps_data[0].updatedAt).toDate()
-                    var lastUpdate = moment(local).format("YYYY-MM-DD HH:mm:ss")
+                    var local = moment.utc(device.peripheral_gps_data[0].updatedAt).toDate();
+                    var lastUpdate = moment(local).format("YYYY-MM-DD HH:mm:ss");
+                    var speed = (device.peripheral_gps_data[0].speed * 3600)/1000;
                     var m = new google.maps.Marker({
                         position: new google.maps.LatLng(device.peripheral_gps_data[0].lat,device.peripheral_gps_data[0].lng),
                         map: self.map,
@@ -259,7 +260,7 @@ angular.module('deviceList').component('deviceList', {
                         id: device.idDevice,
                         imei: device.auth_device,
                         icon: "/img/car-marker48.png",
-                        speed: device.peripheral_gps_data[0].speed,
+                        speed: speed,
                         lastUpdate: lastUpdate
                     });
                     var infoWindow = new google.maps.InfoWindow({
@@ -330,7 +331,7 @@ angular.module('deviceList').component('deviceList', {
                 console.log("device found: ", d);
                 // var local = moment.utc(d.peripheral_gps_data[0].updatedAt).toDate();
                 // var lastUpdate = moment(local).format("YYYY-MM-DD HH:mm:ss");
-                // var speed = (d.peripheral_gps_data[0].speed * 3600)/1000;
+                var speed = (d.peripheral_gps_data[0].speed * 3600)/1000;
                 var contentDetail = "<div>" +
                     "<p class='text-muted'>" +
                     "" + m.title + "</p>" +

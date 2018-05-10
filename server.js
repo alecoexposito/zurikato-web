@@ -1,11 +1,11 @@
 var express = require('express');  
 var app = express();
-var bodyParser = require('body-parser');
+// var bodyParser = require('body-parser');
 var net = require('net');
 
 app.use(express.static("app"));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}) );
+// app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({extended: true}) );
 
 app.all("/*", function(req, res, next){
     res.header('Access-Control-Allow-Origin', '*');
@@ -15,16 +15,18 @@ app.all("/*", function(req, res, next){
 });
 console.log("serverrrrrrrr");
 var client = new net.Socket();
-client.connect(4105, '127.0.0.1', function() {
-    console.log('Connected to socket');
-});
+
 client.on("error", function(error) {
     console.log("Problem connecting to C5 socket");
 });
 app.get('/api/alert-c5', function(req, res) {
+    client.connect(4105, '127.0.0.1', function() {
+        console.log('Connected to socket');
+    });
     res.send('yeappppp');
-    console.log(req.data);
-    client.write(req.data);
+    console.log(req.query);
+    client.write(req.query.data);
+    client.end();
 });
 
 app.get('/', function (req, res) {
