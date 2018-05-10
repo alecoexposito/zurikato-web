@@ -27,7 +27,6 @@ angular.module('deviceList').component('deviceList', {
                 }
                 // console.log(self.groups);
             });
-
             self.addToGroups = function addToGroups(data) {
                 for(var j = 0; j < self.groups.length; j++) {
                     var g = self.groups [j];
@@ -263,12 +262,22 @@ angular.module('deviceList').component('deviceList', {
                         speed: speed,
                         lastUpdate: lastUpdate
                     });
-                    var infoWindow = new google.maps.InfoWindow({
+                    var infoWindow = new SnazzyInfoWindow({
                         content: device.label,
-                        disableAutoPan: true
+                        marker: m,
+                        backgroundColor: '#1C9918',
+                        padding: '7px',
+                        openOnMarkerClick: false,
+                        closeOnMapClick: false,
+                        closeWhenOthersOpen: false,
+                        showCloseButton: false,
+                        fontColor: 'white',
+                        maxWidth: 100,
+                        pointer: '7px'
+                        // disableAutoPan: true
                     });
                     m.labelWindow = infoWindow;
-                    infoWindow.open(self.map, m);
+                    infoWindow.open();
                     google.maps.event.addListener(m, 'click', function() {
                         var lat = this.getPosition().lat();
                         var lng = this.getPosition().lng();

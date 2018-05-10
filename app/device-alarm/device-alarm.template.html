@@ -7,6 +7,13 @@
       <div class="alarm-map" map-lazy-load="https://maps.google.com/maps/api/js"
            map-lazy-load-params="{{$ctrl.googleMapsUrl}}">
         <ng-map center="[{{$ctrl.latitude}}, {{$ctrl.longitude}}]" zoom="18">
+            <custom-control id="address-control" position="TOP_CENTER" index="2" class="" style="max-width: 50%;">
+                <div class="bg-danger rounded-bottom" style="opacity: 0.7;">
+                    <h6 class="text-lg-center p-2" style="color: #FFFFFF;">Botón de Pánico Activado</h6>
+                    <p class="p-3" id="address-p" style="color: white; font-size: 14px"></p>
+                </div>
+            </custom-control>
+
             <custom-control position="TOP_RIGHT" index="1">
                 <div class="mr-3 mt-3">
                     <button class="btn btn-danger" type="button" ng-click="$ctrl.alertC5()">

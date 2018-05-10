@@ -15,6 +15,7 @@ angular.module('deviceAlarm').component('deviceAlarm', {
             self.device = window.device;
             // self.label = $routeParams.label;
             self.coordinates = [];
+            self.geocoder = new google.maps.Geocoder();
             this.googleMapsUrl = "https://maps.googleapis.com/maps/api/js?key=AIzaSyBHsRJFKmB3_E_DGrluQKMRIYNdT8v8CwI";
             self.options = {
                 secure: false,
@@ -34,20 +35,63 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                     self.m = new google.maps.Marker({
                         position: new google.maps.LatLng(self.latitude, self.longitude),
                         map: self.map,
-                        title: self.imei,
+                        title: self.device.label,
                         // id: device.idDevice,
                         imei: self.imei,
                         icon: "/img/car-marker48.png",
                     });
+                    // #1C9918
+                    var infoWindow = new SnazzyInfoWindow({
+                        content: self.m.title,
+                        marker: self.m,
+                        backgroundColor: '#D93444',
+                        padding: '7px',
+                        openOnMarkerClick: false,
+                        closeOnMapClick: false,
+                        closeWhenOthersOpen: false,
+                        showCloseButton: false,
+                        fontColor: 'white',
+                        maxWidth: 100,
+                        pointer: '7px'
+                        // disableAutoPan: true
+                    });
+                    self.m.labelWindow = infoWindow;
+                    infoWindow.open(self.map, self.m);
+                    console.log("pidiendo dir inicial");
+                    self.getAddress(self.latitude, self.longitude, true);
                     console.log("matching device for alarm");
                     var g = self.socket.subscribe(self.imei);
                     g.watch(function (data) {
                         if (self.m != null) {
                             self.m.setPosition(new google.maps.LatLng(data.latitude, data.longitude));
+                            self.map.panTo(new google.maps.LatLng(data.latitude, data.longitude));
+                            console.log("se movio");
+                            self.getAddress(data.latitude, data.longitude, true);
                         }
                     });
 
                     return map;
+                });
+            };
+            self.getAddress = function getAddress(latitude, longitude, showOnMap) {
+                var latlng = new google.maps.LatLng(latitude, longitude);
+                self.geocoder.geocode({
+                    'latLng': latlng
+                }, function (results, status) {
+                    if (status === google.maps.GeocoderStatus.OK) {
+                        if (results[0]) {
+                            console.log(results[0]);
+                            if(showOnMap) {
+                                jQuery("#address-p").html(results[0].formatted_address);
+                                jQuery("#address-control").show("fast");
+                            }
+                            return results[0];
+                        } else {
+                            return false;
+                        }
+                    } else {
+                        return false;
+                    }
                 });
             };
             self.alertC5 = function alertC5() {
