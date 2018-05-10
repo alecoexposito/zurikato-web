@@ -9,13 +9,27 @@
         var vm = this;
 
         vm.login = login;
-
+        vm.options = {
+            secure: false,
+            hostname: "189.207.202.64",
+            port: 3001
+        };
+        vm.socket = socketCluster.connect(vm.options);
         initController();
 
         function initController() {
+
+            console.log("Trying to connect");
+
+            // $localStorage.socket = socket;
+            vm.socket.on('connect', function () {
+                console.log('CONNECTED');
+                console.log(vm.socket.state);
+            });
             // reset login status
             // console.log(Object.keys($localStorage.markers));
             clearMarkers();
+            clearDevices();
             AuthenticationService.Logout();
         }
 
@@ -31,17 +45,26 @@
             });
         }
 
-       function clearMarkers() {
-            if($localStorage.markers == undefined)
+        function clearDevices() {
+            for (var k = 0; k < $localStorage.devices.length; k++) {
+                var d = $localStorage.devices[k];
+                vm.socket.unsubscribe(d.auth_device);
+                vm.socket.unsubscribe("alarms_" + d.auth_device);
+                console.log("unmatched: ", d.auth_device);
+            }
+        }
+
+        function clearMarkers() {
+            if ($localStorage.markers == undefined)
                 return;
-           Object.keys($localStorage.markers).forEach(function(key, index) {
-               this[key].setMap(null);
+            Object.keys($localStorage.markers).forEach(function (key, index) {
+                this[key].setMap(null);
 
-               delete this[key];
+                delete this[key];
 
-           }, $localStorage.markers);
-           console.log("markers cleared ");
-           // console.log($localStorage.markers);
+            }, $localStorage.markers);
+            console.log("markers cleared ");
+            // console.log($localStorage.markers);
         }
     }
 })();

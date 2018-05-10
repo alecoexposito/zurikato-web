@@ -53,6 +53,11 @@
       <div class="index-map" map-lazy-load="https://maps.google.com/maps/api/js"
            map-lazy-load-params="{{$ctrl.googleMapsUrl}}">
         <ng-map center="[{{$ctrl.initialLatitude}}, {{$ctrl.initialLongitude}}]" zoom="10">
+          <custom-control id="address-control" position="TOP_CENTER" index="2" class="" style="display: none; max-width: 50%;">
+            <div class="bg-dark rounded-bottom" style="opacity: 0.7;">
+              <p class="p-3" id="address-p" style="color: white; font-size: 14px">----- ------- ------- ------- ------- ------ ------- ------- ------- -----</p>
+            </div>
+          </custom-control>
           <custom-control id="triguer-control" position="LEFT" index="2" class="ml-3 mb-3" on-click="$ctrl.displayHideMenu()" >
             <button id='trigger' class="btn btn-secondary btn-small"><i class="fa fa-bars"></i> </button>
           </custom-control>
@@ -74,7 +79,7 @@
                 <a class="text-muted" style="text-decoration: none;" data-toggle="collapse" href=".group-{{group.group_id}}"><li class="list-group-item"><h6>{{group.group_label}}</h6></li></a>
                 <div class="collapse group-{{group.group_id}}">
                   <li class="list-group-item " ng-repeat="device in group.devices" id-device="{{device.id}}" imei="{{device.auth_device}}">
-                    <span ng-click="$ctrl.markerOptionClick(device.auth_device)" style="cursor: pointer; width: 100%;">{{device.label}} ({{device.auth_device}})</span>
+                    <span ng-click="$ctrl.markerOptionClick(device.auth_device, $event)" style="cursor: pointer; width: 100%;">{{device.label}} ({{device.auth_device}})</span>
                     <div data-toolbar="device-menu-options" id="{{device.id}}" class="float-right  mt-2 ml-2 test-toolbar" data-toolbar-style="dark">
                       <i class="fa fa-cog" style="font-size: 12px; cursor: pointer;"></i>
                     </div>

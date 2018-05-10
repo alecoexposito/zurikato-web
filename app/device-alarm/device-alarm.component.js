@@ -2,8 +2,8 @@
 
 angular.module('deviceAlarm').component('deviceAlarm', {
     templateUrl: 'device-alarm/device-alarm.template.html',
-    controller: ['Device', '$http', '$timeout', 'NgMap', '$routeParams',
-        function DeviceAlarmController(Device, $http, $timeout, NgMap, $routeParams) {
+    controller: ['Device', '$http', '$timeout', 'NgMap', '$routeParams', '$localStorage',
+        function DeviceAlarmController(Device, $http, $timeout, NgMap, $routeParams, $localStorage) {
             var self = this;
             var map = null;
             var pos = null;
@@ -11,6 +11,8 @@ angular.module('deviceAlarm').component('deviceAlarm', {
             self.longitude = $routeParams.longitude;
             self.imei = $routeParams.imei;
             self.m = null;
+            // self.devices = $localStorage.devices;
+            self.device = window.device;
             // self.label = $routeParams.label;
             self.coordinates = [];
             this.googleMapsUrl = "https://maps.googleapis.com/maps/api/js?key=AIzaSyBHsRJFKmB3_E_DGrluQKMRIYNdT8v8CwI";
@@ -22,7 +24,7 @@ angular.module('deviceAlarm').component('deviceAlarm', {
             console.log("Trying to connect");
             self.socket = socketCluster.connect(self.options);
             self.socket.on('connect', function () {
-                console.log('CONNECTED');
+                // console.log('CONNECTED');
                 console.log(self.socket.state);
             });
             self.getMap = function getMap() {
@@ -30,7 +32,7 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                     self.map = map;
                     console.log("creating the marker for alarm");
                     self.m = new google.maps.Marker({
-                        position: new google.maps.LatLng(self.latitude,self.longitude),
+                        position: new google.maps.LatLng(self.latitude, self.longitude),
                         map: self.map,
                         title: self.imei,
                         // id: device.idDevice,
@@ -39,31 +41,35 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                     });
                     console.log("matching device for alarm");
                     var g = self.socket.subscribe(self.imei);
-                    g.watch(function(data) {
-                        if(self.m != null) {
-                            self.m.setPosition(new google.maps.LatLng( data.latitude,data.longitude));
+                    g.watch(function (data) {
+                        if (self.m != null) {
+                            self.m.setPosition(new google.maps.LatLng(data.latitude, data.longitude));
                         }
                     });
 
                     return map;
                 });
             };
-            // self.displayHideMenu = function displayHideMenu() {
-            //     $("#left-menu").toggle("fast");
-            // };
-            // self.findMarkerByImei = function findMarkerByImei(imei) {
-            //     var markers = self.map.markers;
-            //     console.log(markers);
-            //     if(markers == undefined)
-            //         return false;
-            //     for (var k = 0; k < markers.length; k++) {
-            //         var m = markers[k];
-            //         if(m.imei = imei)
-            //             return m;
-            //     }
-            //     return false;
-            // };
+            self.alertC5 = function alertC5() {
+                var d = self.device;
+                if (d == undefined) {
+                    console.log("Device undefined");
+                    return;
+                }
+                console.log("device alarmed: ", d);
+                var milisecondsMidnight = moment.utc().set({hour: 0, minute: 0, second: 0, millisecond: 0}).valueOf();
+                var milisecondsNow = moment.utc();
+                var secondsDiff = (milisecondsNow - milisecondsMidnight) / 1000;
+                var data = "P," + d.label + "," + d.sim + "," + d.auth_device + "," + d.idDevice +
+                    "," + secondsDiff + "," + self.latitude + "," + self.longitude + d.peripheral_gps_data[0].speed +
+                    "," + d.peripheral_gps_data[0].orientation_plain + 1 + 1;
+                $http.get('/api/alert-c5', data).then(function (result) {
+                    console.log(result);
+                });
+            };
+
             self.getMap();
+
         }
     ]
 });

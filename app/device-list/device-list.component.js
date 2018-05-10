@@ -15,8 +15,9 @@ angular.module('deviceList').component('deviceList', {
             self.yesterdayStart = moment().subtract(1, 'days').set({hour:0,minute:0,second:0,millisecond:0});
             self.yesterdayEnd = moment().subtract(1, 'days').set({hour:23,minute:59,second:0,millisecond:0});
             this.googleMapsUrl = "https://maps.googleapis.com/maps/api/js?key=AIzaSyBHsRJFKmB3_E_DGrluQKMRIYNdT8v8CwI";
-
+            self.geocoder = new google.maps.Geocoder();
             self.groups = [];
+            self.currentMenuImei = null;
             var groupsQuery = $http.get('http://189.207.202.64:3007/api/v1/users/' + $localStorage.currentUser.id + '/groups');
             groupsQuery.then(function(result) {
                 // self.groups = result.data;
@@ -24,7 +25,7 @@ angular.module('deviceList').component('deviceList', {
                     // console.log(result.data[i]);
                     self.addToGroups(result.data[i]);
                 }
-                console.log(self.groups);
+                // console.log(self.groups);
             });
 
             self.addToGroups = function addToGroups(data) {
@@ -70,9 +71,10 @@ angular.module('deviceList').component('deviceList', {
                     // console.log(map.getCenter());
                     // console.log('shapes', map.shapes);
                     self.map = map;
-                    if(self.devices.length > 0) {
-                        self.initializeMarkers(self.devices);
+                    if($localStorage.devices.length > 0) {
+                        self.initializeMarkers($localStorage.devices);
                     }
+                    // console.log(self.addressWindow);
                     console.log("map initialized");
                     return map;
                 });
@@ -80,7 +82,7 @@ angular.module('deviceList').component('deviceList', {
             self.getCurrentDate = function getCurrentDate() {
                 return moment();
             };
-            self.markerOptionClick = function markerOptionClick(param) {
+            self.markerOptionClick = function markerOptionClick(param, $event) {
                 var invoker = $('div[data-toolbar="device-menu-options"].pressed');
                 console.log(invoker.length);
                 if (invoker.length > 0) {
@@ -90,14 +92,26 @@ angular.module('deviceList').component('deviceList', {
                 } else {
                     self.currentImei = param;
                 }
+                console.log($event.currentTarget);
+                if(jQuery($event.currentTarget).parent().hasClass("active")) {
+                    jQuery($event.currentTarget).parent().removeClass("active");
+                    self.currentMenuImei = null;
+                }else{
+                    jQuery($event.currentTarget).closest("#left-menu").find("li").removeClass("active");
+                    jQuery($event.currentTarget).parent().addClass("active");
+                    self.currentMenuImei = param;
+                }
                 var m = self.findMarkerByImei(self.currentImei);
                 var lat = m.getPosition().lat();
                 var lng = m.getPosition().lng();
+                self.getAddress(lat, lng, true);
                 self.map.panTo(new google.maps.LatLng(lat, lng));
             };
             $('#myModal').on('shown.bs.modal', function (e) {
                 var invoker = $('div[data-toolbar="device-menu-options"].pressed');
                 self.currentIdDevice = invoker.parent().attr("id-device");
+                if(self.currentIdDevice == undefined)
+                    return;
                 console.log("current id device: " + self.currentIdDevice);
                 self.currentImei = invoker.parent().attr("imei");
 
@@ -175,7 +189,20 @@ angular.module('deviceList').component('deviceList', {
                 console.log("opening tab: ", latitude);
                 var linkUrl = '#!device/alarm/' + latitude + "/" + longitude + "/" + imei;
                 console.log(linkUrl);
+                var d = self.findDeviceByImei(imei);
                 var w = window.open(linkUrl, 'newwindow', 'width=1024,height=768');
+                w.device = d;
+            };
+            self.findDeviceByImei = function findDeviceByImei(imei) {
+                console.log($localStorage.devices);
+                if($localStorage.devices == undefined)
+                    return false;
+                for (var k = 0; k < $localStorage.devices.length; k++) {
+                    var d = $localStorage.devices[k];
+                    if(d.auth_device == imei)
+                        return d;
+                }
+                return false;
             };
             self.findMarkerByImei = function findMarkerByImei(imei) {
                 var m = $localStorage.markers[imei];
@@ -193,12 +220,9 @@ angular.module('deviceList').component('deviceList', {
                 hostname: "189.207.202.64",
                 port: 3001
             };
-            // self.optionsBB = {
-            //     hostname: "189.207.202.64",
-            //     port: 3001
-            // };
             console.log("Trying to connect");
             var socket = socketCluster.connect(self.options);
+            // $localStorage.socket = socket;
             socket.on('connect', function () {
                 console.log('CONNECTED');
                 console.log(socket.state);
@@ -211,7 +235,7 @@ angular.module('deviceList').component('deviceList', {
 
             $localStorage.markers = [];
             self.markersInitialized = false;
-            this.devices = Device.query({userId: $localStorage.currentUser.id}, function(devices){
+            $localStorage.devices = Device.query({userId: $localStorage.currentUser.id}, function(devices){
                 if(self.map != undefined)
                     self.initializeMarkers(devices);
 
@@ -226,6 +250,8 @@ angular.module('deviceList').component('deviceList', {
                     self.initialLatitude = device.peripheral_gps_data[0].lat;
                     self.initialLongitude = device.peripheral_gps_data[0].lng;
                     console.log("going to create the marker: ", self.map);
+                    var local = moment.utc(device.peripheral_gps_data[0].updatedAt).toDate()
+                    var lastUpdate = moment(local).format("YYYY-MM-DD HH:mm:ss")
                     var m = new google.maps.Marker({
                         position: new google.maps.LatLng(device.peripheral_gps_data[0].lat,device.peripheral_gps_data[0].lng),
                         map: self.map,
@@ -233,7 +259,24 @@ angular.module('deviceList').component('deviceList', {
                         id: device.idDevice,
                         imei: device.auth_device,
                         icon: "/img/car-marker48.png",
+                        speed: device.peripheral_gps_data[0].speed,
+                        lastUpdate: lastUpdate
                     });
+                    var infoWindow = new google.maps.InfoWindow({
+                        content: device.label,
+                        disableAutoPan: true
+                    });
+                    m.labelWindow = infoWindow;
+                    infoWindow.open(self.map, m);
+                    google.maps.event.addListener(m, 'click', function() {
+                        var lat = this.getPosition().lat();
+                        var lng = this.getPosition().lng();
+                        console.log(this);
+                        console.log("latlng: ", lat + "---" + lng);
+                        self.getAddress(lat, lng, true);
+                        self.openDetailInfo(this);
+                    });
+
                     $localStorage.markers[device.auth_device] = m;
 
                     console.log("matching device: " + devices[i].auth_device);
@@ -245,17 +288,63 @@ angular.module('deviceList').component('deviceList', {
                         console.log(m);
                         if(m != undefined) {
                             m.setPosition(new google.maps.LatLng( data.latitude,data.longitude));
+                            m.speed = data.speed;
+                            if(self.currentMenuImei == data.device_id){
+                                self.map.panTo(new google.maps.LatLng(data.latitude, data.longitude));
+                                self.getAddress(data.latitude, data.longitude, true);
+                            }
                         }
                     });
 
                     alarmsSocket.watch(function(data) {
-                        console.log("entro una alarma!!!!");
+                        // console.log("entro una alarma!!!!");
                         console.log(data);
                         self.openAlarm(data);
                     });
                 }
                 self.markersInitialized = true;
             };
+            self.getAddress = function getAddress(latitude, longitude, showOnMap) {
+                var latlng = new google.maps.LatLng(latitude, longitude);
+                self.geocoder.geocode({
+                    'latLng': latlng
+                }, function (results, status) {
+                    if (status === google.maps.GeocoderStatus.OK) {
+                        if (results[0]) {
+                            if(showOnMap) {
+                                jQuery("#address-p").html(results[0].formatted_address);
+                                jQuery("#address-control").show("fast");
+                            }
+                            return results[0];
+                        } else {
+                            return false;
+                        }
+                    } else {
+                        return false;
+                    }
+                });
+            };
+            self.openDetailInfo = function openDetailInfo(m){
+                return;
+                var d = self.findDeviceByImei(m.imei);
+                console.log("device found: ", d);
+                // var local = moment.utc(d.peripheral_gps_data[0].updatedAt).toDate();
+                // var lastUpdate = moment(local).format("YYYY-MM-DD HH:mm:ss");
+                // var speed = (d.peripheral_gps_data[0].speed * 3600)/1000;
+                var contentDetail = "<div>" +
+                    "<p class='text-muted'>" +
+                    "" + m.title + "</p>" +
+                    "<p>Estado: On</p>" +
+                    "<p>Velocidad: " + m.speed + " Km/h</p>" +
+                    "<p>Ultima coordenada: " + m.lastUpdate + "</p>" +
+                    "</div>";
+                var detailInfo = new google.maps.InfoWindow({
+                    content: contentDetail
+                });
+                detailInfo.open(self.map, m);
+            };
+
+
         }
     ]
 });
