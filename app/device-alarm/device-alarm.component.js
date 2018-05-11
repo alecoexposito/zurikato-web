@@ -84,6 +84,7 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                             if(showOnMap) {
                                 jQuery("#address-p").html(results[0].formatted_address);
                                 jQuery("#address-control").show("fast");
+                                self.address = results[0].formatted_address;
                             }
                             return results[0];
                         } else {

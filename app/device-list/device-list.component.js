@@ -316,6 +316,7 @@ angular.module('deviceList').component('deviceList', {
             };
             self.getAddress = function getAddress(latitude, longitude, showOnMap) {
                 var latlng = new google.maps.LatLng(latitude, longitude);
+                jQuery("#address-p").html('<i class="fa fa-spinner fa-spin"></i> cargando...');
                 self.geocoder.geocode({
                     'latLng': latlng
                 }, function (results, status) {
