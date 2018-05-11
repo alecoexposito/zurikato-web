@@ -58,7 +58,10 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                     self.m.labelWindow = infoWindow;
                     infoWindow.open(self.map, self.m);
                     console.log("pidiendo dir inicial");
-                    self.getAddress(self.latitude, self.longitude, true);
+                    google.maps.event.addListenerOnce(map, 'tilesloaded', function() {
+                        self.getAddress(self.latitude, self.longitude, true);
+                        // alert("ahora");
+                    });
                     console.log("matching device for alarm");
                     var g = self.socket.subscribe(self.imei);
                     g.watch(function (data) {
