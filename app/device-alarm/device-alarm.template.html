@@ -9,8 +9,8 @@
         <ng-map center="[{{$ctrl.latitude}}, {{$ctrl.longitude}}]" zoom="18">
             <custom-control id="address-control" position="TOP_CENTER" index="2" class="" style="max-width: 50%;" elem-ready="$ctrl.getAddres($ctrl.latitude, $ctrl.longitude, true)">
                 <div class="bg-danger rounded-bottom" style="opacity: 0.7;">
-                    <h6 class="text-lg-center px-2" style="color: #FFFFFF;">Botón de Pánico Activado</h6>
-                    <p class="px-2 pb-2" id="address-p" style="color: white; font-size: 14px">{{$ctrl.address}}<i class="fa fa-spinner fa-spin"></i> cargando...</p>
+                    <h6 class="text-lg-center px-2 pt-1" style="color: #FFFFFF;">Botón de Pánico Activado</h6>
+                    <p class="px-2 pb-2" id="address-p" style="color: white; font-size: 14px"><i class="fa fa-spinner fa-spin"></i> cargando...</p>
                 </div>
             </custom-control>
 
