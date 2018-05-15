@@ -406,7 +406,7 @@ angular.module('deviceList').component('deviceList', {
                 var sec = parseInt(str.substr(10, 2), 16).toString();
                 var dateStr = year + "/" + month + "/" + day + " " + hour + ":" + min + ":" + sec;
                 console.log(dateStr);
-                var dateFormatted = moment(dateStr, "Y/M/D H:m:s").format("YYYY/MM/DD HH:mm:ss");
+                var dateFormatted = moment(dateStr, "YY/M/D H:m:s").format("YYYY/MM/DD HH:mm:ss");
                 return dateFormatted;
             };
 
