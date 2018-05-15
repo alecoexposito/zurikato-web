@@ -103,8 +103,10 @@ angular.module('deviceList').component('deviceList', {
                 var m = self.findMarkerByImei(self.currentImei);
                 var lat = m.getPosition().lat();
                 var lng = m.getPosition().lng();
-                self.getAddress(lat, lng, true);
+                self.updateMarkerColor(m);
+                self.getAddress(lat, lng, true, m.backgroundColor);
                 self.map.panTo(new google.maps.LatLng(lat, lng));
+                self.refreshDetailWindow(m, true);
             };
             $('#myModal').on('shown.bs.modal', function (e) {
                 var invoker = $('div[data-toolbar="device-menu-options"].pressed');
@@ -251,7 +253,9 @@ angular.module('deviceList').component('deviceList', {
                     console.log("going to create the marker: ", self.map);
                     var local = moment.utc(device.peripheral_gps_data[0].updatedAt).toDate();
                     var lastUpdate = moment(local).format("YYYY-MM-DD HH:mm:ss");
-                    var speed = (device.peripheral_gps_data[0].speed * 3600)/1000;
+                    var speed = device.peripheral_gps_data[0].speed;
+                    var gpsStatus = device.peripheral_gps_data[0].gps_status == 0 ? 'On' : 'Off';
+
                     var m = new google.maps.Marker({
                         position: new google.maps.LatLng(device.peripheral_gps_data[0].lat,device.peripheral_gps_data[0].lng),
                         map: self.map,
@@ -260,12 +264,15 @@ angular.module('deviceList').component('deviceList', {
                         imei: device.auth_device,
                         icon: "/img/car-marker48.png",
                         speed: speed,
-                        lastUpdate: lastUpdate
+                        lastUpdate: lastUpdate,
+                        gpsStatus: gpsStatus
                     });
+
+                    self.updateMarkerColor(m);
                     var infoWindow = new SnazzyInfoWindow({
                         content: device.label,
                         marker: m,
-                        backgroundColor: '#1C9918',
+                        backgroundColor: m.backgroundColor,
                         padding: '7px',
                         openOnMarkerClick: false,
                         closeOnMapClick: false,
@@ -273,18 +280,43 @@ angular.module('deviceList').component('deviceList', {
                         showCloseButton: false,
                         fontColor: 'white',
                         maxWidth: 100,
-                        pointer: '7px'
+                        pointer: '7px',
                         // disableAutoPan: true
                     });
                     m.labelWindow = infoWindow;
                     infoWindow.open();
+                    var contentDetail = "<div style='width: 300px'>" +
+                        "<h6 class='' style='color: white'>" +
+                        "" + m.title + "</h6>" +
+                        "<p>Estado: " + m.gpsStatus + "</p>" +
+                        "<p>Velocidad: " + m.speed + " Km/h</p>" +
+                        "<p>Ultima coordenada: " + m.lastUpdate + "</p>" +
+                        "</div>";
+                    var detailInfo = new SnazzyInfoWindow({
+                        content: contentDetail,
+                        marker: m,
+                        backgroundColor: m.backgroundColor,
+                        padding: '7px',
+                        openOnMarkerClick: true,
+                        closeOnMapClick: false,
+                        closeWhenOthersOpen: true,
+                        showCloseButton: true,
+                        fontColor: 'white',
+                        maxWidth: 350,
+                        pointer: '7px',
+                        // width: 300
+                    });
+                    m.detailWindow = detailInfo;
+
                     google.maps.event.addListener(m, 'click', function() {
                         var lat = this.getPosition().lat();
                         var lng = this.getPosition().lng();
                         console.log(this);
                         console.log("latlng: ", lat + "---" + lng);
-                        self.getAddress(lat, lng, true);
-                        self.openDetailInfo(this);
+                        // self.refreshDetailWindow(m);
+                        self.updateMarkerColor(this);
+                        self.getAddress(lat, lng, true, this.backgroundColor);
+                        // self.openDetailInfo(this);
                     });
 
                     $localStorage.markers[device.auth_device] = m;
@@ -299,9 +331,14 @@ angular.module('deviceList').component('deviceList', {
                         if(m != undefined) {
                             m.setPosition(new google.maps.LatLng( data.latitude,data.longitude));
                             m.speed = data.speed;
+                            m.orientation = data.orientation_plain;
+                            m.gpsStatus = data.gps_status == 0 ? 'On' : 'Off';
+                            m.lastUpdate = self.getDateByHex(data.date);
                             if(self.currentMenuImei == data.device_id){
                                 self.map.panTo(new google.maps.LatLng(data.latitude, data.longitude));
-                                self.getAddress(data.latitude, data.longitude, true);
+                                self.updateMarkerColor(m);
+                                self.getAddress(data.latitude, data.longitude, true, m.backgroundColor);
+                                self.refreshDetailWindow(m);
                             }
                         }
                     });
@@ -314,8 +351,19 @@ angular.module('deviceList').component('deviceList', {
                 }
                 self.markersInitialized = true;
             };
-            self.getAddress = function getAddress(latitude, longitude, showOnMap) {
+            self.updateMarkerColor = function updateMarkerColor(m) {
+                console.log("gps status when updating color: ", m.gpsStatus);
+                var backgroundColor = '#1C9918';
+                if(m.gpsStatus === 'Off')
+                    backgroundColor = '#6A7272';
+                else if(m.speed == 0)
+                    backgroundColor = '#E1B300';
+                m.backgroundColor = backgroundColor;
+            };
+            self.getAddress = function getAddress(latitude, longitude, showOnMap, backgroundColor) {
                 var latlng = new google.maps.LatLng(latitude, longitude);
+                if(backgroundColor)
+                    jQuery("#address-control div").css("background-color", backgroundColor);
                 jQuery("#address-p").html('<i class="fa fa-spinner fa-spin"></i> cargando...');
                 self.geocoder.geocode({
                     'latLng': latlng
@@ -335,24 +383,31 @@ angular.module('deviceList').component('deviceList', {
                     }
                 });
             };
-            self.openDetailInfo = function openDetailInfo(m){
-                return;
-                var d = self.findDeviceByImei(m.imei);
-                console.log("device found: ", d);
-                // var local = moment.utc(d.peripheral_gps_data[0].updatedAt).toDate();
-                // var lastUpdate = moment(local).format("YYYY-MM-DD HH:mm:ss");
-                var speed = (d.peripheral_gps_data[0].speed * 3600)/1000;
-                var contentDetail = "<div>" +
-                    "<p class='text-muted'>" +
-                    "" + m.title + "</p>" +
-                    "<p>Estado: On</p>" +
+
+            self.refreshDetailWindow = function refreshDetailWindow(m, open) {
+
+                var contentDetail = "<div style='width: 300px'>" +
+                    "<h6 class='' style='color: white'>" +
+                    "" + m.title + "</h6>" +
+                    "<p>Estado: " + m.gpsStatus + "</p>" +
                     "<p>Velocidad: " + m.speed + " Km/h</p>" +
                     "<p>Ultima coordenada: " + m.lastUpdate + "</p>" +
                     "</div>";
-                var detailInfo = new google.maps.InfoWindow({
-                    content: contentDetail
-                });
-                detailInfo.open(self.map, m);
+                m.detailWindow.setContent(contentDetail);
+                if(open)
+                    m.detailWindow.open();
+            };
+            self.getDateByHex = function getDateByHex(str) {
+                var year = parseInt(str.substr(0, 2), 16).toString();
+                var month = parseInt(str.substr(2, 2), 16).toString();
+                var day = parseInt(str.substr(4, 2), 16).toString();
+                var hour = parseInt(str.substr(6, 2), 16).toString();
+                var min = parseInt(str.substr(8, 2), 16).toString();
+                var sec = parseInt(str.substr(10, 2), 16).toString();
+                var dateStr = year + "/" + month + "/" + day + " " + hour + ":" + min + ":" + sec;
+                console.log(dateStr);
+                var dateFormatted = moment(dateStr, "Y/M/D H:m:s").format("YYYY/MM/DD HH:mm:ss");
+                return dateFormatted;
             };
 
 
