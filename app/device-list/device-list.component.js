@@ -383,7 +383,8 @@ angular.module('deviceList').component('deviceList', {
                 else if(m.speed == 0)
                     backgroundColor = '#E1B300';
                 m.backgroundColor = backgroundColor;
-                m.labelWindow.backgroundColor = backgroundColor;
+                if(m.labelWindow != undefined)
+                    m.labelWindow.backgroundColor = backgroundColor;
             };
             self.getAddress = function getAddress(latitude, longitude, showOnMap, backgroundColor) {
                 var latlng = new google.maps.LatLng(latitude, longitude);
