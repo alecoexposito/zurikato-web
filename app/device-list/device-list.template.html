@@ -55,7 +55,7 @@
         <ng-map center="[{{$ctrl.initialLatitude}}, {{$ctrl.initialLongitude}}]" zoom="10">
           <custom-control id="address-control" position="TOP_CENTER" index="2" class="justify-content-center" style="max-width: 50%;position: center; display: none;">
             <div class="rounded-bottom" style="opacity: 0.7;">
-              <p class="p-3 text-center" id="address-p" style="color: white; font-size: 14px"><i class="fa fa-spinner fa-spin"></i> cargando...</p>
+              <p class="p-1 text-center" id="address-p" style="color: white; font-size: 14px"><i class="fa fa-spinner fa-spin"></i> cargando...</p>
             </div>
           </custom-control>
           <custom-control id="triguer-control" position="LEFT" index="2" class="ml-3 mb-3" on-click="$ctrl.displayHideMenu()" >
@@ -109,7 +109,7 @@
           </custom-control>
 
           <custom-control id="detail-control" position="BOTTOM_CENTER" index="2" class="rounded-top justify-content-center" style="opacity: 0.7; position: center; display: none;">
-            <div class="p-3" style="color: #ffffff;">
+            <div class="p-1 rounded-top" style="color: #ffffff;">
 
             </div>
           </custom-control>

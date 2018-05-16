@@ -253,7 +253,7 @@ angular.module('deviceList').component('deviceList', {
                     self.initialLongitude = device.peripheral_gps_data[0].lng;
                     console.log("going to create the marker: ", self.map);
                     var local = moment.utc(device.peripheral_gps_data[0].updatedAt).toDate();
-                    var lastUpdate = moment(local).format("YYYY-MM-DD HH:mm:ss");
+                    var lastUpdate = moment(local).format("HH:mm:ss DD/MM/YYYY");
                     var speed = device.peripheral_gps_data[0].speed;
                     var gpsStatus = device.peripheral_gps_data[0].gps_status == 0 ? 'On' : 'Off';
                     // var image = "http://127.0.0.1:8000/img/car-marker48.png";
@@ -281,46 +281,26 @@ angular.module('deviceList').component('deviceList', {
                         lastUpdate: lastUpdate,
                         gpsStatus: gpsStatus
                     });
-
                     self.updateMarkerColor(m);
+
                     var infoWindow = new SnazzyInfoWindow({
-                        content: device.label,
+                        content: "<p style='white-space: nowrap'>" + device.label + "</p>",
                         marker: m,
                         backgroundColor: m.backgroundColor,
-                        padding: '7px',
+                        padding: '4px',
                         openOnMarkerClick: false,
                         closeOnMapClick: false,
                         closeWhenOthersOpen: false,
                         showCloseButton: false,
                         fontColor: 'white',
-                        maxWidth: 100,
+                        maxWidth: 800,
+                        maxHeight: 35,
                         pointer: '7px',
+                        wrapperClass: 'label-window label-' + m.imei
                         // disableAutoPan: true
                     });
                     m.labelWindow = infoWindow;
                     infoWindow.open();
-                    // var contentDetail = "<div style='width: 300px'>" +
-                    //     "<h6 class='' style='color: white'>" +
-                    //     "" + m.title + "</h6>" +
-                    //     "<p>Estado: " + m.gpsStatus + "</p>" +
-                    //     "<p>Velocidad: " + m.speed + " Km/h</p>" +
-                    //     "<p>Ultima coordenada: " + m.lastUpdate + "</p>" +
-                    //     "</div>";
-                    // var detailInfo = new SnazzyInfoWindow({
-                    //     content: contentDetail,
-                    //     marker: m,
-                    //     backgroundColor: m.backgroundColor,
-                    //     padding: '7px',
-                    //     openOnMarkerClick: true,
-                    //     closeOnMapClick: false,
-                    //     closeWhenOthersOpen: true,
-                    //     showCloseButton: true,
-                    //     fontColor: 'white',
-                    //     maxWidth: 350,
-                    //     pointer: '7px',
-                    //     // width: 300
-                    // });
-                    // m.detailWindow = detailInfo;
 
                     google.maps.event.addListener(m, 'click', function() {
                         var lat = this.getPosition().lat();
@@ -414,13 +394,22 @@ angular.module('deviceList').component('deviceList', {
 
             self.refreshDetailWindow = function refreshDetailWindow(m, open) {
 
-                var contentDetail = "<div class='rounded-top' style='width: 300px'>" +
-                    "<h6 class=''>" +
-                    "" + m.title + "</h6>" +
-                    "<p>Estado: " + m.gpsStatus + "</p>" +
-                    "<p>Velocidad: " + m.speed + " Km/h</p>" +
-                    "<p>Ultima coordenada: " + m.lastUpdate + "</p>" +
-                    "</div>";
+                // var contentDetail = "<div class='rounded-top' style='width: 300px'>" +
+                //     "<h6 class=''>" +
+                //     "" + m.title + "</h6>" +
+                //     "<p>Estado: " + m.gpsStatus + "</p>" +
+                //     "<p>Velocidad: " + m.speed + " Km/h</p>" +
+                //     "<p>Ultima coordenada: " + m.lastUpdate + "</p>" +
+                //     "</div>";
+
+                var contentDetail = "" +
+                    "<p class='' style='font-size: 14px'><strong>" +
+                    "" + m.title + "</strong> " +
+                    "Estado: " + m.gpsStatus + ", " +
+                    "Velocidad: " + m.speed + " Km/h, " +
+                    "Último reporte: " + m.lastUpdate + "" +
+                    "";
+
                 // m.detailWindow.setContent(contentDetail);
                 // if(open){
                     jQuery("#detail-control div").html(contentDetail);
