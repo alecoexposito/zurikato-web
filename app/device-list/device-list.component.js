@@ -330,6 +330,8 @@ angular.module('deviceList').component('deviceList', {
                         self.updateMarkerColor(this);
                         self.getAddress(lat, lng, true, this.backgroundColor);
                         self.refreshDetailWindow(this, true);
+                        self.map.setZoom(20);
+                        self.map.setCenter(this.getPosition());
                         // self.rotateMarker(this, 45);
 
                         console.log(this.icon);
