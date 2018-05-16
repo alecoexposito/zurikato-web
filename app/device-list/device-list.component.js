@@ -294,7 +294,7 @@ angular.module('deviceList').component('deviceList', {
                         showCloseButton: false,
                         fontColor: 'white',
                         maxWidth: 800,
-                        maxHeight: 50,
+                        maxHeight: 35,
                         pointer: '7px',
                         wrapperClass: 'label-window label-' + m.imei
                         // disableAutoPan: true
