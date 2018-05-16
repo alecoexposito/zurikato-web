@@ -34,6 +34,10 @@ ng-map {width:100%; height:100%;position: absolute;}
     /*display: block !important;*/
 /*}*/
 
-label-window p {
-    word-break: keep-all;
+.label-window .si-content-wrapper .si-content {
+    overflow: hidden;
+}
+
+.label-window .si-content-wrapper {
+    border-radius: 6px;
 }
