@@ -105,7 +105,7 @@ angular.module('deviceList').component('deviceList', {
                 var lng = m.getPosition().lng();
                 self.updateMarkerColor(m);
                 self.getAddress(lat, lng, true, m.backgroundColor);
-                self.map.setZoom(20);
+                self.map.setZoom(16);
                 self.map.panTo(new google.maps.LatLng(lat, lng));
                 self.refreshDetailWindow(m, true);
             };
@@ -332,7 +332,8 @@ angular.module('deviceList').component('deviceList', {
                         self.getAddress(lat, lng, true, this.backgroundColor);
                         self.refreshDetailWindow(this, true);
                         // self.rotateMarker(this, 45);
-
+                        self.map.setZoom(20);
+                        self.map.setCenter(this.getPosition());
                         console.log(this.icon);
                         // self.openDetailInfo(this);
                     });
