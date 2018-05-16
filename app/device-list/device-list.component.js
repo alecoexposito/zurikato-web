@@ -105,6 +105,7 @@ angular.module('deviceList').component('deviceList', {
                 var lng = m.getPosition().lng();
                 self.updateMarkerColor(m);
                 self.getAddress(lat, lng, true, m.backgroundColor);
+                self.map.setZoom(20);
                 self.map.panTo(new google.maps.LatLng(lat, lng));
                 self.refreshDetailWindow(m, true);
             };
@@ -330,8 +331,6 @@ angular.module('deviceList').component('deviceList', {
                         self.updateMarkerColor(this);
                         self.getAddress(lat, lng, true, this.backgroundColor);
                         self.refreshDetailWindow(this, true);
-                        self.map.setZoom(20);
-                        self.map.setCenter(this.getPosition());
                         // self.rotateMarker(this, 45);
 
                         console.log(this.icon);
