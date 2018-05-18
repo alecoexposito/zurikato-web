@@ -25,6 +25,49 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                     return map;
                 });
             };
+
+            self.shapeClick = function shapeClick(event ){
+                console.log(event);
+                // return;
+                var minDist = Number.MAX_VALUE;
+                var index = -1;
+                for (var i=0; i<this.getPath().getLength(); i++){
+                    var distance = google.maps.geometry.spherical.computeDistanceBetween(event.latLng, this.getPath().getAt(i));
+                    if (distance < minDist) {
+                        minDist = distance;
+                        index = i;
+                    }
+                }
+                console.log("coordinates closest", self.coordinates[index]);
+                var content = "<p style='white-space: nowrap; margin-bottom: 3px;'>Velocidad: " + self.coordinates[index].speed + " </p>" +
+                    "<p style='white-space: nowrap; margin-bottom: 3px; mx-1'>Fecha y hora: " + self.coordinates[index].day + "</p>";
+                self.infoWindow.setContent(content);
+                self.infoWindow.setPosition(event.latLng);
+                self.infoWindow.setMap(self.map);
+                self.infoWindow.open();
+
+            };
+
+            self.infoWindow = new SnazzyInfoWindow({
+                content: 'Nothing to show',
+                // marker: m,
+                // backgroundColor: m.backgroundColor,
+                padding: '4px',
+                // openOnMarkerClick: false,
+                closeOnMapClick: true,
+                closeWhenOthersOpen: true,
+                showCloseButton: true,
+                // fontColor: 'white',
+                maxWidth: 300,
+                // maxHeight: 35,
+                pointer: '7px',
+                // wrapperClass: 'label-window label-' + m.imei
+                // disableAutoPan: true
+                position: null,
+                map: self.map
+            });
+
+
             self.displayHideMenu = function displayHideMenu() {
                 $("#left-menu").toggle("fast");
             };
@@ -59,13 +102,20 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                 }
 
                 var point = [parseFloat(historical[pos].lat), parseFloat(historical[pos].lng)];
-                self.coordinates.push(point);
+                var pointObj = {
+                    day: moment(historical[pos].day, "YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY HH:mm:ss"),
+                    lat: parseFloat(historical[pos].lat),
+                    lng: parseFloat(historical[pos].lng),
+                    speed: historical[pos].speed + ' Km/h'
+                };
+                self.coordinates.push(pointObj);
 
                 google.maps.event.trigger(self.map, 'resize');
+                self.drawHistorical(historical, pos + 1);
 
-                $timeout(function() {
-                        self.drawHistorical(historical, pos + 1);
-                }, 500);
+                // $timeout(function() {
+                //         self.drawHistorical(historical, pos + 1);
+                // }, 0);
             }
             var historical = $http.get('http://189.207.202.64:3007/api/v1/devices/' + $routeParams.deviceId + '/history?start_date=' + $routeParams.start + '&end_date=' + $routeParams.end)
             historical.then(function(result) {

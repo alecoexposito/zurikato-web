@@ -34,12 +34,12 @@
           <!--</custom-control>-->
 
 
-          <shape name="polyline"
+          <shape id="historics-line" name="polyline"
                  path="{{$ctrl.coordinates}}"
                  geodesic="true"
                  stroke-color="#FF0000"
                  stroke-opacity="1.0"
-                 stroke-weight="2">
+                 stroke-weight="2" on-click="$ctrl.shapeClick()">
           </shape>
 
 
