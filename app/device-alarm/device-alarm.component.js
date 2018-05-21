@@ -10,7 +10,9 @@ angular.module('deviceAlarm').component('deviceAlarm', {
             self.latitude = $routeParams.latitude;
             self.longitude = $routeParams.longitude;
             self.imei = $routeParams.imei;
+            self.alarmType = $routeParams.alarmType;
             self.m = null;
+            self.backgroundColor = '#D93444';
             // self.devices = $localStorage.devices;
             self.device = window.device;
             // self.label = $routeParams.label;
@@ -22,6 +24,13 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                 hostname: "189.207.202.64",
                 port: 3001
             };
+            self.setBackgroundColor = function setBackgroundColor() {
+                if(self.alarmType == 100) {
+                    self.backgroundColor = '#D93444'; // rojo boton de panico
+                } else if(self.alarmType == '000') {
+                    self.backgroundColor = '#E1B300'; // amarillo exceso de velocidad
+                }
+            };
             console.log("Trying to connect");
             self.socket = socketCluster.connect(self.options);
             self.socket.on('connect', function () {
@@ -32,17 +41,40 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                 NgMap.getMap().then(function (map) {
                     self.map = map;
                     console.log("creating the marker for alarm");
+                    var local = moment.utc(self.device.peripheral_gps_data[0].updatedAt).toDate();
+                    var lastUpdate = moment(local).format("HH:mm:ss DD/MM/YYYY");
+                    var speed = self.device.peripheral_gps_data[0].speed;
+                    var gpsStatus = self.device.peripheral_gps_data[0].gps_status == 0 ? 'On' : 'Off';
+                    var rotation = parseInt(self.device.peripheral_gps_data[0].orientation_plain);
+
+                    var car = "M17.402,0H5.643C2.526,0,0,3.467,0,6.584v34.804c0,3.116,2.526,5.644,5.643,5.644h11.759c3.116,0,5.644-2.527,5.644-5.644 V6.584C23.044,3.467,20.518,0,17.402,0z M22.057,14.188v11.665l-2.729,0.351v-4.806L22.057,14.188z M20.625,10.773 c-1.016,3.9-2.219,8.51-2.219,8.51H4.638l-2.222-8.51C2.417,10.773,11.3,7.755,20.625,10.773z M3.748,21.713v4.492l-2.73-0.349 V14.502L3.748,21.713z M1.018,37.938V27.579l2.73,0.343v8.196L1.018,37.938z M2.575,40.882l2.218-3.336h13.771l2.219,3.336H2.575z M19.328,35.805v-7.872l2.729-0.355v10.048L19.328,35.805z";
+                    var icon = {
+                        path: car,
+                        scale: .7,
+                        strokeColor: 'white',
+                        strokeWeight: .10,
+                        fillOpacity: 1,
+                        fillColor: '#404040',
+                        offset: '1%',
+                        rotation: rotation
+                        // anchor: new google.maps.Point(10, 0) // orig 10,50 back of car, 10,0 front of car, 10,25 center of car
+                    };
                     self.m = new google.maps.Marker({
                         position: new google.maps.LatLng(self.latitude, self.longitude),
                         map: self.map,
                         title: self.device.label,
                         // id: device.idDevice,
                         imei: self.imei,
-                        icon: "/img/car-marker48.png",
+                        // icon: "/img/car-marker48.png",
+                        icon: icon,
+                        speed: speed,
+                        lastUpdate: lastUpdate,
+                        gpsStatus: gpsStatus
                     });
+                    console.log("marker created: ", self.m);
                     // #1C9918
                     var infoWindow = new SnazzyInfoWindow({
-                        content: self.m.title,
+                        content: "<p style='white-space: nowrap'>" + self.m.title + "</p>",
                         marker: self.m,
                         backgroundColor: '#D93444',
                         padding: '7px',
@@ -57,9 +89,11 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                     });
                     self.m.labelWindow = infoWindow;
                     infoWindow.open(self.map, self.m);
+                    // self.refreshDetailWindow(self.m);
                     console.log("pidiendo dir inicial");
                     google.maps.event.addListenerOnce(map, 'tilesloaded', function() {
                         self.getAddress(self.latitude, self.longitude, true);
+                        self.refreshDetailWindow(self.m);
                         // alert("ahora");
                     });
                     console.log("matching device for alarm");
@@ -67,14 +101,53 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                     g.watch(function (data) {
                         if (self.m != null) {
                             self.m.setPosition(new google.maps.LatLng(data.latitude, data.longitude));
+                            self.m.speed = data.speed;
+                            self.m.orientation = data.orientation_plain;
+                            self.m.gpsStatus = data.gps_status == 0 ? 'On' : 'Off';
+                            self.m.lastUpdate = self.getDateByHex(data.date);
+                            self.rotateMarker(self.m, data.orientation_plain);
                             self.map.panTo(new google.maps.LatLng(data.latitude, data.longitude));
                             console.log("se movio");
                             self.getAddress(data.latitude, data.longitude, true);
+                            self.refreshDetailWindow(self.m);
                         }
                     });
 
                     return map;
                 });
+            };
+            self.getDateByHex = function getDateByHex(str) {
+                var year = parseInt(str.substr(0, 2), 16).toString();
+                var month = parseInt(str.substr(2, 2), 16).toString();
+                var day = parseInt(str.substr(4, 2), 16).toString();
+                var hour = parseInt(str.substr(6, 2), 16).toString();
+                var min = parseInt(str.substr(8, 2), 16).toString();
+                var sec = parseInt(str.substr(10, 2), 16).toString();
+                var dateStr = year + "/" + month + "/" + day + " " + hour + ":" + min + ":" + sec;
+                console.log(dateStr);
+                var dateFormatted = moment(dateStr, "YY/M/D H:m:s").format("YYYY/MM/DD HH:mm:ss");
+                return dateFormatted;
+            };
+            self.refreshDetailWindow = function refreshDetailWindow(m) {
+                console.log("mostrando abajo");
+                var contentDetail = "" +
+                    "<p class='' style='font-size: 14px'><strong>" +
+                    "" + self.m.title + "</strong> " +
+                    "Estado: " + self.m.gpsStatus + ", " +
+                    "Velocidad: " + self.m.speed + " Km/h, " +
+                    "Último reporte: " + self.m.lastUpdate + "" +
+                    "";
+                console.log("content detail. ", jQuery("#detail-control div"));
+                console.log("content detail. ", jQuery("#detail-control"));
+
+                // m.detailWindow.setContent(contentDetail);
+                // if(open){
+                $timeout(function() {
+                    jQuery("#detail-control div").html(contentDetail);
+                    jQuery("#detail-control").css("background-color", self.backgroundColor).show("fast");
+                }, 500);
+                // m.detailWindow.open();
+                // }
             };
             self.getAddress = function getAddress(latitude, longitude, showOnMap) {
                 var latlng = new google.maps.LatLng(latitude, longitude);
@@ -97,6 +170,11 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                         return false;
                     }
                 });
+            };
+            self.rotateMarker = function rotateMarker(m, degrees) {
+                var icon2 = m.icon;
+                icon2.rotation = degrees;
+                m.setIcon(icon2);
             };
             self.alertC5 = function alertC5() {
                 var d = self.device;

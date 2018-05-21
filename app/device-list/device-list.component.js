@@ -188,8 +188,10 @@ angular.module('deviceList').component('deviceList', {
                 var imei = alarm.device_id;
                 var latitude = alarm.latitude;
                 var longitude = alarm.longitude;
+                var speed = alarm.speed;
+                var orientation_plain = 
                 console.log("opening tab: ", latitude);
-                var linkUrl = '#!device/alarm/' + latitude + "/" + longitude + "/" + imei;
+                var linkUrl = '#!device/alarm/' + latitude + "/" + longitude + "/" + imei + "/" + alarmType;
                 console.log(linkUrl);
                 var d = self.findDeviceByImei(imei);
                 var w = window.open(linkUrl, 'newwindow', 'width=1024,height=768');
@@ -393,15 +395,6 @@ angular.module('deviceList').component('deviceList', {
             };
 
             self.refreshDetailWindow = function refreshDetailWindow(m, open) {
-
-                // var contentDetail = "<div class='rounded-top' style='width: 300px'>" +
-                //     "<h6 class=''>" +
-                //     "" + m.title + "</h6>" +
-                //     "<p>Estado: " + m.gpsStatus + "</p>" +
-                //     "<p>Velocidad: " + m.speed + " Km/h</p>" +
-                //     "<p>Ultima coordenada: " + m.lastUpdate + "</p>" +
-                //     "</div>";
-
                 var contentDetail = "" +
                     "<p class='' style='font-size: 14px'><strong>" +
                     "" + m.title + "</strong> " +
