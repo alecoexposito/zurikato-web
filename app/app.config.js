@@ -19,7 +19,7 @@ angular.
         when('/device/:deviceId/historical/:start/:end', {
             template: '<device-historical></device-historical>'
         }).
-        when('/device/alarm/:latitude/:longitude/:imei', {
+        when('/device/alarm/:latitude/:longitude/:speed/:alarmType', {
             template: '<device-alarm></device-alarm>'
         }).
         when('/login', {

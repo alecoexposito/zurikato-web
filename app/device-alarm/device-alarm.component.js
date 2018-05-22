@@ -9,7 +9,7 @@ angular.module('deviceAlarm').component('deviceAlarm', {
             var pos = null;
             self.latitude = $routeParams.latitude;
             self.longitude = $routeParams.longitude;
-            self.imei = $routeParams.imei;
+            self.speed = $routeParams.speed;
             self.alarmType = $routeParams.alarmType;
             self.m = null;
             self.backgroundColor = '#D93444';
@@ -42,8 +42,8 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                     self.map = map;
                     console.log("creating the marker for alarm");
                     var local = moment.utc(self.device.peripheral_gps_data[0].updatedAt).toDate();
-                    var lastUpdate = moment(local).format("HH:mm:ss DD/MM/YYYY");
-                    var speed = self.device.peripheral_gps_data[0].speed;
+                    var lastUpdate = moment(local).format("DD/MM/YYYY HH:mm:ss");
+                    // var speed = self.device.peripheral_gps_data[0].speed;
                     var gpsStatus = self.device.peripheral_gps_data[0].gps_status == 0 ? 'On' : 'Off';
                     var rotation = parseInt(self.device.peripheral_gps_data[0].orientation_plain);
 
@@ -64,10 +64,10 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                         map: self.map,
                         title: self.device.label,
                         // id: device.idDevice,
-                        imei: self.imei,
+                        imei: self.device.auth_device,
                         // icon: "/img/car-marker48.png",
                         icon: icon,
-                        speed: speed,
+                        speed: self.speed,
                         lastUpdate: lastUpdate,
                         gpsStatus: gpsStatus
                     });
@@ -84,7 +84,9 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                         showCloseButton: false,
                         fontColor: 'white',
                         maxWidth: 100,
-                        pointer: '7px'
+                        maxHeight: 40,
+                        pointer: '7px',
+                        wrapperClass: 'label-window label-' + self.m.imei
                         // disableAutoPan: true
                     });
                     self.m.labelWindow = infoWindow;
@@ -92,12 +94,23 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                     // self.refreshDetailWindow(self.m);
                     console.log("pidiendo dir inicial");
                     google.maps.event.addListenerOnce(map, 'tilesloaded', function() {
+                        self.updateColor();
                         self.getAddress(self.latitude, self.longitude, true);
                         self.refreshDetailWindow(self.m);
                         // alert("ahora");
                     });
-                    console.log("matching device for alarm");
-                    var g = self.socket.subscribe(self.imei);
+                    self.updateColor = function updateColor() {
+                        self.setBackgroundColor();
+                        jQuery("#address-control div").css("background-color", self.backgroundColor);
+                        jQuery("#detail-control div").css("background-color", self.backgroundColor);
+                        self.m.labelWindow._opts.backgroundColor = self.backgroundColor;
+                        console.log("updating color: ", self.alarmType);
+                        if(self.alarmType == '000') {
+                            jQuery("#upperTitle").html("Exceso de velocidad");
+                        }
+                    }
+                    console.log("matching alarmed device", self.device.auth_device);
+                    var g = self.socket.subscribe(self.device.auth_device);
                     g.watch(function (data) {
                         if (self.m != null) {
                             self.m.setPosition(new google.maps.LatLng(data.latitude, data.longitude));
@@ -108,6 +121,7 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                             self.rotateMarker(self.m, data.orientation_plain);
                             self.map.panTo(new google.maps.LatLng(data.latitude, data.longitude));
                             console.log("se movio");
+                            self.updateColor();
                             self.getAddress(data.latitude, data.longitude, true);
                             self.refreshDetailWindow(self.m);
                         }
@@ -135,7 +149,7 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                     "" + self.m.title + "</strong> " +
                     "Estado: " + self.m.gpsStatus + ", " +
                     "Velocidad: " + self.m.speed + " Km/h, " +
-                    "Último reporte: " + self.m.lastUpdate + "" +
+                    "Último reporte: " + moment(self.m.lastUpdate, 'HH:mm:ss DD/MM/YYYY').format("DD/MM/YYYY HH:mm:ss") + "" +
                     "";
                 console.log("content detail. ", jQuery("#detail-control div"));
                 console.log("content detail. ", jQuery("#detail-control"));

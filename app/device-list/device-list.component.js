@@ -189,9 +189,9 @@ angular.module('deviceList').component('deviceList', {
                 var latitude = alarm.latitude;
                 var longitude = alarm.longitude;
                 var speed = alarm.speed;
-                var orientation_plain = 
+                var orientation_plain = alarm.orientation_plain;
                 console.log("opening tab: ", latitude);
-                var linkUrl = '#!device/alarm/' + latitude + "/" + longitude + "/" + imei + "/" + alarmType;
+                var linkUrl = '#!device/alarm/' + latitude + "/" + longitude + "/" + speed + "/" + alarmType;
                 console.log(linkUrl);
                 var d = self.findDeviceByImei(imei);
                 var w = window.open(linkUrl, 'newwindow', 'width=1024,height=768');
@@ -365,10 +365,12 @@ angular.module('deviceList').component('deviceList', {
                 if(m.gpsStatus === 'Off')
                     backgroundColor = '#6A7272';
                 else if(m.speed == 0)
-                    backgroundColor = '#E1B300';
+                    backgroundColor = '#248DFD'; // blue for stopped '#E1B300';
                 m.backgroundColor = backgroundColor;
-                if(m.labelWindow != undefined)
-                    m.labelWindow.backgroundColor = backgroundColor;
+                if(m.labelWindow != undefined){
+                    console.log("label window: ", m.labelWindow);
+                    m.labelWindow._opts.backgroundColor = backgroundColor;
+                }
             };
             self.getAddress = function getAddress(latitude, longitude, showOnMap, backgroundColor) {
                 var latlng = new google.maps.LatLng(latitude, longitude);
@@ -419,7 +421,7 @@ angular.module('deviceList').component('deviceList', {
                 var sec = parseInt(str.substr(10, 2), 16).toString();
                 var dateStr = year + "/" + month + "/" + day + " " + hour + ":" + min + ":" + sec;
                 console.log(dateStr);
-                var dateFormatted = moment(dateStr, "YY/M/D H:m:s").format("YYYY/MM/DD HH:mm:ss");
+                var dateFormatted = moment(dateStr, "YY/M/D H:m:s").format("DD/MM/YYYY HH:mm:ss");
                 return dateFormatted;
             };
 
