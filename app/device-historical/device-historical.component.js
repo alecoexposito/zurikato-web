@@ -138,9 +138,11 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                 self.paused = true;
             }
             self.playHistoricsButton = function playHistoricsButton() {
-                    self.paused = false;
-                    self.playHistorical(self.historics, self.pausedPos);
-                    self.pausedPos = 0;
+                if(self.playMarker != null && self.paused == false)
+                    return;
+                self.paused = false;
+                self.playHistorical(self.historics, self.pausedPos);
+                self.pausedPos = 0;
             };
             self.playHistorical = function playHistorical(historical, pos) {
                 var len = historical.length;
