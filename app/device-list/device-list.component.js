@@ -245,14 +245,18 @@ angular.module('deviceList').component('deviceList', {
 
 
             });
-
+            self.initialLatitude = null;
+            self.initialLongitude = null;
             self.initializeMarkers = function initializeMarkers(devices) {
                 for(var i = 0; i < devices.length; i++){
                     var device = devices[i];
                     if(device.peripheral_gps_data[0] == undefined)
                         continue;
-                    self.initialLatitude = device.peripheral_gps_data[0].lat;
-                    self.initialLongitude = device.peripheral_gps_data[0].lng;
+                    if(self.initialLatitude == null) {
+                        console.log(device);
+                        self.initialLatitude = device.peripheral_gps_data[0].lat;
+                        self.initialLongitude = device.peripheral_gps_data[0].lng;
+                    }
                     console.log("going to create the marker: ", self.map);
                     var local = moment.utc(device.peripheral_gps_data[0].updatedAt).toDate();
                     var lastUpdate = moment(local).format("HH:mm:ss DD/MM/YYYY");
@@ -298,8 +302,8 @@ angular.module('deviceList').component('deviceList', {
                         maxWidth: 800,
                         maxHeight: 35,
                         pointer: '7px',
-                        wrapperClass: 'label-window label-' + m.imei
-                        // disableAutoPan: true
+                        wrapperClass: 'label-window label-' + m.imei,
+                        panOnOpen: false
                     });
                     m.labelWindow = infoWindow;
                     infoWindow.open();
