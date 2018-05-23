@@ -13,7 +13,7 @@
         <shape id="historics-line" name="polyline"
                path="{{$ctrl.coordinates}}"
                geodesic="true"
-               stroke-color="#FF0000"
+               stroke-color="#778899"
                stroke-opacity="1.0"
                stroke-weight="2" on-mouseover="$ctrl.shapeClick()">
         </shape>
@@ -25,11 +25,14 @@
                 <button class="btn btn-secondary" type="button" ng-click="$ctrl.pausePlay()">
                     <i class="fa fa-pause"></i> Pause
                 </button>
+                <button class="btn btn-secondary" type="button" ng-click="$ctrl.resetPlay()">
+                    <i class="fa fa-stop"></i> Reset
+                </button>
                 <button class="btn btn-secondary" type="button" ng-click="$ctrl.playIncreaseSpeed()">
-                    <i class="fa fa-plus"></i> Speed
+                    <i class="fa fa-plus"></i> Velocidad
                 </button>
                 <button class="btn btn-secondary" type="button" ng-click="$ctrl.playDecreaseSpeed()">
-                    <i class="fa fa-minus"></i> Speed
+                    <i class="fa fa-minus"></i> Velocidad
                 </button>
 
             </div>

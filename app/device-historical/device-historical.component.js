@@ -10,6 +10,7 @@ angular.module('deviceHistorical').component('deviceHistorical', {
             var pos = null;
             self.coordinates = [];
             this.googleMapsUrl = "https://maps.googleapis.com/maps/api/js?key=AIzaSyBHsRJFKmB3_E_DGrluQKMRIYNdT8v8CwI";
+            self.geocoder = new google.maps.Geocoder();
             self.getMap = function getMap() {
                 NgMap.getMap().then(function (map) {
                     // console.log(map.getCenter());
@@ -31,6 +32,21 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                 // return;
                 var minDist = Number.MAX_VALUE;
                 var index = -1;
+                self.geocoder.geocode({
+                    'latLng': event.latLng
+                }, function (results, status) {
+                    if (status === google.maps.GeocoderStatus.OK) {
+                        // console.log("results from ")
+                        if (results[0]) {
+                            jQuery("#address-info").html(results[0].formatted_address);
+                            return results[0];
+                        } else {
+                            return false;
+                        }
+                    } else {
+                        return false;
+                    }
+                });
                 for (var i=0; i<this.getPath().getLength(); i++){
                     var distance = google.maps.geometry.spherical.computeDistanceBetween(event.latLng, this.getPath().getAt(i));
                     if (distance < minDist) {
@@ -40,7 +56,8 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                 }
                 console.log("coordinates closest", self.coordinates[index]);
                 var content = "<p style='white-space: nowrap; margin-bottom: 3px;'>Velocidad: " + self.coordinates[index].speed + " </p>" +
-                    "<p style='white-space: nowrap; margin-bottom: 3px; mx-1'>Fecha y hora: " + self.coordinates[index].day + "</p>";
+                    "<p style='white-space: nowrap; margin-bottom: 3px; mx-1'>Fecha y hora: " + self.coordinates[index].day + "</p>" +
+                    "<p id='address-info'><i class='fa fa-spinner fa-spin'></i> cargando...</p>";
                 self.infoWindow.setContent(content);
                 self.infoWindow.setPosition(event.latLng);
                 self.infoWindow.setMap(self.map);
@@ -91,10 +108,10 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                     var endMarker = new google.maps.Marker({
                         position: new google.maps.LatLng(parseFloat(historical[lastPos].lat),parseFloat(historical[lastPos].lng)),
                         map: self.map,
-                        label: 'B',
+                        // label: 'B',
                         // id: device.idDevice,
                         // imei: device.auth_device,
-                        // icon: "/img/car-marker48.png",
+                        icon: "/img/transparent-end.png",
                     });
                     return;
 
@@ -136,8 +153,20 @@ angular.module('deviceHistorical').component('deviceHistorical', {
             self.pausedPos = 0;
             self.pausePlay = function pausePlay() {
                 self.paused = true;
-            }
+            };
+            self.reset = false;
+            self.resetPlay = function resetPlay() {
+                self.reset = true;
+            };
+            self.finished = false;
             self.playHistoricsButton = function playHistoricsButton() {
+                if(self.finished == true) {
+                    self.playSpeed = 500;
+                    self.paused = false;
+                    self.pausedPos = 0;
+                    self.finished = false;
+                    self.playHistorical(self.historics, 0);
+                }
                 if(self.playMarker != null && self.paused == false)
                     return;
                 self.paused = false;
@@ -147,11 +176,16 @@ angular.module('deviceHistorical').component('deviceHistorical', {
             self.playHistorical = function playHistorical(historical, pos) {
                 var len = historical.length;
                 if(pos == len) {
+                    self.finished = true;
                     return;
                 }
                 if(self.paused == true) {
                     self.pausedPos = pos;
                     return;
+                }
+                if(self.reset == true) {
+                    pos = 0;
+                    self.reset = false;
                 }
                 var position = new google.maps.LatLng(parseFloat(historical[pos].lat),parseFloat(historical[pos].lng));
                 var rotation = parseFloat(historical[pos].orientation_plain);
@@ -192,15 +226,15 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                     alert("This device has no activity");
                     return;
                 }
-                console.log("historics", self.historics);
+                // console.log("historics", self.historics);
                 self.drawHistorical(self.historics, 0);
                 var beginMarker = new google.maps.Marker({
                     position: new google.maps.LatLng(parseFloat(self.historics[0].lat),parseFloat(self.historics[0].lng)),
                     map: self.map,
-                    label: 'A',
+                    // label: 'A',
                     // id: device.idDevice,
                     // imei: device.auth_device,
-                    // icon: "/img/car-marker48.png",
+                    icon: "/img/transparent-start.png",
                 });
 
             });

@@ -3,8 +3,8 @@
 // Register `deviceList` component, along with its associated controller and template
 angular.module('deviceList').component('deviceList', {
     templateUrl: 'device-list/device-list.template.html',
-    controller: ['Device', '$http', 'NgMap', '$localStorage',
-        function DeviceListController(Device, $http, NgMap, $localStorage) {
+    controller: ['Device', '$http', 'NgMap', '$localStorage', '$timeout',
+        function DeviceListController(Device, $http, NgMap, $localStorage, $timeout) {
             var self = this;
             self.currentUser = $localStorage.currentUser;
             self.start = null;
@@ -194,9 +194,39 @@ angular.module('deviceList').component('deviceList', {
                 var linkUrl = '#!device/alarm/' + latitude + "/" + longitude + "/" + speed + "/" + alarmType;
                 console.log(linkUrl);
                 var d = self.findDeviceByImei(imei);
-                var w = window.open(linkUrl, 'newwindow', 'width=1024,height=768');
-                w.device = d;
+                var m = self.findMarkerByImei(imei);
+                self.alarmMarker(m, alarmType, false);
+                if(alarmType == 100 || alarmType == '000') {
+                    var w = window.open(linkUrl, 'newwindow', 'width=1024,height=768');
+                    w.device = d;
+                }
             };
+            self.alarmMarker = function alarmMarker(m, alarmType, isTimeout) {
+                // console.log("alarm type: ", alarmType);
+                // console.log(alarmType == '000');
+                if(!isTimeout) {
+                    var backgroundColor = "";
+                    if(alarmType == 100) {
+                        backgroundColor = '#D93444'; // rojo boton de panico
+                    } else if(alarmType === '000') {
+                        backgroundColor = '#E1B300'; // amarillo exceso de velocidad
+                    }
+                    if(m.labelWindow != undefined){
+                        console.log("label window: ", m.labelWindow);
+                        m.labelWindow._opts.backgroundColor = backgroundColor;
+                        m.alarmed = true;
+                        $timeout(function() {
+                            self.alarmMarker(m, null, true);
+                        }, 5000);
+                    }
+                } else {
+                    console.log("segunda vez: ", m.backgroundColor);
+                    m.labelWindow._opts.backgroundColor = m.backgroundColor;
+                    m.alarmed = false;
+                    m.labelWindow.close();
+                    m.labelWindow.open();
+                }
+            }
             self.findDeviceByImei = function findDeviceByImei(imei) {
                 console.log($localStorage.devices);
                 if($localStorage.devices == undefined)
@@ -259,7 +289,7 @@ angular.module('deviceList').component('deviceList', {
                     }
                     console.log("going to create the marker: ", self.map);
                     var local = moment.utc(device.peripheral_gps_data[0].updatedAt).toDate();
-                    var lastUpdate = moment(local).format("HH:mm:ss DD/MM/YYYY");
+                    var lastUpdate = moment(local).format("DD/MM/YYYY HH:mm:ss");
                     var speed = device.peripheral_gps_data[0].speed;
                     var gpsStatus = device.peripheral_gps_data[0].gps_status == 0 ? 'On' : 'Off';
                     // var image = "http://127.0.0.1:8000/img/car-marker48.png";
@@ -321,6 +351,7 @@ angular.module('deviceList').component('deviceList', {
                         self.map.setZoom(20);
                         self.map.setCenter(this.getPosition());
                         console.log(this.icon);
+                        self.alarmMarker(this, '000', false);
                         // self.openDetailInfo(this);
                     });
 
@@ -365,13 +396,13 @@ angular.module('deviceList').component('deviceList', {
             };
             self.updateMarkerColor = function updateMarkerColor(m) {
                 console.log("gps status when updating color: ", m.gpsStatus);
-                var backgroundColor = '#1C9918';
+                var backgroundColor = '#1C9918'; // default for when is moving
                 if(m.gpsStatus === 'Off')
-                    backgroundColor = '#6A7272';
+                    backgroundColor = '#6A7272'; // dark for statos off
                 else if(m.speed == 0)
                     backgroundColor = '#248DFD'; // blue for stopped '#E1B300';
                 m.backgroundColor = backgroundColor;
-                if(m.labelWindow != undefined){
+                if(m.labelWindow != undefined && m.alarmed == false){
                     console.log("label window: ", m.labelWindow);
                     m.labelWindow._opts.backgroundColor = backgroundColor;
                 }

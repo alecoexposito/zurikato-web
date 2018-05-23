@@ -104,6 +104,8 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                         jQuery("#address-control div").css("background-color", self.backgroundColor);
                         jQuery("#detail-control div").css("background-color", self.backgroundColor);
                         self.m.labelWindow._opts.backgroundColor = self.backgroundColor;
+                        self.m.labelWindow.close();
+                        self.m.labelWindow.open();
                         console.log("updating color: ", self.alarmType);
                         if(self.alarmType == '000') {
                             jQuery("#upperTitle").html("Exceso de velocidad");
