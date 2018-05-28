@@ -1,133 +1,205 @@
 <div class="container-fluid">
-  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Select date range</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <button ng-click="$ctrl.historicalRangeClick('today')" class="btn btn-small btn-primary"><i class="fa fa-calendar-check"></i> Today</button>
-          <button ng-click="$ctrl.historicalRangeClick('yesterday')" class="btn btn-small btn-primary" href=""><i class="fa fa-calendar"></i> Yesterday</button>
-          <button id="historical-custom" class="btn btn-small btn-primary" ng-click="$ctrl.historicalCustomClick()">
-            <i class="fa fa-road"></i> Custom
-          </button>
-
-          <input id="historical-dates" type="text" class="form-control mt-1" style="display: none;"/>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <!--<a id="modal-historical" target="_blank" href="" class="btn btn-primary"><i class="fa fa-road"> Watch historical</i></a>-->
-        </div>
-      </div>
-    </div>
-  </div>
-  <div id="device-menu-options" class="toolbar-icons hidden">
-    <a data-toggle="modal" data-target="#myModal" href="">
-      <i class="fa fa-road"></i>
-    </a>
-    <a href="#"><i class="fa fa-map-marker" ng-click="$ctrl.markerOptionClick()"></i></a>
-  </div>
-
-      <!--Body content-->
-      <div class="index-map" map-lazy-load="https://maps.google.com/maps/api/js"
-           map-lazy-load-params="{{$ctrl.googleMapsUrl}}">
-        <ng-map center="[{{$ctrl.initialLatitude}}, {{$ctrl.initialLongitude}}]" zoom="10">
-          <custom-control id="address-control" position="TOP_CENTER" index="2" class="justify-content-center" style="max-width: 50%;position: center; display: none;">
-            <div class="rounded-bottom" style="opacity: 0.7;">
-              <p class="p-1 text-center" id="address-p" style="color: white; font-size: 14px"><i class="fa fa-spinner fa-spin"></i> cargando...</p>
-            </div>
-          </custom-control>
-          <custom-control id="triguer-control" position="LEFT" index="2" class="ml-3 mb-3" on-click="$ctrl.displayHideMenu()" >
-            <button id='trigger' class="btn btn-secondary btn-small"><i class="fa fa-bars"></i> </button>
-          </custom-control>
-          <custom-control id="right-menu" position="TOP_RIGHT" index="1">
-            <div class="mr-3 mt-3">
-              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fa fa-user"></i>
-              </button>
-              <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton" class="mr-3">
-                <a class="dropdown-item" href="#!/login">Log out</a>
-              </div>
-            </div>
-          </custom-control>
-          <custom-control id="left-menu-control" position="LEFT" index="1">
-            <div id="left-menu">
-            <ul class="list-group" style="overflow-y: scroll; max-height: 500px">
-              <li class="list-group-item"><h6>Groups</h6></li>
-              <ul class="list-group" ng-repeat="group in $ctrl.groups" id="{{group.group_id}}">
-                <a class="text-muted" style="text-decoration: none;" data-toggle="collapse" href=".group-{{group.group_id}}"><li class="list-group-item"><h6>{{group.group_label}}</h6></li></a>
-                <div class="collapse group-{{group.group_id}}">
-                  <li class="list-group-item " ng-repeat="device in group.devices" id-device="{{device.id}}" imei="{{device.auth_device}}">
-                    <span ng-click="$ctrl.markerOptionClick(device.auth_device, $event)" style="cursor: pointer; width: 100%;">{{device.label}} ({{device.auth_device}})</span>
-                    <div data-toolbar="device-menu-options" id="{{device.id}}" class="float-right  mt-2 ml-2 test-toolbar" data-toolbar-style="dark">
-                      <i class="fa fa-cog" style="font-size: 12px; cursor: pointer;"></i>
-                    </div>
-                  </li>
+    <div class="modal fade" id="automaticWaitIntervalModal" tabindex="-1" role="dialog" aria-labelledby="automaticWaitInterval"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Set how much time this device will stay visible on automatic</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
-              </ul>
-            </ul>
+                <div class="modal-body fow">
+                    <div class="col-4 offset-3">
+                        <input type="number" id="automaticWaitInterval" value="{{$ctrl.automaticTime / 1000}}"/>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="$ctrl.setIntervalToMarker()">
+                        <i class="fa fa-check"></i> Set Time
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+                    <!--<a id="modal-historical" target="_blank" href="" class="btn btn-primary"><i class="fa fa-road"> Watch historical</i></a>-->
+                </div>
             </div>
-          </custom-control>
+        </div>
 
-          <custom-control id="detail-control" position="BOTTOM_CENTER" index="2" class="rounded-top justify-content-center" style="opacity: 0.7; position: center; display: none;">
-            <div class="p-1 rounded-top" style="color: #ffffff;">
+    </div>
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Select date range</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <button ng-click="$ctrl.historicalRangeClick('today')" class="btn btn-small btn-primary"><i
+                            class="fa fa-calendar-check"></i> Today
+                    </button>
+                    <button ng-click="$ctrl.historicalRangeClick('yesterday')" class="btn btn-small btn-primary"
+                            href=""><i class="fa fa-calendar"></i> Yesterday
+                    </button>
+                    <button id="historical-custom" class="btn btn-small btn-primary"
+                            ng-click="$ctrl.historicalCustomClick()">
+                        <i class="fa fa-road"></i> Custom
+                    </button>
 
+                    <input id="historical-dates" type="text" class="form-control mt-1" style="display: none;"/>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+                    <!--<a id="modal-historical" target="_blank" href="" class="btn btn-primary"><i class="fa fa-road"> Watch historical</i></a>-->
+                </div>
             </div>
-          </custom-control>
-          <!--<marker position="[{{$ctrl.coordinates[0].origin}}, {{$ctrl.coordinates[0].destination}}]" title="Begin"></marker>-->
-          <!--<directions-->
-                  <!--draggable="false"-->
-                  <!--travel-mode="DRIVING"-->
-                  <!--origin="{{$ctrl.originLocation}}"-->
-                  <!--destination="{{$ctrl.destinationLocation}}"-->
-                  <!--waypoints="{{$ctrl.coordinates}}">-->
-          <!--</directions>-->
+        </div>
+    </div>
+    <div id="device-menu-options" class="toolbar-icons hidden">
+        <a data-toggle="modal" data-target="#myModal" href="">
+            <i class="fa fa-road"></i>
+        </a>
+        <a href="" data-toggle="modal" data-target="#automaticWaitIntervalModal">
+            <i class="fa fa-clock"></i>
+        </a>
+    </div>
 
-          <!--<shape name="polyline"-->
-                 <!--path="{{$ctrl.coordinates}}"-->
-                 <!--geodesic="true"-->
-                 <!--stroke-color="#FF0000"-->
-                 <!--stroke-opacity="1.0"-->
-                 <!--stroke-weight="2">-->
-          <!--</shape>-->
+    <!--Body content-->
+    <div class="index-map" map-lazy-load="https://maps.google.com/maps/api/js"
+         map-lazy-load-params="{{$ctrl.googleMapsUrl}}">
+        <ng-map center="[{{$ctrl.initialLatitude}}, {{$ctrl.initialLongitude}}]" zoom="10">
+            <custom-control id="address-control" position="TOP_CENTER" index="2" class="justify-content-center"
+                            style="max-width: 50%;position: center; display: none;">
+                <div class="rounded-bottom" style="opacity: 0.7;">
+                    <p class="p-1 text-center" id="address-p" style="color: white; font-size: 14px"><i
+                            class="fa fa-spinner fa-spin"></i> cargando...</p>
+                </div>
+            </custom-control>
+            <custom-control id="toggle-automatic" position="LEFT" index="2" class="ml-3 mb-3">
+                <button id='toggle-automatic-button' class="btn btn-secondary btn-small" ng-click="$ctrl.toggleAutomatic()">
+                    <i class="fa fa-play-circle"></i>
+                </button>
+            </custom-control>
+            <custom-control id="triguer-control" position="LEFT" index="2" class="ml-3 mb-3"
+                            on-click="$ctrl.displayHideMenu()">
+                <button id='trigger' class="btn btn-secondary btn-small">
+                    <i class="fa fa-bars"></i></button>
+            </custom-control>
+            <custom-control id="right-menu" position="TOP_RIGHT" index="1">
+                <div class="mr-3 mt-3">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-user"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton" class="mr-3">
+                        <a class="dropdown-item" href="#!/login">Log out</a>
+                    </div>
+                </div>
+            </custom-control>
+            <custom-control id="left-menu-control" position="LEFT" index="1">
+                <div id="left-menu">
+                    <div id="treeMenu">
 
-          <!--<directions-->
-                  <!--draggable="false"-->
-                  <!--travel-mode="DRIVING"-->
-                  <!--suppress-markers="true"-->
-                  <!--origin="19.26966,-99.57630222222222"-->
-                  <!--destination="19.2577,-99.57401777777778">-->
-          <!--</directions>-->
-          <!--<marker position="[19.2577, -99.57401777777778]" title="End"></marker>-->
+                    </div>
+                    <!--<ul class="list-group" style="overflow-y: scroll; max-height: 500px">-->
+                        <!--<li class="list-group-item"><h6>Groups</h6></li>-->
+                        <!--<ul class="list-group" ng-repeat="group in $ctrl.groups" id="{{group.group_id}}">-->
+                            <!--<a class="text-muted" style="text-decoration: none;" data-toggle="collapse"-->
+                               <!--href=".group-{{group.group_id}}">-->
+                                <!--<li class="list-group-item"><h6>{{group.group_label}}</h6>-->
+                                <!--</li>-->
+                            <!--</a>-->
+                            <!--<div class="collapse group-{{group.group_id}}">-->
+                                <!--<li class="list-group-item " ng-repeat="device in group.devices"-->
+                                    <!--id-device="{{device.id}}" imei="{{device.auth_device}}">-->
+                                    <!--<span ng-click="$ctrl.markerOptionClick(device.auth_device, $event)"-->
+                                          <!--style="cursor: pointer; width: 100%;">{{device.label}}</span>-->
+                                    <!--<div class="btn-group dropright">-->
+                                        <!--<button class="btn btn-outline-dark btn-sm dropdown-toggle p-0"-->
+                                                <!--style="margin: 2px;" type="button" id="menu-{{device.id}}"-->
+                                                <!--data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">-->
+                                            <!--<i class="fa fa-cog"></i>-->
+                                        <!--</button>-->
+                                    <!--</div>-->
+                                    <!--<div class="dropdown-menu p-0" style="min-width: 0px !important;">-->
+                                        <!--<button class="btn btn-small dropdown-item p-1" data-toggle="modal"-->
+                                                <!--data-target="#myModal" href="">-->
+                                            <!--<i class="fa fa-road"></i>-->
+                                        <!--</button>-->
+                                        <!--<button class="btn btn-small dropdown-item p-1" href="#"-->
+                                                <!--ng-click="$ctrl.markerOptionClick(device.auth_device, $event)">-->
+                                            <!--<i class="fa fa-map-marker"></i>-->
+                                        <!--</button>-->
+                                    <!--</div>-->
+                                    <!--<div data-toolbar="device-menu-options" id="{{device.id}}" class="float-right  mt-2 ml-2 test-toolbar" data-toolbar-style="dark">-->
+                                    <!--<i class="fa fa-cog" style="font-size: 12px; cursor: pointer;"></i>-->
+                                    <!--</div>-->
+                                <!--</li>-->
+                            <!--</div>-->
+                        <!--</ul>-->
+                    <!--</ul>-->
+                </div>
+            </custom-control>
 
-          <!--<directions draggable="true" panel="directions-panel" travel-mode="DRIVING" waypoints="[{&quot;location&quot;:{&quot;lat&quot;:44.32384807250689,&quot;lng&quot;:-78.079833984375},&quot;stopover&quot;:true},{&quot;location&quot;:{&quot;lat&quot;:44.55916341529184,&quot;lng&quot;:-76.17919921875},&quot;stopover&quot;:true}]" origin="toronto" destination="ottawa">-->
-          <!--</directions>-->
+            <custom-control id="detail-control" position="BOTTOM_CENTER" index="2"
+                            class="rounded-top justify-content-center"
+                            style="opacity: 0.7; position: center; display: none;">
+                <div class="p-1 rounded-top" style="color: #ffffff;">
 
-          <!--<directions-->
-                  <!--draggable="true"-->
-                  <!--panel="directions-panel"-->
-                  <!--travel-mode="DRIVING"-->
-                  <!--origin="1135 Karamea-Kohaihai Rd, Kahurangi National Park, Tasman"-->
-                  <!--destination="Pier St, Jackson Bay, West Coast, New Zeland">-->
-          <!--</directions>-->
+                </div>
+            </custom-control>
+            <!--<marker position="[{{$ctrl.coordinates[0].origin}}, {{$ctrl.coordinates[0].destination}}]" title="Begin"></marker>-->
+            <!--<directions-->
+            <!--draggable="false"-->
+            <!--travel-mode="DRIVING"-->
+            <!--origin="{{$ctrl.originLocation}}"-->
+            <!--destination="{{$ctrl.destinationLocation}}"-->
+            <!--waypoints="{{$ctrl.coordinates}}">-->
+            <!--</directions>-->
 
-          <!--<marker id="{{device.idDevice}}" ng-repeat="device in $ctrl.devices" position="[{{device.peripheral_gps_data[0].lat}}, {{device.peripheral_gps_data[0].lng}}]" title="{{device.label}}" imei="{{device.auth_device}}"></marker>-->
-          <!--<marker position="[19.454941666666667, -99.2195535]" title="hello"></marker>-->
-          <!--<marker position="[40.72, -74.20]" title="marker" animation="Animation.DROP"></marker>-->
-          <!--<marker position="[40.73, -74.19]" title="drag me" draggable="true"></marker>-->
-          <!--<marker position="[40.74, -74.18]" title="how" animation="Animation.BOUNCE"></marker>-->
-          <!--<marker position="[40.75, -74.17]" title="are"></marker>-->
-          <!--<marker position="[40.76, -74.16]" title="you"-->
-          <!--icon="https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png"></marker>-->
-          <!--<marker position="[40.77, -74.15]" title="from"></marker>-->
-          <!--<marker position="[40.78, -74.14]" title="allen"></marker>-->
+            <!--<shape name="polyline"-->
+            <!--path="{{$ctrl.coordinates}}"-->
+            <!--geodesic="true"-->
+            <!--stroke-color="#FF0000"-->
+            <!--stroke-opacity="1.0"-->
+            <!--stroke-weight="2">-->
+            <!--</shape>-->
+
+            <!--<directions-->
+            <!--draggable="false"-->
+            <!--travel-mode="DRIVING"-->
+            <!--suppress-markers="true"-->
+            <!--origin="19.26966,-99.57630222222222"-->
+            <!--destination="19.2577,-99.57401777777778">-->
+            <!--</directions>-->
+            <!--<marker position="[19.2577, -99.57401777777778]" title="End"></marker>-->
+
+            <!--<directions draggable="true" panel="directions-panel" travel-mode="DRIVING" waypoints="[{&quot;location&quot;:{&quot;lat&quot;:44.32384807250689,&quot;lng&quot;:-78.079833984375},&quot;stopover&quot;:true},{&quot;location&quot;:{&quot;lat&quot;:44.55916341529184,&quot;lng&quot;:-76.17919921875},&quot;stopover&quot;:true}]" origin="toronto" destination="ottawa">-->
+            <!--</directions>-->
+
+            <!--<directions-->
+            <!--draggable="true"-->
+            <!--panel="directions-panel"-->
+            <!--travel-mode="DRIVING"-->
+            <!--origin="1135 Karamea-Kohaihai Rd, Kahurangi National Park, Tasman"-->
+            <!--destination="Pier St, Jackson Bay, West Coast, New Zeland">-->
+            <!--</directions>-->
+
+            <!--<marker id="{{device.idDevice}}" ng-repeat="device in $ctrl.devices" position="[{{device.peripheral_gps_data[0].lat}}, {{device.peripheral_gps_data[0].lng}}]" title="{{device.label}}" imei="{{device.auth_device}}"></marker>-->
+            <!--<marker position="[19.454941666666667, -99.2195535]" title="hello"></marker>-->
+            <!--<marker position="[40.72, -74.20]" title="marker" animation="Animation.DROP"></marker>-->
+            <!--<marker position="[40.73, -74.19]" title="drag me" draggable="true"></marker>-->
+            <!--<marker position="[40.74, -74.18]" title="how" animation="Animation.BOUNCE"></marker>-->
+            <!--<marker position="[40.75, -74.17]" title="are"></marker>-->
+            <!--<marker position="[40.76, -74.16]" title="you"-->
+            <!--icon="https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png"></marker>-->
+            <!--<marker position="[40.77, -74.15]" title="from"></marker>-->
+            <!--<marker position="[40.78, -74.14]" title="allen"></marker>-->
 
         </ng-map>
-      </div>
-
-
     </div>
+
+
+</div>
 <!--</div>-->

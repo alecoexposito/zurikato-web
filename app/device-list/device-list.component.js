@@ -18,15 +18,133 @@ angular.module('deviceList').component('deviceList', {
             self.geocoder = new google.maps.Geocoder();
             self.groups = [];
             self.currentMenuImei = null;
+            self.menuTree = [];
             var groupsQuery = $http.get('http://189.207.202.64:3007/api/v1/users/' + $localStorage.currentUser.id + '/groups');
             groupsQuery.then(function(result) {
                 // self.groups = result.data;
                 for(var i = 0; i < result.data.length; i++) {
-                    // console.log(result.data[i]);
+                    console.log(result.data[i]);
                     self.addToGroups(result.data[i]);
                 }
-                // console.log(self.groups);
+                self.generateMenu();
             });
+
+            self.generateMenu = function generateMenu() {
+                var data2 = [];
+                for(var i = 0; i < self.groups.length; i++) {
+                    var root = {
+                        text: self.groups[i].group_label,
+                        nodes: []
+                    }
+                    var devices = self.groups[i].devices;
+                    for(var j = 0; j < devices.length; j++) {
+                        root.nodes.push({
+                            text: devices[j].label + "<i class='fa fa-ellipsis-v float-right px-1 test-toolbar' data-toolbar='device-menu-options' id='" + devices[j].id + "' data-toolbar-style='dark' id-device = '" + devices[j].id + "' imei = '" + devices[j].auth_device + "'></i>",
+                            dataAttr: {
+                                imei: devices[j].auth_device,
+                                device_id: devices[j].id
+                            }
+                        });
+                    }
+                    data2.push(root);
+                }
+                jQuery('#treeMenu').treeview({
+                    data: data2,
+                    levels: 3,
+                    collapseIcon: 'fa fa-minus',
+                    expandIcon: 'fa fa-plus',
+                    showCheckbox: true,
+                    uncheckedIcon: 'fa fa-square',
+                    checkedIcon: 'fa fa-check',
+                    partiallyCheckedIcon: 'fa fa-square',
+                    hierarchicalCheck: true,
+                    // backColor: 'transparent',
+                    borderColor: 'transparent',
+                    // showTags: true,
+                    // tagsClass: 'tag tag-pill bg-primary float-right ml-1 p-1',
+                    //events
+                    onNodeSelected: function(event, data) {
+                        // console.log("data", data);
+                        var imei = data.dataAttr.imei;
+                        self.currentImei = imei;
+                        self.currentIdDevice =  data.dataAttr.device_id;
+                        console.log(self.currentIdDevice);
+                        self.markerOptionClick(imei);
+                    },
+                    onNodeChecked: function(event, data) {
+                        self.addMarkerToAutomatic(data.dataAttr.imei);
+                    },
+                    onNodeUnchecked: function(event, data) {
+                        self.removeMarkerFromAutomatic(data.dataAttr.imei);
+                    }
+                });
+            };
+            // self.generateMenu();
+
+            self.automaticOn = false;
+            self.automaticTime = 3000; // time in milliseconds for automatic to change
+            self.automaticPos = 0;
+            self.automaticMarkers = [];
+            self.setIntervalToMarker = function setIntervalToMarker() {
+                var m = self.findMarkerByImei(self.currentImei);
+                if(m)
+                    m.automaticTime = jQuery("#automaticWaitInterval").val() * 1000;
+                console.log(m);
+            };
+            self.toggleAutomatic = function toggleAutomatic() {
+                if(self.automaticOn){
+                    self.stopAutomatic();
+                } else {
+                    self.startAutomatic();
+                }
+            };
+            self.stopAutomatic = function stopAutomatic() {
+                jQuery("#toggle-automatic-button i").removeClass("fa-pause-circle").addClass("fa-play-circle");
+                self.automaticOn = false;
+            };
+            self.startAutomatic = function startAutomatic() {
+                jQuery("#toggle-automatic-button i").removeClass("fa-play-circle").addClass("fa-pause-circle");
+                self.automaticOn = true;
+                self.playAutomatic();
+            };
+            self.addMarkerToAutomatic = function addMarkerToAutomatic(imei) {
+                var m = self.findMarkerByImei(imei);
+                self.automaticMarkers.push(m);
+            };
+            self.removeMarkerFromAutomatic = function removeMarkerFromAutomatic(imei) {
+                // console.log(self.automaticMarkers.length);
+                for(var i = 0; self.automaticMarkers.length; i++) {
+                    if(self.automaticMarkers[i].imei == imei){
+                        self.automaticMarkers.splice(i, 1);
+                        break;
+                    }
+                }
+            };
+            self.playAutomatic = function playAutomatic() {
+                if(!self.automaticOn)
+                    return;
+                if(self.automaticMarkers.length == 0) {
+                    self.stopAutomatic();
+                    return;
+                }
+                if(self.automaticPos >= self.automaticMarkers.length) {
+                    self.automaticPos = 0;
+                }
+                var marker = self.automaticMarkers[self.automaticPos++];
+                var nextMarkerTime = self.automaticTime;
+                if(marker.automaticTime != undefined && marker.automaticTime != false)
+                    nextMarkerTime = marker.automaticTime;
+
+                var position = marker.getPosition();
+                self.map.setZoom(16);
+                self.map.panTo(position);
+                $timeout(function() {
+                    self.playAutomatic();
+                }, nextMarkerTime);
+
+            }
+
+
             self.addToGroups = function addToGroups(data) {
                 for(var j = 0; j < self.groups.length; j++) {
                     var g = self.groups [j];
@@ -81,26 +199,29 @@ angular.module('deviceList').component('deviceList', {
             self.getCurrentDate = function getCurrentDate() {
                 return moment();
             };
-            self.markerOptionClick = function markerOptionClick(param, $event) {
-                var invoker = $('div[data-toolbar="device-menu-options"].pressed');
-                console.log(invoker.length);
-                if (invoker.length > 0) {
-                    console.log("setting currentIdDevice");
-                    self.currentIdDevice = invoker.parent().attr("id-device");
-                    self.currentImei = invoker.parent().attr("imei");
-                } else {
-                    self.currentImei = param;
-                }
-                console.log($event.currentTarget);
-                if(jQuery($event.currentTarget).parent().hasClass("active")) {
-                    jQuery($event.currentTarget).parent().removeClass("active");
-                    self.currentMenuImei = null;
-                }else{
-                    jQuery($event.currentTarget).closest("#left-menu").find("li").removeClass("active");
-                    jQuery($event.currentTarget).parent().addClass("active");
-                    self.currentMenuImei = param;
-                }
-                var m = self.findMarkerByImei(self.currentImei);
+            self.setAutomaticWaitTime = function setAutomaticWaitTime() {
+                console("setting automatic wait time for this device");
+            }
+            self.markerOptionClick = function markerOptionClick(imei) {
+                // var invoker = $('div[data-toolbar="device-menu-options"].pressed');
+                // console.log(invoker.length);
+                // if (invoker.length > 0) {
+                //     console.log("setting currentIdDevice");
+                //     self.currentIdDevice = invoker.attr("id-device");
+                //     self.currentImei = invoker.attr("imei");
+                // } else {
+                //     self.currentImei = imei;
+                // }
+                // console.log($event.currentTarget);
+                // if(jQuery($event.currentTarget).parent().hasClass("active")) {
+                //     jQuery($event.currentTarget).parent().removeClass("active");
+                //     self.currentMenuImei = null;
+                // }else{
+                //     jQuery($event.currentTarget).closest("#left-menu").find("li").removeClass("active");
+                //     jQuery($event.currentTarget).parent().addClass("active");
+                //     self.currentMenuImei = param;
+                // }
+                var m = self.findMarkerByImei(imei);
                 var lat = m.getPosition().lat();
                 var lng = m.getPosition().lng();
                 self.updateMarkerColor(m);
@@ -110,12 +231,14 @@ angular.module('deviceList').component('deviceList', {
                 self.refreshDetailWindow(m, true);
             };
             $('#myModal').on('shown.bs.modal', function (e) {
-                var invoker = $('div[data-toolbar="device-menu-options"].pressed');
-                self.currentIdDevice = invoker.parent().attr("id-device");
-                if(self.currentIdDevice == undefined)
-                    return;
-                console.log("current id device: " + self.currentIdDevice);
-                self.currentImei = invoker.parent().attr("imei");
+                // var invoker = jQuery('i[data-toolbar="device-menu-options"].pressed');
+                // console.log(invoker);
+                // self.currentIdDevice = invoker.attr("id-device");
+                // console.log(self.currentIdDevice);
+                // if(self.currentIdDevice == undefined)
+                //     return;
+                // console.log("current id device: " + self.currentIdDevice);
+                // self.currentImei = invoker.attr("imei");
 
                 $('#historical-custom').daterangepicker({
                     opens: "center",
@@ -123,7 +246,7 @@ angular.module('deviceList').component('deviceList', {
                     "timePicker24Hour": true,
                     "autoApply": true,
                     locale: {
-                        format: 'MM/DD/YYYY H:mm ',
+                        format: 'MM/DD/YYYY HH:mm ',
                         applyLabel: '<i class="fa fa-arrow-right"></i> Go'
                     },
                     // "ranges": {
@@ -141,7 +264,7 @@ angular.module('deviceList').component('deviceList', {
                     console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
                     self.start = start;
                     self.end = end;
-                    window.open('#!device/' + self.currentIdDevice + '/historical/' + self.start.format("YYYY-MM-DD H:mm") + '/' + self.end.format("YYYY-MM-DD H:mm"),'_blank');
+                    window.open('#!device/' + self.currentIdDevice + '/historical/' + self.start.format("YYYY-MM-DD HH:mm") + '/' + self.end.format("YYYY-MM-DD HH:mm"),'_blank');
                     // $("#modal-historical").attr("href", '#!device/' + self.currentIdDevice + '/historical/' + self.start.format("YYYY-MM-DD H:mm") + '/' + self.end.format("YYYY-MM-DD H:mm"));
                     $('#myModal').modal('hide');
                 });
@@ -161,7 +284,7 @@ angular.module('deviceList').component('deviceList', {
                     self.start = moment().subtract(1, 'days').set({hour:0,minute:0,second:0,millisecond:0}).utc();
                     self.end = moment().subtract(1, 'days').set({hour:23,minute:59,second:0,millisecond:0}).utc();
                 }
-                var linkUrl = '#!device/' + self.currentIdDevice + '/historical/' + moment(self.start).utc().format("YYYY-MM-DD H:mm") + '/' + moment(self.end).utc().format("YYYY-MM-DD H:mm");
+                var linkUrl = '#!device/' + self.currentIdDevice + '/historical/' + moment(self.start).utc().format("YYYY-MM-DD HH:mm") + '/' + moment(self.end).utc().format("YYYY-MM-DD HH:mm");
                 $('#myModal').modal('hide');
                 window.open(linkUrl, '_blank');
             };
@@ -170,14 +293,23 @@ angular.module('deviceList').component('deviceList', {
                 $('#historical-custom').data('daterangepicker').toggle();
             };
             self.displayHideMenu = function displayHideMenu() {
-                $('div[data-toolbar="device-menu-options"]').toolbar({
+                self.generateMenu();
+                $('i[data-toolbar="device-menu-options"]').toolbar({
                     content: '#device-menu-options',
                     position: 'right',
-                    event: 'click',
+                    // event: 'click',
                     hideOnClick: true
                 });
+                jQuery('i[data-toolbar="device-menu-options"]').on('toolbarShown',
+                    function( event ) {
+                        console.log("toolbar shown", this);
+                        var idDevice = jQuery(this).attr("id-device");
+                        var imei = jQuery(this).attr("imei");
+                        self.currentIdDevice = idDevice;
+                        self.currentImei = imei;
+                    }
+                );
                 $("#left-menu").toggle("fast");
-                console.log("opening alarm window");
             };
             self.centerMarkerClick = function centerMarkerClick() {
 
@@ -217,7 +349,7 @@ angular.module('deviceList').component('deviceList', {
                         m.alarmed = true;
                         $timeout(function() {
                             self.alarmMarker(m, null, true);
-                        }, 5000);
+                        }, 60000);
                     }
                 } else {
                     console.log("segunda vez: ", m.backgroundColor);
@@ -459,6 +591,8 @@ angular.module('deviceList').component('deviceList', {
                 var dateFormatted = moment(dateStr, "YY/M/D H:m:s").format("DD/MM/YYYY HH:mm:ss");
                 return dateFormatted;
             };
+
+
 
 
         }

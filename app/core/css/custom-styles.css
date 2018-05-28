@@ -41,3 +41,9 @@ ng-map {width:100%; height:100%;position: absolute;}
 .label-window .si-content-wrapper {
     border-radius: 6px;
 }
+
+#treeMenu li.list-group-item {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-right: 5px;
+}
