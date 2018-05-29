@@ -386,7 +386,7 @@ angular.module('deviceList').component('deviceList', {
                 var m = self.findMarkerByImei(imei);
                 self.alarmMarker(m, alarmType, false);
                 if(alarmType == 100 || alarmType == '000') {
-                    var w = window.open(linkUrl, 'newwindow-' + alarm.device_id, 'width=1024,height=768');
+                    var w = window.open(linkUrl, 'newwindow-' + Date.now(), 'width=1024,height=768');
                     w.device = d;
                 }
             };
