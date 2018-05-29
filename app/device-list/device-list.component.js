@@ -37,9 +37,14 @@ angular.module('deviceList').component('deviceList', {
                         nodes: []
                     }
                     var devices = self.groups[i].devices;
+                    var imeis = $localStorage.currentUser.automatic_imeis;
                     for(var j = 0; j < devices.length; j++) {
+                        var checked = imeis.indexOf(devices[j].auth_device) != -1;
                         root.nodes.push({
                             text: devices[j].label + "<i class='fa fa-ellipsis-v float-right px-1 test-toolbar' data-toolbar='device-menu-options' id='" + devices[j].id + "' data-toolbar-style='dark' id-device = '" + devices[j].id + "' imei = '" + devices[j].auth_device + "'></i>",
+                            // state: {
+                            //     checked: checked
+                            // },
                             dataAttr: {
                                 imei: devices[j].auth_device,
                                 device_id: devices[j].id
@@ -78,6 +83,21 @@ angular.module('deviceList').component('deviceList', {
                         self.removeMarkerFromAutomatic(data.dataAttr.imei);
                     }
                 });
+                self.checkAutomatedMarkers();
+            };
+            self.checkAutomatedMarkers = function checkAutomatedMarkers() {
+                var imeis = $localStorage.currentUser.automatic_imeis;
+                var nodes = $('#treeMenu').treeview('getNodes');
+                var l = Object.keys(nodes).length;
+
+                for(var i = 0; i < l; i++) {
+                    console.log(nodes[i].level);
+                    if(nodes[i].level == 2 && imeis.indexOf(nodes[i].dataAttr.imei) != -1) {
+                        console.log("dentro del if");
+                        $('#treeMenu').treeview('checkNode', [ nodes[i], { silent: false } ]);
+                    }
+                }
+
             };
             // self.generateMenu();
 
@@ -85,6 +105,24 @@ angular.module('deviceList').component('deviceList', {
             self.automaticTime = 3000; // time in milliseconds for automatic to change
             self.automaticPos = 0;
             self.automaticMarkers = [];
+            self.getSelectedImeis = function getSelectedImeis() {
+                var automaticImeis = "";
+                for(var i = 0; i < self.automaticMarkers.length; i++) {
+                    var imei = self.automaticMarkers[i].imei;
+                    if(automaticImeis != "")
+                        automaticImeis = automaticImeis + "," + imei;
+                    else
+                        automaticImeis = imei;
+                }
+                return automaticImeis;
+            },
+            self.updateImeis = function updateImeis() {
+                var imeis = self.getSelectedImeis();
+                var imeisUpdate = $http.put('http://189.207.202.64:3007/api/v1/users/' + $localStorage.currentUser.id + '/updimeis/' + imeis);
+                imeisUpdate.then(function(result) {
+                    console.log("result data for imeis query: ", result);
+                });
+            };
             self.setIntervalToMarker = function setIntervalToMarker() {
                 var m = self.findMarkerByImei(self.currentImei);
                 if(m)
@@ -92,6 +130,7 @@ angular.module('deviceList').component('deviceList', {
                 console.log(m);
             };
             self.toggleAutomatic = function toggleAutomatic() {
+                self.updateImeis();
                 if(self.automaticOn){
                     self.stopAutomatic();
                 } else {
@@ -221,6 +260,7 @@ angular.module('deviceList').component('deviceList', {
                 //     jQuery($event.currentTarget).parent().addClass("active");
                 //     self.currentMenuImei = param;
                 // }
+                self.currentMenuImei = imei;
                 var m = self.findMarkerByImei(imei);
                 var lat = m.getPosition().lat();
                 var lng = m.getPosition().lng();
@@ -293,22 +333,25 @@ angular.module('deviceList').component('deviceList', {
                 $('#historical-custom').data('daterangepicker').toggle();
             };
             self.displayHideMenu = function displayHideMenu() {
-                self.generateMenu();
-                $('i[data-toolbar="device-menu-options"]').toolbar({
-                    content: '#device-menu-options',
-                    position: 'right',
-                    // event: 'click',
-                    hideOnClick: true
-                });
-                jQuery('i[data-toolbar="device-menu-options"]').on('toolbarShown',
-                    function( event ) {
-                        console.log("toolbar shown", this);
-                        var idDevice = jQuery(this).attr("id-device");
-                        var imei = jQuery(this).attr("imei");
-                        self.currentIdDevice = idDevice;
-                        self.currentImei = imei;
-                    }
-                );
+                if(jQuery("#treeMenu ul").length == 0) {
+                    self.generateMenu();
+                    $('i[data-toolbar="device-menu-options"]').toolbar({
+                        content: '#device-menu-options',
+                        position: 'right',
+                        // event: 'click',
+                        hideOnClick: true
+                    });
+                    jQuery('i[data-toolbar="device-menu-options"]').on('toolbarShown',
+                        function( event ) {
+                            console.log("toolbar shown", this);
+                            var idDevice = jQuery(this).attr("id-device");
+                            var imei = jQuery(this).attr("imei");
+                            self.currentIdDevice = idDevice;
+                            self.currentImei = imei;
+                        }
+                    );
+
+                }
                 $("#left-menu").toggle("fast");
             };
             self.centerMarkerClick = function centerMarkerClick() {
