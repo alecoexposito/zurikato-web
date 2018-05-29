@@ -187,6 +187,7 @@ angular.module('deviceList').component('deviceList', {
                 if(marker.automaticTime != undefined && marker.automaticTime != false)
                     nextMarkerTime = marker.automaticTime;
 
+                self.updateAddressAndDetail(marker);
                 var position = marker.getPosition();
                 self.map.setZoom(16);
                 self.map.panTo(position);
@@ -595,6 +596,10 @@ angular.module('deviceList').component('deviceList', {
                     m.labelWindow._opts.backgroundColor = backgroundColor;
                 }
             };
+            self.updateAddressAndDetail = function updateAddressAndDetail(m) {
+                self.getAddress(m.getPosition().lat(), m.getPosition().lng(), true, m.backgroundColor);
+                self.refreshDetailWindow(m, true);
+            };
             self.getAddress = function getAddress(latitude, longitude, showOnMap, backgroundColor) {
                 var latlng = new google.maps.LatLng(latitude, longitude);
                 if(backgroundColor)
@@ -630,8 +635,9 @@ angular.module('deviceList').component('deviceList', {
 
                 // m.detailWindow.setContent(contentDetail);
                 // if(open){
-                    jQuery("#detail-control div").html(contentDetail);
-                    jQuery("#detail-control").css("background-color", m.backgroundColor).show("fast");
+                jQuery("#detail-control div").html(contentDetail);
+                console.log("content detail: ", contentDetail);
+                jQuery("#detail-control").css("background-color", m.backgroundColor).show("fast");
                     // m.detailWindow.open();
                 // }
             };
