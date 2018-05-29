@@ -28,7 +28,18 @@ angular.module('deviceList').component('deviceList', {
                 }
                 self.generateMenu();
             });
-
+            self.updateTreeColors = function updateTreeColors() {
+                var nodes = $('#treeMenu').treeview('getNodes');
+                var l = Object.keys(nodes).length;
+                for(var i = 0; i < l; i++) {
+                    console.log(nodes[i].level);
+                    if(nodes[i].level == 2) {
+                        var m = self.findMarkerByImei(nodes[i].dataAttr.imei);
+                        if(m.backgroundColor != undefined)
+                            jQuery("li.node-treeMenu[data-imei='" + nodes[i].dataAttr.imei + "']").css('color', m.backgroundColor);
+                    }
+                }
+            };
             self.generateMenu = function generateMenu() {
                 var data2 = [];
                 for(var i = 0; i < self.groups.length; i++) {
@@ -84,6 +95,7 @@ angular.module('deviceList').component('deviceList', {
                     }
                 });
                 self.checkAutomatedMarkers();
+                self.updateTreeColors();
             };
             self.checkAutomatedMarkers = function checkAutomatedMarkers() {
                 var imeis = $localStorage.currentUser.automatic_imeis;
@@ -99,7 +111,6 @@ angular.module('deviceList').component('deviceList', {
                 }
 
             };
-            // self.generateMenu();
 
             self.automaticOn = false;
             self.automaticTime = 3000; // time in milliseconds for automatic to change
