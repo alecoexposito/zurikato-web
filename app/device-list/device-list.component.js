@@ -89,9 +89,12 @@ angular.module('deviceList').component('deviceList', {
                     },
                     onNodeChecked: function(event, data) {
                         self.addMarkerToAutomatic(data.dataAttr.imei);
+                        self.updateImeis();
+
                     },
                     onNodeUnchecked: function(event, data) {
                         self.removeMarkerFromAutomatic(data.dataAttr.imei);
+                        self.updateImeis();
                     }
                 });
                 self.checkAutomatedMarkers();
@@ -113,7 +116,7 @@ angular.module('deviceList').component('deviceList', {
             };
 
             self.automaticOn = false;
-            self.automaticTime = 3000; // time in milliseconds for automatic to change
+            self.automaticTime = 5000; // time in milliseconds for automatic to change
             self.automaticPos = 0;
             self.automaticMarkers = [];
             self.getSelectedImeis = function getSelectedImeis() {
@@ -132,6 +135,7 @@ angular.module('deviceList').component('deviceList', {
                 var imeisUpdate = $http.put('http://189.207.202.64:3007/api/v1/users/' + $localStorage.currentUser.id + '/updimeis/' + imeis);
                 imeisUpdate.then(function(result) {
                     console.log("result data for imeis query: ", result);
+                    $localStorage.currentUser.automatic_imeis = imeis;
                 });
             };
             self.setIntervalToMarker = function setIntervalToMarker() {
@@ -141,7 +145,6 @@ angular.module('deviceList').component('deviceList', {
                 console.log(m);
             };
             self.toggleAutomatic = function toggleAutomatic() {
-                self.updateImeis();
                 if(self.automaticOn){
                     self.stopAutomatic();
                 } else {
