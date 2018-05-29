@@ -134,7 +134,6 @@ angular.module('deviceList').component('deviceList', {
                 var imeis = self.getSelectedImeis();
                 var imeisUpdate = $http.put('http://189.207.202.64:3007/api/v1/users/' + $localStorage.currentUser.id + '/updimeis/' + imeis);
                 imeisUpdate.then(function(result) {
-                    console.log("result data for imeis query: ", result);
                     $localStorage.currentUser.automatic_imeis = imeis;
                 });
             };
@@ -386,7 +385,7 @@ angular.module('deviceList').component('deviceList', {
                 var m = self.findMarkerByImei(imei);
                 self.alarmMarker(m, alarmType, false);
                 if(alarmType == 100 || alarmType == '000') {
-                    var w = window.open(linkUrl, 'newwindow', 'width=1024,height=768');
+                    var w = window.open(linkUrl, 'newwindow-' + alarm.device_id, 'width=1024,height=768');
                     w.device = d;
                 }
             };
