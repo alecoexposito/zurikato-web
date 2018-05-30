@@ -372,20 +372,17 @@ angular.module('deviceList').component('deviceList', {
 
             };
             self.openAlarm = function openAlarm(alarm) {
-                console.log("in method: ", alarm);
                 var alarmType = alarm.device_info;
                 var imei = alarm.device_id;
                 var latitude = alarm.latitude;
                 var longitude = alarm.longitude;
                 var speed = alarm.speed;
                 var orientation_plain = alarm.orientation_plain;
-                console.log("opening tab: ", latitude);
-                var linkUrl = '#!device/alarm/' + latitude + "/" + longitude + "/" + speed + "/" + alarmType;
-                console.log(linkUrl);
-                var d = self.findDeviceByImei(imei);
-                var m = self.findMarkerByImei(imei);
-                self.alarmMarker(m, alarmType, false);
                 if(alarmType == 100 || alarmType == '000') {
+                    var linkUrl = '#!device/alarm/' + latitude + "/" + longitude + "/" + speed + "/" + alarmType;
+                    var d = self.findDeviceByImei(imei);
+                    var m = self.findMarkerByImei(imei);
+                    self.alarmMarker(m, alarmType, false);
                     var w = window.open(linkUrl, 'newwindow-' + Date.now(), 'width=1024,height=768');
                     w.device = d;
                 }
