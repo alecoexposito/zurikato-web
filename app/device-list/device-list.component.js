@@ -388,8 +388,6 @@ angular.module('deviceList').component('deviceList', {
                 }
             };
             self.alarmMarker = function alarmMarker(m, alarmType, isTimeout) {
-                // console.log("alarm type: ", alarmType);
-                // console.log(alarmType == '000');
                 if(!isTimeout) {
                     var backgroundColor = "";
                     if(alarmType == 100) {

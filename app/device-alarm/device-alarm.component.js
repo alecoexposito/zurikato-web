@@ -112,7 +112,6 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                             jQuery("#upperTitle").html("Botón de Pánico Activado");
                         }
                     }
-                    console.log("matching alarmed device", self.device.auth_device);
                     var g = self.socket.subscribe(self.device.auth_device);
                     g.watch(function (data) {
                         if (self.m != null) {
@@ -123,7 +122,6 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                             self.m.lastUpdate = self.getDateByHex(data.date);
                             self.rotateMarker(self.m, data.orientation_plain);
                             self.map.panTo(new google.maps.LatLng(data.latitude, data.longitude));
-                            console.log("se movio");
                             self.updateColor();
                             self.getAddress(data.latitude, data.longitude, true);
                             self.refreshDetailWindow(self.m);
@@ -141,12 +139,10 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                 var min = parseInt(str.substr(8, 2), 16).toString();
                 var sec = parseInt(str.substr(10, 2), 16).toString();
                 var dateStr = year + "/" + month + "/" + day + " " + hour + ":" + min + ":" + sec;
-                console.log(dateStr);
                 var dateFormatted = moment(dateStr, "YY/M/D H:m:s").format("YYYY/MM/DD HH:mm:ss");
                 return dateFormatted;
             };
             self.refreshDetailWindow = function refreshDetailWindow(m) {
-                console.log("mostrando abajo");
                 var contentDetail = "" +
                     "<p class='' style='font-size: 14px'><strong>" +
                     "" + self.m.title + "</strong> " +
@@ -154,8 +150,6 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                     "Velocidad: " + self.m.speed + " Km/h, " +
                     "Último reporte: " + moment(self.m.lastUpdate, 'HH:mm:ss DD/MM/YYYY').format("DD/MM/YYYY HH:mm:ss") + "" +
                     "";
-                console.log("content detail. ", jQuery("#detail-control div"));
-                console.log("content detail. ", jQuery("#detail-control"));
 
                 // m.detailWindow.setContent(contentDetail);
                 // if(open){
