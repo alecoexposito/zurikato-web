@@ -28,6 +28,11 @@ angular.module('deviceList').component('deviceList', {
                 }
                 self.generateMenu();
             });
+            self.hideMenu = function hideMenu() {
+                $timeout(function() {
+                    $("#left-menu").hide("fast");
+                }, 1000);
+            };
             self.updateTreeColors = function updateTreeColors() {
                 var nodes = $('#treeMenu').treeview('getNodes');
                 var l = Object.keys(nodes).length;
@@ -248,7 +253,10 @@ angular.module('deviceList').component('deviceList', {
                     if($localStorage.devices.length > 0) {
                         self.initializeMarkers($localStorage.devices);
                     }
-                    // console.log(self.addressWindow);
+                    google.maps.event.addListener(self.map, 'click', function() {
+                        self.hideMenu();
+                    });
+
                     console.log("map initialized");
                     return map;
                 });
@@ -526,6 +534,7 @@ angular.module('deviceList').component('deviceList', {
                     m.labelWindow = infoWindow;
                     infoWindow.open();
 
+
                     google.maps.event.addListener(m, 'click', function() {
                         var lat = this.getPosition().lat();
                         var lng = this.getPosition().lng();
@@ -539,7 +548,6 @@ angular.module('deviceList').component('deviceList', {
                         self.map.setZoom(20);
                         self.map.setCenter(this.getPosition());
                         console.log(this.icon);
-                        self.alarmMarker(this, '000', false);
                         // self.openDetailInfo(this);
                     });
 
