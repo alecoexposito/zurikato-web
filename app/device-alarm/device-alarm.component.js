@@ -106,9 +106,10 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                         self.m.labelWindow._opts.backgroundColor = self.backgroundColor;
                         self.m.labelWindow.close();
                         self.m.labelWindow.open();
-                        console.log("updating color: ", self.alarmType);
                         if(self.alarmType == '000') {
                             jQuery("#upperTitle").html("Exceso de velocidad");
+                        }else {
+                            jQuery("#upperTitle").html("Botón de Pánico Activado");
                         }
                     }
                     console.log("matching alarmed device", self.device.auth_device);
