@@ -95,10 +95,14 @@ angular.module('deviceList').component('deviceList', {
                     onNodeUnchecked: function(event, data) {
                         self.removeMarkerFromAutomatic(data.dataAttr.imei);
                         self.updateImeis();
+                    },
+                    onRendered: function(event, nodes) {
+                        $timeout(function() {
+                            self.checkAutomatedMarkers();
+                            self.updateTreeColors();
+                        }, 300);
                     }
                 });
-                self.checkAutomatedMarkers();
-                self.updateTreeColors();
             };
             self.checkAutomatedMarkers = function checkAutomatedMarkers() {
                 var imeis = $localStorage.currentUser.automatic_imeis;
