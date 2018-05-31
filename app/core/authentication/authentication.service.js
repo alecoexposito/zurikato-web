@@ -35,7 +35,6 @@
         }
 
         function SaveTokenInCookie(t) {
-            console.log("saving token: ", t);
             $cookies.put("auth_token", t);
         }
 

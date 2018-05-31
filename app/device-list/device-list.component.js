@@ -391,6 +391,13 @@ angular.module('deviceList').component('deviceList', {
                 var speed = alarm.speed;
                 var orientation_plain = alarm.orientation_plain;
                 if(alarmType == 100 || alarmType == '000') {
+                    var s;
+                    if(alarmType == 100)
+                        s = document.getElementById("panicAlarmAudio");
+                    else
+                        s = document.getElementById("speedAlarmAudio");
+                    s.play();
+
                     var linkUrl = '#!device/alarm/' + latitude + "/" + longitude + "/" + speed + "/" + alarmType;
                     var d = self.findDeviceByImei(imei);
                     var m = self.findMarkerByImei(imei);
