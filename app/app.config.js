@@ -30,7 +30,7 @@ angular.
         otherwise('/devices');
     }
   ]).run(run);
-  function run($rootScope, $http, $location, $localStorage) {
+  function run($rootScope, $http, $location, $localStorage, $cookies) {
       // keep user logged in after page refresh
       if ($localStorage.currentUser) {
           $http.defaults.headers.common.Authorization = 'Bearer ' + $localStorage.currentUser.token;
@@ -40,7 +40,7 @@ angular.
       $rootScope.$on('$locationChangeStart', function (event, next, current) {
           var publicPages = ['/login'];
           var restrictedPage = publicPages.indexOf($location.path()) === -1;
-          if (restrictedPage && !$localStorage.currentUser) {
+          if (restrictedPage && !$cookies.get("auth_token")) {
               $location.path('/login');
           }
       });

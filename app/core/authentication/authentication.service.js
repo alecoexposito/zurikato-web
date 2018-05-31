@@ -5,7 +5,7 @@
         .module('core.authentication')
         .factory('AuthenticationService', Service);
 
-    function Service($http, $localStorage, $cacheFactory) {
+    function Service($http, $localStorage, $cacheFactory, $cookies) {
         var service = {};
 
         service.Login = Login;
@@ -19,9 +19,9 @@
                     if (response.auth_token) {
                         // store username and token in local storage to keep user logged in between page refreshes
                         $localStorage.currentUser = { username: username, token: response.auth_token, id: response.id, automatic_imeis: response.automatic_imeis };
-
+                        SaveTokenInCookie(response.auth_token);
                         // add jwt token to auth header for all requests made by the $http service
-                        $http.defaults.headers.common.Authorization = 'Bearer ' + response.auth_token;
+                        $http.defaults.headers.common.Authorization = 'Bearer ' + GetTokenFromCookie();
                         // execute callback with true to indicate successful login
                         callback(true);
                     } else {
@@ -34,9 +34,19 @@
                 });
         }
 
+        function SaveTokenInCookie(t) {
+            console.log("saving token: ", t);
+            $cookies.put("auth_token", t);
+        }
+
+        function GetTokenFromCookie() {
+            return $cookies.get('auth_token');
+        }
+
         function Logout() {
             // remove user from local storage and clear http auth header
             delete $localStorage.currentUser;
+            $cookies.remove("auth_token");
             $cacheFactory.get('$http').removeAll();
             $http.defaults.headers.common.Authorization = '';
         }

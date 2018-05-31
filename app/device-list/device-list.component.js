@@ -395,7 +395,9 @@ angular.module('deviceList').component('deviceList', {
                     var d = self.findDeviceByImei(imei);
                     var m = self.findMarkerByImei(imei);
                     self.alarmMarker(m, alarmType, false);
-                    var w = window.open(linkUrl, 'newwindow-' + Date.now(), 'width=1024,height=768');
+                    var width = (window.screen.width * 25)/100;
+                    var height = (window.screen.height * 25)/100;
+                    var w = window.open(linkUrl, 'newwindow-' + Date.now(), 'width=' + width + ',height=' + height + '  ');
                     w.device = d;
                 }
             };

@@ -106,6 +106,7 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                         self.m.labelWindow._opts.backgroundColor = self.backgroundColor;
                         self.m.labelWindow.close();
                         self.m.labelWindow.open();
+                        console.log("waiting to change title: ", self.alarmType);
                         if(self.alarmType == '000') {
                             jQuery("#upperTitle").html("Exceso de velocidad");
                         }else {

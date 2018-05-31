@@ -5,7 +5,7 @@
         .module('phonecatApp')
         .controller('Login.IndexController', Controller);
 
-    function Controller($location, AuthenticationService, $localStorage) {
+    function Controller($location, AuthenticationService, $localStorage, $cookies) {
         var vm = this;
 
         vm.login = login;

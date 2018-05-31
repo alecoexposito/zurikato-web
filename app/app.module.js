@@ -12,4 +12,5 @@ angular.module('phonecatApp', [
   'deviceHistorical',
   'deviceAlarm',
   'ngStorage',
+  'ngCookies'
 ]);
