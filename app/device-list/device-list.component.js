@@ -3,8 +3,8 @@
 // Register `deviceList` component, along with its associated controller and template
 angular.module('deviceList').component('deviceList', {
     templateUrl: 'device-list/device-list.template.html',
-    controller: ['Device', '$http', 'NgMap', '$localStorage', '$timeout',
-        function DeviceListController(Device, $http, NgMap, $localStorage, $timeout) {
+    controller: ['Device', '$http', 'NgMap', '$location', '$localStorage', '$timeout',
+        function DeviceListController(Device, $http, NgMap, $location, $localStorage, $timeout) {
             var self = this;
             self.currentUser = $localStorage.currentUser;
             self.start = null;
@@ -19,11 +19,316 @@ angular.module('deviceList').component('deviceList', {
             self.groups = [];
             self.currentMenuImei = null;
             self.menuTree = [];
+            self.fences = [];//JSON.parse($localStorage.currentUser.fences);
+            self.polygonInfoWindow = new SnazzyInfoWindow({
+                content: "",
+                // marker: m,
+                // backgroundColor: m.backgroundColor,
+                padding: '10px',
+                // openOnMarkerClick: false,
+                closeOnMapClick: true,
+                closeWhenOthersOpen: true,
+                showCloseButton: true,
+                // fontColor: 'white',
+                maxWidth: 1000,
+                // maxHeight: 35,
+                pointer: '7px',
+                wrapperClass: 'area-info-window',
+                // disableAutoPan: true
+                position: null,
+                map: self.map
+            });
+            // jQuery("body").on("click", ".area-info-window", function() {
+            //     console.log("estoy aki");
+            //     self.editPolygonInfo();
+            // });
+
+            self.features = null;
+
+            self.test = function test() {
+                self.disableFenceEditionMode();
+                // self.updateFences();
+                // return;
+                // self.map.data.forEach(function(feat) {
+                //     self.map.data.remove(feat);
+                // });
+
+                // self.fences.forEach(function(fence) {
+                //     console.log("kitando el map al poly con id: ", fence.id);
+                //     fence.setMap(null);
+                // });
+                // console.log("antes de eliminar", self.fences);
+                // self.fences = [];
+                // console.log("despues de eliminar: ", self.fences);
+
+                // self.map.data.forEach(function(feat) {
+                //     self.map.data.remove(feat);
+                // });
+                // self.fences = [];
+
+                // var m = self.findMarkerByImei("0353701090075181");
+                // self.alarmFenceMarker(m);
+            };
+
+            self.enableFenceEditionMode = function enableFenceEditionMode() {
+                self.map.mapDrawingManager[0].setOptions({drawingControl:true});
+                self.fences.forEach(function(elem) {
+                    elem.setMap(self.map);
+                });
+                $("#enableFenceEditionButton").hide();
+                $(".fence-edit-btn").show();
+            };
+            self.disableFenceEditionMode = function disableFenceEditionMode() {
+                self.map.mapDrawingManager[0].setOptions({drawingControl:false});
+                self.fences.forEach(function(elem) {
+                    elem.setMap(null);
+                });
+                $("#enableFenceEditionButton").show();
+                $(".fence-edit-btn").hide();
+            };
+            self.logOutOption = function logOutOption() {
+                self.map.data.forEach(function(feat) {
+                    self.map.data.remove(feat);
+                });
+                self.fences.forEach(function(fence) {
+                    fence.setMap(null);
+                });
+                delete self.fences;
+                console.log("antes de eliminar", self.fences);
+                self.fences = [];
+                console.log("despues de eliminar: ", self.fences);
+                $location.path("/login");
+            };
+            self.updateFences = function updateImeis() {
+                var fences2 = self.getGeoJson();
+                var fencesUpdate = $http.put('http://189.207.202.64:3007/api/v1/users/' + $localStorage.currentUser.id + '/updfences', {fences: fences2});
+                fencesUpdate.then(function(result) {
+                    $localStorage.currentUser.fences = fences2;
+                });
+            };
+            jQuery("body").on("click", ".clear-radios-button", function() {
+                self.clearRadiosRow(this);
+            });
+            self.clearRadiosRow = function clearRadiosRow(elem) {
+                jQuery(elem).parent().find("label.active").removeClass("active");
+            };
+            self.setDevicesToFences = function setDevicesToFences() {
+                jQuery("ul#fence-list li").each(function(index) {
+                    var imei = self.currentImei;
+                    var pos = jQuery(this).attr("fence-index");
+                    var arr = jQuery(this).find("label.active input");
+                    if(arr.length > 0) {
+                        if(arr.hasClass('enter-alarm')) {
+                            self.addDeviceToFence(self.fences[pos], imei, true);
+                        } else {
+                            self.addDeviceToFence(self.fences[pos], imei, false);
+                        }
+                    }
+                });
+            };
+            $('#fencesModal').on('shown.bs.modal', function (e) {
+            });
+            self.getGeoJson = function getGeoJson() {
+                // self.map.data.toGeoJson(function(data){
+                //     self.features = data;
+                // });
+                self.features.features.length = 0;
+                for(var i = 0; i < self.fences.length; i++) {
+                    console.log("En el ciclo de las features");
+                    var polygon = self.fences[i];
+                    var geoJson = self.getGeoJsonFromFence(polygon, false);
+
+                    // var geoJson = {
+                    //     type: 'Feature',
+                    //     geometry: {
+                    //         type: 'Polygon',
+                    //         coordinates: [[]]
+                    //     },
+                    //     properties: {}
+                    // }
+                    // for (let point of polygon.getPath().getArray()) {
+                    //     geoJson.geometry.coordinates[0].push([point.lng(), point.lat()]);
+                    // }
+                    // var point = polygon.getPath().getArray()[0];
+                    // geoJson.geometry.coordinates[0].push([point.lng(), point.lat()]);
+                    self.features.features.push(geoJson);
+                }
+                return JSON.stringify(self.features);
+            };
+            self.incremental = 0;
+            self.getGeoJsonFromFence = function getGeoJsonFromFence(fence, withHeader) {
+                var geoJson = {
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Polygon',
+                        coordinates: [[]]
+                    },
+                    properties: {
+                        fill: "#2622e2",
+                    }
+                }
+                for (let point of fence.getPath().getArray()) {
+                    geoJson.geometry.coordinates[0].push([point.lng(), point.lat()]);
+                }
+                var point = fence.getPath().getArray()[0];
+                geoJson.geometry.coordinates[0].push([point.lng(), point.lat()]);
+                geoJson.properties = {
+                    id: Date.now() + self.incremental++,
+                    title: fence.title,
+                    description: fence.description,
+                    devices: JSON.stringify(fence.devices)
+                };
+                if(withHeader) {
+                    var headerGeoJson = {
+                        type: "FeatureCollection",
+                        features: [geoJson]
+                    };
+                    return headerGeoJson;
+                }
+                return geoJson;
+            };
+            self.addFeatureToData = function addFeatureToData(event) {
+                // if(event.type == google.maps.drawing.OverlayType.POLYGON) {
+                //     var feat = new google.maps.Data.Feature({
+                //         geometry: new google.maps.Data.Polygon([event.overlay.getPath().getArray()])
+                //     });
+                //     feat.setProperty("title", "test");
+                //     self.map.data.add(feat);
+                // }
+                //
+                //
+                // google.maps.event.addListener(self.map.data, 'click', function(e) {
+                //     self.fenceClick(e, this);
+                // });
+
+            };
+            self.alarmFenceMarker = function alarmFenceMarker(m) {
+                for(var i = 0; i < self.fences.length; i++) {
+                    var f = self.fences[i];
+                    var d = f.devices.find(function(elem) {
+                        if(elem.imei == m.imei)
+                            return elem;
+                    });
+                    if(d == undefined)
+                        continue;
+                    var isContained = google.maps.geometry.poly.containsLocation(m.getPosition(), f);
+                    if(d.alarmOnEntering) {
+                        if(isContained && !d.alreadyAlarmed){
+                            d.alreadyAlarmed = true;
+                            self.alarmFence(f, m, true);
+                        } else if(!isContained && d.alreadyAlarmed){
+                            d.alreadyAlarmed = false;
+                        }
+                    }else {
+                        if(!isContained && !d.alreadyAlarmed) {
+                            d.alreadyAlarmed = true;
+                            self.alarmFence(f, m, false);
+                        } else if(isContained && d.alreadyAlarmed) {
+                            d.alreadyAlarmed = false;
+                        }
+                    }
+                }
+            };
+            self.alarmFence = function alarmFence(fence, marker, enteringAlarm) {
+                var geoJson = self.getGeoJsonFromFence(fence, true);
+                var markerPos = marker.getPosition();
+                var latitude = markerPos.lat();
+                var longitude = markerPos.lng();
+                var speed = marker.speed;
+                var alarmType = enteringAlarm ? 'enter-fence' : 'exit-fence';
+                var linkUrl = '#!device/alarm/' + latitude + "/" + longitude + "/" + speed + "/" + alarmType;
+                var d = self.findDeviceByImei(marker.imei);
+                // self.alarmMarker(m, alarmType, false);
+                var width = (window.screen.width * 25)/100;
+                var height = (window.screen.height * 25)/100;
+                self.openAlarmWindow(linkUrl, width, height, d, geoJson);
+
+            };
+            self.addFencePolygon = function addFencePolygon(polygon) {
+                polygon.devices = [];
+                polygon.id = Date.now() + self.incremental;
+                polygon.title = "Sin nombre";
+                polygon.description = "Sin descripción";
+                // var fence = {
+                //     type: 'polygon',
+                //     shape: polygon
+                // };
+                google.maps.event.addListener(polygon, 'click', function(e) {
+                    self.fenceClick(e, this);
+                });
+                self.fences.push(polygon);
+            };
+            self.editPolygonInfo = function editPolygonInfo() {
+                jQuery("#titleLabel, #descriptionLabel, #infoEdit").hide();
+                jQuery("#titleInput, #descriptionInput, #infoSave").show();
+            };
+            self.savePolygonInfo = function savePolygonInfo() {
+                var title = jQuery("#titleInput").val();
+                var description = jQuery("#descriptionInput").val();
+                self.clickedPolygon.title = title;
+                self.clickedPolygon.description = description;
+                self.polygonInfoWindow.close();
+            };
+            self.clickedPolygon = null;
+            self.fenceClick = function fenceClick(e, polygon){
+                self.clickedPolygon = polygon;
+                var content = "<div class='mr-3'>" +
+                    "<h5 class='' style='white-space: nowrap' id='titleLabel'>" +
+                    polygon.title +
+                    "</h5>" +
+                    "<input id='titleInput' class='border rounded' type='text' style='display: none;' value='" +
+                    polygon.title +
+                    "'>" +
+                    "<div class='text-muted mb-2' style='white-space: nowrap' id='descriptionLabel'>" +
+                    polygon.description +
+                    "</div> " +
+                    "<textarea id='descriptionInput' class='rounded my-2 border' style='display: none'>" +
+                    polygon.description +
+                    "</textarea>" +
+                    "<button type='button' class='btn btn-sm btn-outline-secondary float-right infoEdit' id='infoEdit'><i class='fa fa-cog'> Editar</i></button>" +
+                    "<button type='button' class='btn btn-sm btn-outline-secondary float-right infoSave' id='infoSave' style='display: none'><i class='fa fa-check'> Guardar</i></button>" +
+                    "</div>";
+                var a = $(content).find(".infoEdit").click(function() {
+                    self.editPolygonInfo();
+                }).parent();
+                a = $(a).find(".infoSave").click(function() {
+                    self.savePolygonInfo();
+                }).parent();
+
+                self.polygonInfoWindow.setContent(a[0]);
+                self.polygonInfoWindow.setMap(self.map);
+                self.polygonInfoWindow.setPosition(e.latLng);
+                self.polygonInfoWindow.open();
+            }
+            /**
+             *
+             * @param fence
+             * @param m
+             * @param Boolean alarmOnEntering
+             */
+            self.addDeviceToFence = function addDeviceToFence(polygon, imei, alarmOnEntering) {
+                var d = polygon.devices.find(function(elem) {
+                    if(elem.imei == imei)
+                        return elem;
+                });
+                if(d == undefined) {
+                    var device = self.findDeviceByImei(imei);
+
+                    d = {
+                        alarmOnEntering: alarmOnEntering,
+                        imei: imei,
+                        label: device.label,
+                        alreadyAlarmed: false
+                    };
+                    polygon.devices.push(d);
+                } else {
+                    d.alarmOnEntering = alarmOnEntering;
+                }
+            };
             var groupsQuery = $http.get('http://189.207.202.64:3007/api/v1/users/' + $localStorage.currentUser.id + '/groups');
             groupsQuery.then(function(result) {
                 // self.groups = result.data;
                 for(var i = 0; i < result.data.length; i++) {
-                    console.log(result.data[i]);
                     self.addToGroups(result.data[i]);
                 }
                 self.generateMenu();
@@ -37,7 +342,6 @@ angular.module('deviceList').component('deviceList', {
                 var nodes = $('#treeMenu').treeview('getNodes');
                 var l = Object.keys(nodes).length;
                 for(var i = 0; i < l; i++) {
-                    console.log(nodes[i].level);
                     if(nodes[i].level == 2) {
                         var m = self.findMarkerByImei(nodes[i].dataAttr.imei);
                         if(m.backgroundColor != undefined)
@@ -54,6 +358,8 @@ angular.module('deviceList').component('deviceList', {
                     }
                     var devices = self.groups[i].devices;
                     var imeis = $localStorage.currentUser.automatic_imeis;
+                    if(imeis == undefined)
+                        imeis = "";
                     for(var j = 0; j < devices.length; j++) {
                         var checked = imeis.indexOf(devices[j].auth_device) != -1;
                         root.nodes.push({
@@ -85,11 +391,9 @@ angular.module('deviceList').component('deviceList', {
                     // tagsClass: 'tag tag-pill bg-primary float-right ml-1 p-1',
                     //events
                     onNodeSelected: function(event, data) {
-                        // console.log("data", data);
                         var imei = data.dataAttr.imei;
                         self.currentImei = imei;
                         self.currentIdDevice =  data.dataAttr.device_id;
-                        console.log(self.currentIdDevice);
                         self.markerOptionClick(imei);
                     },
                     onNodeChecked: function(event, data) {
@@ -111,13 +415,13 @@ angular.module('deviceList').component('deviceList', {
             };
             self.checkAutomatedMarkers = function checkAutomatedMarkers() {
                 var imeis = $localStorage.currentUser.automatic_imeis;
+                if(imeis == undefined)
+                    imeis = "";
                 var nodes = $('#treeMenu').treeview('getNodes');
                 var l = Object.keys(nodes).length;
 
                 for(var i = 0; i < l; i++) {
-                    console.log(nodes[i].level);
                     if(nodes[i].level == 2 && imeis.indexOf(nodes[i].dataAttr.imei) != -1) {
-                        console.log("dentro del if");
                         $('#treeMenu').treeview('checkNode', [ nodes[i], { silent: false } ]);
                     }
                 }
@@ -150,7 +454,6 @@ angular.module('deviceList').component('deviceList', {
                 var m = self.findMarkerByImei(self.currentImei);
                 if(m)
                     m.automaticTime = jQuery("#automaticWaitInterval").val() * 1000;
-                console.log(m);
             };
             self.toggleAutomatic = function toggleAutomatic() {
                 if(self.automaticOn){
@@ -173,7 +476,6 @@ angular.module('deviceList').component('deviceList', {
                 self.automaticMarkers.push(m);
             };
             self.removeMarkerFromAutomatic = function removeMarkerFromAutomatic(imei) {
-                // console.log(self.automaticMarkers.length);
                 for(var i = 0; self.automaticMarkers.length; i++) {
                     if(self.automaticMarkers[i].imei == imei){
                         self.automaticMarkers.splice(i, 1);
@@ -225,7 +527,7 @@ angular.module('deviceList').component('deviceList', {
                     groupId = data.group_id;
                     self.groups.unshift({
                         group_id: groupId,
-                        group_label: groupId == -1 ? 'No Group' : data.group_label,
+                        group_label: groupId == -1 ? 'Sin Grupo' : data.group_label,
                         devices: [{
                             id: data.device_id,
                             label: data.device_label,
@@ -235,7 +537,7 @@ angular.module('deviceList').component('deviceList', {
                 } else
                     self.groups.push({
                         group_id: groupId,
-                        group_label: groupId == -1 ? 'No Group' : data.group_label,
+                        group_label: groupId == -1 ? 'Sin Grupo' : data.group_label,
                         devices: [{
                             id: data.device_id,
                             label: data.device_label,
@@ -247,17 +549,85 @@ angular.module('deviceList').component('deviceList', {
 
             self.getMap = function getMap() {
                 NgMap.getMap().then(function (map) {
-                    // console.log(map.getCenter());
-                    // console.log('shapes', map.shapes);
                     self.map = map;
+                    // self.fences.forEach(function(fence){
+                    //     self.fence.setMap(null);
+                    // });
+                    // self.fences.splice(0,1);
+                    // self.fences = null;
+                    // self.features = null;
+                    self.fences = [];
+                    self.fenceIds = [];
+                    google.maps.event.addListener(self.map.data, 'addfeature', function (event) {
+                        console.log("pasando por aki");
+                        if (event.feature.getGeometry().getType() === 'Polygon') {
+                            var posExists = false;
+                            console.log("fences array: ", self.fences);
+                            console.log("feat id: ", event.feature.getProperty("id"));
+                            if(self.fenceIds.indexOf(event.feature.getProperty("id")) != -1) {
+                                console.log("DENTRO DEL IFFFFFFF");
+                                posExists = true;
+                            } else {
+                                posExists = false;
+                            }
+                            // for(var i = 0; i < self.fenceIds.length; i++) {
+                            //     var fence = self.fences[i];
+                            //     console.log(i, fence);
+                            //     if(self.fenceIds.indexOf(event.feature.getProperty("id")) != -1) {
+                            //         console.log("DENTRO DEL IFFFFFFF");
+                            //         posExists = true;
+                            //         break;
+                            //     }
+                            //     posExists = false;
+                            // }
+                            // var pos = self.fences.findIndex(function(fence) {
+                            //     console.log("fence id: ", fence.id);
+                            //     return (fence.id != undefined && fence.id == event.feature.getProperty("id"));
+                            // });
+                            if(posExists)
+                                return;
+                            console.log("agregando poly");
+                            var polyPath = event.feature.getGeometry().getAt(0).getArray();
+                            var poly = new google.maps.Polygon({
+                                paths: polyPath,
+                                fillColor: 'red',
+                                strokeWeight: 1,
+                                editable: true,
+                                draggable: true,
+                                id: event.feature.getProperty("id"),
+                                title: event.feature.getProperty("title"),
+                                description: event.feature.getProperty("description"),
+                                devices: JSON.parse(event.feature.getProperty("devices"))
+                            });
+
+                            // poly.setMap(self.map);
+                            google.maps.event.addListener(poly, 'click', function(e) {
+                                self.fenceClick(e, this);
+                            });
+
+                            self.fences.push(poly);
+                            self.fenceIds.push(poly.id);
+                        }
+                    });
                     if($localStorage.devices.length > 0) {
                         self.initializeMarkers($localStorage.devices);
                     }
                     google.maps.event.addListener(self.map, 'click', function() {
                         self.hideMenu();
                     });
+                    var fs = $localStorage.currentUser.fences;
+                    self.map.data.setStyle({
+                        visible: false
+                    });
 
-                    console.log("map initialized");
+                    self.map.data.forEach(function(feat) {
+                        self.map.data.remove(feat);
+                    });
+                    self.map.data.addGeoJson(JSON.parse(fs));
+                    self.map.data.toGeoJson(function(data){
+                        self.features = data;
+                    });
+
                     return map;
                 });
             };
@@ -269,15 +639,12 @@ angular.module('deviceList').component('deviceList', {
             }
             self.markerOptionClick = function markerOptionClick(imei) {
                 // var invoker = $('div[data-toolbar="device-menu-options"].pressed');
-                // console.log(invoker.length);
                 // if (invoker.length > 0) {
-                //     console.log("setting currentIdDevice");
                 //     self.currentIdDevice = invoker.attr("id-device");
                 //     self.currentImei = invoker.attr("imei");
                 // } else {
                 //     self.currentImei = imei;
                 // }
-                // console.log($event.currentTarget);
                 // if(jQuery($event.currentTarget).parent().hasClass("active")) {
                 //     jQuery($event.currentTarget).parent().removeClass("active");
                 //     self.currentMenuImei = null;
@@ -297,15 +664,6 @@ angular.module('deviceList').component('deviceList', {
                 self.refreshDetailWindow(m, true);
             };
             $('#myModal').on('shown.bs.modal', function (e) {
-                // var invoker = jQuery('i[data-toolbar="device-menu-options"].pressed');
-                // console.log(invoker);
-                // self.currentIdDevice = invoker.attr("id-device");
-                // console.log(self.currentIdDevice);
-                // if(self.currentIdDevice == undefined)
-                //     return;
-                // console.log("current id device: " + self.currentIdDevice);
-                // self.currentImei = invoker.attr("imei");
-
                 $('#historical-custom').daterangepicker({
                     opens: "center",
                     timePicker: true,
@@ -315,19 +673,10 @@ angular.module('deviceList').component('deviceList', {
                         format: 'MM/DD/YYYY HH:mm ',
                         applyLabel: '<i class="fa fa-arrow-right"></i> Go'
                     },
-                    // "ranges": {
-                    //     // 'Last half hour': [moment().subtract(30, 'minutes'), moment()],
-                    //     // 'Last hour': [moment().subtract(1, 'hours'), moment()],
-                    //     // 'Last three hours': [moment().subtract(3, 'hours'), moment()],
-                    //     'Today': [moment().set({hour:0,minute:0,second:0,millisecond:0}), moment()],
-                    //     'Yesterday': [moment().subtract(1, 'days').set({hour:0,minute:0,second:0,millisecond:0} ), moment().set({hour:23,minute:59,second:0,millisecond:0}).subtract(1, 'days')],
-                    //     // 'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                    // },
                     "alwaysShowCalendars": true,
                     "startDate": moment().subtract(3, 'hours'),
                     "endDate": moment()
                 }, function(start, end, label) {
-                    console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
                     self.start = start;
                     self.end = end;
                     window.open('#!device/' + self.currentIdDevice + '/historical/' + self.start.format("YYYY-MM-DD HH:mm") + '/' + self.end.format("YYYY-MM-DD HH:mm"),'_blank');
@@ -369,7 +718,6 @@ angular.module('deviceList').component('deviceList', {
                     });
                     jQuery('i[data-toolbar="device-menu-options"]').on('toolbarShown',
                         function( event ) {
-                            console.log("toolbar shown", this);
                             var idDevice = jQuery(this).attr("id-device");
                             var imei = jQuery(this).attr("imei");
                             self.currentIdDevice = idDevice;
@@ -404,8 +752,14 @@ angular.module('deviceList').component('deviceList', {
                     self.alarmMarker(m, alarmType, false);
                     var width = (window.screen.width * 25)/100;
                     var height = (window.screen.height * 25)/100;
-                    var w = window.open(linkUrl, 'newwindow-' + Date.now(), 'width=' + width + ',height=' + height + '  ');
-                    w.device = d;
+                    self.openAlarmWindow(linkUrl, width, height, d);
+                }
+            };
+            self.openAlarmWindow = function openAlarmWindow(linkUrl, width, height, d, geoJson) {
+                var w = window.open(linkUrl, 'newwindow-' + Date.now(), 'width=' + width + ',height=' + height + '  ');
+                w.device = d;
+                if(geoJson){
+                    w.geoJson = geoJson;
                 }
             };
             self.alarmMarker = function alarmMarker(m, alarmType, isTimeout) {
@@ -417,7 +771,6 @@ angular.module('deviceList').component('deviceList', {
                         backgroundColor = '#E1B300'; // amarillo exceso de velocidad
                     }
                     if(m.labelWindow != undefined){
-                        console.log("label window: ", m.labelWindow);
                         m.labelWindow._opts.backgroundColor = backgroundColor;
                         m.alarmed = true;
                         $timeout(function() {
@@ -425,15 +778,13 @@ angular.module('deviceList').component('deviceList', {
                         }, 60000);
                     }
                 } else {
-                    console.log("segunda vez: ", m.backgroundColor);
                     m.labelWindow._opts.backgroundColor = m.backgroundColor;
                     m.alarmed = false;
                     m.labelWindow.close();
                     m.labelWindow.open();
                 }
-            }
+            };
             self.findDeviceByImei = function findDeviceByImei(imei) {
-                console.log($localStorage.devices);
                 if($localStorage.devices == undefined)
                     return false;
                 for (var k = 0; k < $localStorage.devices.length; k++) {
@@ -459,17 +810,12 @@ angular.module('deviceList').component('deviceList', {
                 hostname: "189.207.202.64",
                 port: 3001
             };
-            console.log("Trying to connect");
             var socket = socketCluster.connect(self.options);
             // $localStorage.socket = socket;
             socket.on('connect', function () {
-                console.log('CONNECTED');
-                console.log(socket.state);
             });
             // var socketBB = socketCluster.connect(self.optionsBB);
             // socketBB.on('connect', function () {
-            //     console.log('CONNECTED2');
-            //     console.log(socketBB.state);
             // });
 
             $localStorage.markers = [];
@@ -488,11 +834,9 @@ angular.module('deviceList').component('deviceList', {
                     if(device.peripheral_gps_data[0] == undefined)
                         continue;
                     if(self.initialLatitude == null) {
-                        console.log(device);
                         self.initialLatitude = device.peripheral_gps_data[0].lat;
                         self.initialLongitude = device.peripheral_gps_data[0].lng;
                     }
-                    console.log("going to create the marker: ", self.map);
                     var local = moment.utc(device.peripheral_gps_data[0].updatedAt).toDate();
                     var lastUpdate = moment(local).format("DD/MM/YYYY HH:mm:ss");
                     var speed = device.peripheral_gps_data[0].speed;
@@ -525,7 +869,7 @@ angular.module('deviceList').component('deviceList', {
                     self.updateMarkerColor(m);
 
                     var infoWindow = new SnazzyInfoWindow({
-                        content: "<p style='white-space: nowrap'>" + device.label + "</p>",
+                        content: "<p style='white-space: nowrap'>" + device.label + ": " + device.auth_device + "</p>",
                         marker: m,
                         backgroundColor: m.backgroundColor,
                         padding: '4px',
@@ -547,8 +891,6 @@ angular.module('deviceList').component('deviceList', {
                     google.maps.event.addListener(m, 'click', function() {
                         var lat = this.getPosition().lat();
                         var lng = this.getPosition().lng();
-                        console.log(this);
-                        console.log("latlng: ", lat + "---" + lng);
                         self.refreshDetailWindow(m);
                         self.updateMarkerColor(this);
                         self.getAddress(lat, lng, true, this.backgroundColor);
@@ -556,19 +898,16 @@ angular.module('deviceList').component('deviceList', {
                         // self.rotateMarker(this, 45);
                         self.map.setZoom(20);
                         self.map.setCenter(this.getPosition());
-                        console.log(this.icon);
                         // self.openDetailInfo(this);
+                        self.alarmFenceMarker(this);
                     });
 
                     $localStorage.markers[device.auth_device] = m;
 
-                    console.log("matching device: " + devices[i].auth_device);
                     var g = socket.subscribe(devices[i].auth_device);
                     var alarmsSocket = socket.subscribe("alarms_" + devices[i].auth_device);
                     g.watch(function(data) {
-                        console.log(data);
                         var m = $localStorage.markers[data.device_id];
-                        console.log(m);
                         if(m != undefined) {
                             m.setPosition(new google.maps.LatLng( data.latitude,data.longitude));
                             m.speed = data.speed;
@@ -582,12 +921,11 @@ angular.module('deviceList').component('deviceList', {
                                 self.getAddress(data.latitude, data.longitude, true, m.backgroundColor);
                                 self.refreshDetailWindow(m);
                             }
+                            self.alarmFenceMarker(m);
                         }
                     });
 
                     alarmsSocket.watch(function(data) {
-                        // console.log("entro una alarma!!!!");
-                        console.log(data);
                         self.openAlarm(data);
                     });
                 }
@@ -600,7 +938,6 @@ angular.module('deviceList').component('deviceList', {
                 m.setIcon(icon2);
             };
             self.updateMarkerColor = function updateMarkerColor(m) {
-                console.log("gps status when updating color: ", m.gpsStatus);
                 var backgroundColor = '#1C9918'; // default for when is moving
                 if(m.gpsStatus === 'Off')
                     backgroundColor = '#6A7272'; // dark for statos off
@@ -608,7 +945,6 @@ angular.module('deviceList').component('deviceList', {
                     backgroundColor = '#248DFD'; // blue for stopped '#E1B300';
                 m.backgroundColor = backgroundColor;
                 if(m.labelWindow != undefined && m.alarmed == false){
-                    console.log("label window: ", m.labelWindow);
                     m.labelWindow._opts.backgroundColor = backgroundColor;
                 }
             };
@@ -652,7 +988,6 @@ angular.module('deviceList').component('deviceList', {
                 // m.detailWindow.setContent(contentDetail);
                 // if(open){
                 jQuery("#detail-control div").html(contentDetail);
-                console.log("content detail: ", contentDetail);
                 jQuery("#detail-control").css("background-color", m.backgroundColor).show("fast");
                     // m.detailWindow.open();
                 // }
@@ -665,7 +1000,6 @@ angular.module('deviceList').component('deviceList', {
                 var min = parseInt(str.substr(8, 2), 16).toString();
                 var sec = parseInt(str.substr(10, 2), 16).toString();
                 var dateStr = year + "/" + month + "/" + day + " " + hour + ":" + min + ":" + sec;
-                console.log(dateStr);
                 var dateFormatted = moment(dateStr, "YY/M/D H:m:s").format("DD/MM/YYYY HH:mm:ss");
                 return dateFormatted;
             };

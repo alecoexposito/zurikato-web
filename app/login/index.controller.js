@@ -52,7 +52,6 @@
                 var d = $localStorage.devices[k];
                 vm.socket.unsubscribe(d.auth_device);
                 vm.socket.unsubscribe("alarms_" + d.auth_device);
-                console.log("unmatched: ", d.auth_device);
             }
         }
 
@@ -65,8 +64,6 @@
                 delete this[key];
 
             }, $localStorage.markers);
-            console.log("markers cleared ");
-            // console.log($localStorage.markers);
         }
     }
 })();

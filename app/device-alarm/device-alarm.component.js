@@ -15,6 +15,8 @@ angular.module('deviceAlarm').component('deviceAlarm', {
             self.backgroundColor = '#D93444';
             // self.devices = $localStorage.devices;
             self.device = window.device;
+            self.geoJson = window.geoJson;
+            console.log("geojson stringified", self.geoJson);
             // self.label = $routeParams.label;
             self.coordinates = [];
             self.geocoder = new google.maps.Geocoder();
@@ -27,7 +29,7 @@ angular.module('deviceAlarm').component('deviceAlarm', {
             self.setBackgroundColor = function setBackgroundColor() {
                 if(self.alarmType == 100) {
                     self.backgroundColor = '#D93444'; // rojo boton de panico
-                } else if(self.alarmType == '000') {
+                } else if(self.alarmType == '000' || self.alarmType == "enter-fence" || self.alarmType == "exit-fence") {
                     self.backgroundColor = '#E1B300'; // amarillo exceso de velocidad
                 }
             };
@@ -40,6 +42,7 @@ angular.module('deviceAlarm').component('deviceAlarm', {
             self.getMap = function getMap() {
                 NgMap.getMap().then(function (map) {
                     self.map = map;
+                    self.map.data.addGeoJson(self.geoJson);
                     console.log("creating the marker for alarm");
                     var local = moment.utc(self.device.peripheral_gps_data[0].updatedAt).toDate();
                     var lastUpdate = moment(local).format("DD/MM/YYYY HH:mm:ss");
@@ -109,7 +112,9 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                         console.log("waiting to change title: ", self.alarmType);
                         if(self.alarmType == '000') {
                             jQuery("#upperTitle").html("Exceso de velocidad");
-                        }else {
+                        } else if (self.alarmType == "enter-fence") {
+                            jQuery("#upperTitle").html("Entrada a zona restringida");
+                        } else {
                             jQuery("#upperTitle").html("Botón de Pánico Activado");
                         }
                     }
