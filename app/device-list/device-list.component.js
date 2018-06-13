@@ -869,7 +869,7 @@ angular.module('deviceList').component('deviceList', {
                     self.updateMarkerColor(m);
 
                     var infoWindow = new SnazzyInfoWindow({
-                        content: "<p style='white-space: nowrap'>" + device.label + ": " + device.auth_device + "</p>",
+                        content: "<p style='white-space: nowrap'>" + device.label + "</p>",
                         marker: m,
                         backgroundColor: m.backgroundColor,
                         padding: '4px',
