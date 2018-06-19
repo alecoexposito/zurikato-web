@@ -20,7 +20,7 @@ client.on("error", function(error) {
     console.log("Problem connecting to C5 socket");
 });
 app.get('/api/alert-c5', function(req, res) {
-    client.connect(4105, '189.207.202.64', function() {
+    client.connect(4105, '69.64.32.172', function() {
         console.log('Connected to socket');
     });
     res.send('yeappppp');

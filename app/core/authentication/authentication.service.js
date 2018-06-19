@@ -13,7 +13,7 @@
         return service;
 
         function Login(username, password, callback) {
-            $http.post('http://189.207.202.64:3007/api/v1/login', { email: username, pass: password })
+            $http.post('http://69.64.32.172:3007/api/v1/login', { email: username, pass: password })
                 .success(function (response) {
                     // login successful if there's a token in the response
                     if (response.auth_token) {

@@ -46,7 +46,12 @@ angular.module('deviceList').component('deviceList', {
             self.features = null;
 
             self.test = function test() {
-                self.disableFenceEditionMode();
+                var groupsQuery = $http.get('http://69.64.32.172:3007/api/v1/shared-screen/1');
+                groupsQuery.then(function(result) {
+                    console.log("result: ", result);
+                });
+
+                // self.disableFenceEditionMode();
                 // self.updateFences();
                 // return;
                 // self.map.data.forEach(function(feat) {
@@ -69,7 +74,47 @@ angular.module('deviceList').component('deviceList', {
                 // var m = self.findMarkerByImei("0353701090075181");
                 // self.alarmFenceMarker(m);
             };
+            self.generateSharedLink = function generateSharedLink() {
+                jQuery("#load-link").show();
+                var expirationDate = jQuery("#shareDate").data("DateTimePicker").date();
+                var ids = jQuery("#chosenDevices").val();
+                var saveShareQuery = $http.post('http://69.64.32.172:3007/api/v1/save-share', {
+                    expirationDate: expirationDate,
+                    ids: ids
+                });
 
+                saveShareQuery.then(function(result) {
+                    console.log(result);
+                });
+
+            };
+            $('#createShareLink').on('shown.bs.modal', function (e) {
+                jQuery("#chosenDevices").html("");
+                jQuery("#load-link").hide();
+                jQuery("#shareDate").datetimepicker({
+                    icons: {
+                        time: 'fa fa-clock',
+                        date: 'fa fa-calendar',
+                        up: 'fa fa-chevron-up',
+                        down: 'fa fa-chevron-down',
+                        previous: 'fa fa-chevron-left',
+                        next: 'fa fa-chevron-right',
+                        today: 'fa fa-screenshot',
+                        clear: 'fa fa-trash',
+                        close: 'fa fa-remove'
+                    }
+                });
+                // console.log($localStorage.devices);
+
+                for(var i = 0; i < $localStorage.devices.length; i++) {
+                    var d = $localStorage.devices[i];
+                    var opt = jQuery("<option></option>").val(d.idDevice).html(d.label);
+                    if(self.currentImei == d.auth_device)
+                        opt.attr("selected", true);
+                    jQuery("#chosenDevices").append(opt);
+                }
+                jQuery("#chosenDevices").select2();
+            });
             self.enableFenceEditionMode = function enableFenceEditionMode() {
                 self.map.mapDrawingManager[0].setOptions({drawingControl:true});
                 self.fences.forEach(function(elem) {
@@ -101,7 +146,7 @@ angular.module('deviceList').component('deviceList', {
             };
             self.updateFences = function updateImeis() {
                 var fences2 = self.getGeoJson();
-                var fencesUpdate = $http.put('http://189.207.202.64:3007/api/v1/users/' + $localStorage.currentUser.id + '/updfences', {fences: fences2});
+                var fencesUpdate = $http.put('http://69.64.32.172:3007/api/v1/users/' + $localStorage.currentUser.id + '/updfences', {fences: fences2});
                 fencesUpdate.then(function(result) {
                     $localStorage.currentUser.fences = fences2;
                 });
@@ -126,8 +171,6 @@ angular.module('deviceList').component('deviceList', {
                     }
                 });
             };
-            $('#fencesModal').on('shown.bs.modal', function (e) {
-            });
             self.getGeoJson = function getGeoJson() {
                 // self.map.data.toGeoJson(function(data){
                 //     self.features = data;
@@ -325,7 +368,7 @@ angular.module('deviceList').component('deviceList', {
                     d.alarmOnEntering = alarmOnEntering;
                 }
             };
-            var groupsQuery = $http.get('http://189.207.202.64:3007/api/v1/users/' + $localStorage.currentUser.id + '/groups');
+            var groupsQuery = $http.get('http://69.64.32.172:3007/api/v1/users/' + $localStorage.currentUser.id + '/groups');
             groupsQuery.then(function(result) {
                 // self.groups = result.data;
                 for(var i = 0; i < result.data.length; i++) {
@@ -445,7 +488,7 @@ angular.module('deviceList').component('deviceList', {
             },
             self.updateImeis = function updateImeis() {
                 var imeis = self.getSelectedImeis();
-                var imeisUpdate = $http.put('http://189.207.202.64:3007/api/v1/users/' + $localStorage.currentUser.id + '/updimeis/' + imeis);
+                var imeisUpdate = $http.put('http://69.64.32.172:3007/api/v1/users/' + $localStorage.currentUser.id + '/updimeis/' + imeis);
                 imeisUpdate.then(function(result) {
                     $localStorage.currentUser.automatic_imeis = imeis;
                 });
@@ -562,10 +605,7 @@ angular.module('deviceList').component('deviceList', {
                         console.log("pasando por aki");
                         if (event.feature.getGeometry().getType() === 'Polygon') {
                             var posExists = false;
-                            console.log("fences array: ", self.fences);
-                            console.log("feat id: ", event.feature.getProperty("id"));
                             if(self.fenceIds.indexOf(event.feature.getProperty("id")) != -1) {
-                                console.log("DENTRO DEL IFFFFFFF");
                                 posExists = true;
                             } else {
                                 posExists = false;
@@ -586,7 +626,6 @@ angular.module('deviceList').component('deviceList', {
                             // });
                             if(posExists)
                                 return;
-                            console.log("agregando poly");
                             var polyPath = event.feature.getGeometry().getAt(0).getArray();
                             var poly = new google.maps.Polygon({
                                 paths: polyPath,
@@ -807,7 +846,7 @@ angular.module('deviceList').component('deviceList', {
             // web sockets code
             self.options = {
                 secure: false,
-                hostname: "189.207.202.64",
+                hostname: "69.64.32.172",
                 port: 3001
             };
             var socket = socketCluster.connect(self.options);

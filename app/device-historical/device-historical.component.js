@@ -218,7 +218,7 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                         self.playHistorical(historical, pos + 1);
                 }, self.playSpeed);
             };
-            var historical = $http.get('http://189.207.202.64:3007/api/v1/devices/' + $routeParams.deviceId + '/history?start_date=' + $routeParams.start + '&end_date=' + $routeParams.end)
+            var historical = $http.get('http://69.64.32.172:3007/api/v1/devices/' + $routeParams.deviceId + '/history?start_date=' + $routeParams.start + '&end_date=' + $routeParams.end)
             self.historics = null;
             historical.then(function(result) {
                 self.historics = result.data;

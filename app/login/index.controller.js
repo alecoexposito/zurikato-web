@@ -11,7 +11,7 @@
         vm.login = login;
         vm.options = {
             secure: false,
-            hostname: "189.207.202.64",
+            hostname: "69.64.32.172",
             port: 3001
         };
         vm.socket = socketCluster.connect(vm.options);

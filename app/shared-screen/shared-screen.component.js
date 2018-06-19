@@ -1,9 +1,9 @@
 'use strict';
 
-angular.module('deviceAlarm').component('deviceAlarm', {
+angular.module('sharedScreen').component('sharedScreen', {
     templateUrl: 'device-alarm/device-alarm.template.html',
     controller: ['Device', '$http', '$timeout', 'NgMap', '$routeParams', '$localStorage',
-        function DeviceAlarmController(Device, $http, $timeout, NgMap, $routeParams, $localStorage) {
+        function SharedScreenController(Device, $http, $timeout, NgMap, $routeParams, $localStorage) {
             var self = this;
             var map = null;
             var pos = null;
@@ -15,11 +15,6 @@ angular.module('deviceAlarm').component('deviceAlarm', {
             self.backgroundColor = '#D93444';
             // self.devices = $localStorage.devices;
             self.device = window.device;
-            self.geoJson = window.geoJson;
-            console.log("geojson stringified", self.geoJson);
-            // self.label = $routeParams.label;
-            self.coordinates = [];
-            self.geocoder = new google.maps.Geocoder();
             this.googleMapsUrl = "https://maps.googleapis.com/maps/api/js?key=AIzaSyBHsRJFKmB3_E_DGrluQKMRIYNdT8v8CwI";
             self.options = {
                 secure: false,
@@ -42,8 +37,6 @@ angular.module('deviceAlarm').component('deviceAlarm', {
             self.getMap = function getMap() {
                 NgMap.getMap().then(function (map) {
                     self.map = map;
-                    self.map.data.addGeoJson(self.geoJson);
-                    console.log("creating the marker for alarm");
                     var local = moment.utc(self.device.peripheral_gps_data[0].updatedAt).toDate();
                     var lastUpdate = moment(local).format("DD/MM/YYYY HH:mm:ss");
                     // var speed = self.device.peripheral_gps_data[0].speed;
@@ -74,8 +67,6 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                         lastUpdate: lastUpdate,
                         gpsStatus: gpsStatus
                     });
-                    console.log("marker created: ", self.m);
-                    // #1C9918
                     var infoWindow = new SnazzyInfoWindow({
                         content: "<p style='white-space: nowrap'>" + self.m.title + "</p>",
                         marker: self.m,
@@ -95,7 +86,6 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                     self.m.labelWindow = infoWindow;
                     infoWindow.open(self.map, self.m);
                     // self.refreshDetailWindow(self.m);
-                    console.log("pidiendo dir inicial");
                     google.maps.event.addListenerOnce(map, 'tilesloaded', function() {
                         self.updateColor();
                         self.getAddress(self.latitude, self.longitude, true);

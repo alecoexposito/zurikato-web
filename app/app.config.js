@@ -23,9 +23,12 @@ angular.
             template: '<device-alarm></device-alarm>'
         }).
         when('/login', {
-          templateUrl: 'login/index.view.html',
-          controller: 'Login.IndexController',
-          controllerAs: 'vm'
+            templateUrl: 'login/index.view.html',
+            controller: 'Login.IndexController',
+            controllerAs: 'vm'
+        }).
+        when('/shared-screen/:share-id', {
+            template: '<shared-screen></shared-screen>'
         }).
         otherwise('/devices');
     }
@@ -38,7 +41,7 @@ angular.
 
       // redirect to login page if not logged in and trying to access a restricted page
       $rootScope.$on('$locationChangeStart', function (event, next, current) {
-          var publicPages = ['/login'];
+          var publicPages = ['/login', '/shared-screen/:device-id'];
           var restrictedPage = publicPages.indexOf($location.path()) === -1;
           if (restrictedPage && !$cookies.get("auth_token")) {
               $location.path('/login');

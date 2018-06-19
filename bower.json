@@ -18,6 +18,8 @@
     "daterangepicker": "bootstrap-daterangepicker#^3.0.2",
     "ngmap": "^1.18.4",
     "patternfly-bootstrap-treeview": "^2.1.5",
-    "angular-cookies": "1.5.11"
+    "angular-cookies": "1.5.11",
+    "eonasdan-bootstrap-datetimepicker": "^4.17.47",
+    "select2": "^4.0.5"
   }
 }
