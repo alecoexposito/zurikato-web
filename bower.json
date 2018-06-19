@@ -21,6 +21,7 @@
     "angular-cookies": "1.5.11",
     "eonasdan-bootstrap-datetimepicker": "^4.17.47",
     "select2": "^4.0.5",
-    "ngstorage": "^0.3.11"
+    "ngstorage": "^0.3.11",
+    "font-awsome": "^5.0.13"
   }
 }
