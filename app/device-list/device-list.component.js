@@ -106,7 +106,8 @@ angular.module('deviceList').component('deviceList', {
                         today: 'fa fa-screenshot',
                         clear: 'fa fa-trash',
                         close: 'fa fa-remove'
-                    }
+                    },
+                    minDate: 'now'
                 });
                 // console.log($localStorage.devices);
 
