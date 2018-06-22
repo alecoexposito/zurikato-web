@@ -42,7 +42,7 @@ angular.
       // redirect to login page if not logged in and trying to access a restricted page
       $rootScope.$on('$locationChangeStart', function (event, next, current) {
           var publicPages = ['/login'];
-          var restrictedPage = (publicPages.indexOf($location.path()) === -1) || ($location.path().indexOf("sharedscreen") === -1);
+          var restrictedPage = (publicPages.indexOf($location.path()) === -1) && ($location.path().indexOf("sharedscreen") === -1);
           if (restrictedPage && !$cookies.get("auth_token")) {
               $location.path('/login');
           }
