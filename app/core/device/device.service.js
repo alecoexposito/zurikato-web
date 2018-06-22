@@ -4,7 +4,7 @@ angular.
   module('core.device').
   factory('Device', ['$resource', '$localStorage',
     function($resource, $localStorage) {
-      return $resource('http://69.64.32.172:3007/api/v1/users/:userId/devices', {}, {
+      return $resource(window.__env.apiUrl + 'users/:userId/devices', {}, {
         query: {
           method: 'GET',
           isArray: true,
@@ -28,7 +28,7 @@ angular.
 
 
 // function($resource) {
-//     return $resource('http://69.64.32.172:3007/api/v1/devices/1/history?start_date=2018-03-07%2014:20:00&end_date=2018-03-08%2014:20:00', {}, {
+//     return $resource(window.__env.apiUrl + ' 'devices/1/history?start_date=2018-03-07%2014:20:00&end_date=2018-03-08%2014:20:00', {}, {
 //         historical: {
 //             method: 'GET',
 //             // params: {phoneId: 'phones'},

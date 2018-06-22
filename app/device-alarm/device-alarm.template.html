@@ -14,7 +14,7 @@
                 </div>
             </custom-control>
 
-            <custom-control position="TOP_RIGHT" index="1" ng-if="$ctrl.alarmType == 100">
+            <custom-control position="TOP_RIGHT" index="1" ng-if="$ctrl.alarmType == 100 && $ctrl.device.panic_button == 1">
                 <div class="mr-3 mt-3">
                     <button class="btn btn-danger" type="button" ng-click="$ctrl.alertC5()">
                         <i class="fa fa-exclamation"></i> Alert C5

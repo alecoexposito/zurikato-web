@@ -75,6 +75,7 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                         gpsStatus: gpsStatus
                     });
                     console.log("marker created: ", self.m);
+                    console.log("device: ", self.device);
                     // #1C9918
                     var infoWindow = new SnazzyInfoWindow({
                         content: "<p style='white-space: nowrap'>" + self.m.title + "</p>",
@@ -176,6 +177,13 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                             console.log(results[0]);
                             if(showOnMap) {
                                 jQuery("#address-p").html(results[0].formatted_address);
+                                if(self.alarmType == '000') {
+                                    jQuery("#upperTitle").html("Exceso de velocidad");
+                                } else if (self.alarmType == "enter-fence") {
+                                    jQuery("#upperTitle").html("Entrada a zona restringida");
+                                } else {
+                                    jQuery("#upperTitle").html("Botón de Pánico Activado");
+                                }
                                 jQuery("#address-control").show("fast");
                                 self.address = results[0].formatted_address;
                             }

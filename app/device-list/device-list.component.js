@@ -46,7 +46,7 @@ angular.module('deviceList').component('deviceList', {
             self.features = null;
 
             self.test = function test() {
-                var groupsQuery = $http.get('http://69.64.32.172:3007/api/v1/shared-screen/1');
+                var groupsQuery = $http.get(window.__env.apiUrl + 'shared-screen/34');
                 groupsQuery.then(function(result) {
                     console.log("result: ", result);
                 });
@@ -78,19 +78,23 @@ angular.module('deviceList').component('deviceList', {
                 jQuery("#load-link").show();
                 var expirationDate = jQuery("#shareDate").data("DateTimePicker").date();
                 var ids = jQuery("#chosenDevices").val();
-                var saveShareQuery = $http.post('http://69.64.32.172:3007/api/v1/save-share', {
+                var saveShareQuery = $http.post(window.__env.apiUrl + 'save-share', {
                     expirationDate: expirationDate,
                     ids: ids
                 });
 
                 saveShareQuery.then(function(result) {
-                    console.log(result);
+                    jQuery("#load-link").hide("fast");
+                    jQuery("#shared-link").val(window.__env.webUrl + 'sharedscreen/' + result.data.id + '/' + result.data.url_hash);
+                    jQuery("#show-link").show("fast");
                 });
 
             };
             $('#createShareLink').on('shown.bs.modal', function (e) {
                 jQuery("#chosenDevices").html("");
                 jQuery("#load-link").hide();
+                jQuery("#shared-link").val("");
+                jQuery("#show-link").hide("fast");
                 jQuery("#shareDate").datetimepicker({
                     icons: {
                         time: 'fa fa-clock',
@@ -146,7 +150,7 @@ angular.module('deviceList').component('deviceList', {
             };
             self.updateFences = function updateImeis() {
                 var fences2 = self.getGeoJson();
-                var fencesUpdate = $http.put('http://69.64.32.172:3007/api/v1/users/' + $localStorage.currentUser.id + '/updfences', {fences: fences2});
+                var fencesUpdate = $http.put(window.__env.apiUrl + 'users/' + $localStorage.currentUser.id + '/updfences', {fences: fences2});
                 fencesUpdate.then(function(result) {
                     $localStorage.currentUser.fences = fences2;
                 });
@@ -368,7 +372,7 @@ angular.module('deviceList').component('deviceList', {
                     d.alarmOnEntering = alarmOnEntering;
                 }
             };
-            var groupsQuery = $http.get('http://69.64.32.172:3007/api/v1/users/' + $localStorage.currentUser.id + '/groups');
+            var groupsQuery = $http.get(window.__env.apiUrl + 'users/' + $localStorage.currentUser.id + '/groups');
             groupsQuery.then(function(result) {
                 // self.groups = result.data;
                 for(var i = 0; i < result.data.length; i++) {
@@ -488,7 +492,7 @@ angular.module('deviceList').component('deviceList', {
             },
             self.updateImeis = function updateImeis() {
                 var imeis = self.getSelectedImeis();
-                var imeisUpdate = $http.put('http://69.64.32.172:3007/api/v1/users/' + $localStorage.currentUser.id + '/updimeis/' + imeis);
+                var imeisUpdate = $http.put(window.__env.apiUrl + 'users/' + $localStorage.currentUser.id + '/updimeis/' + imeis);
                 imeisUpdate.then(function(result) {
                     $localStorage.currentUser.automatic_imeis = imeis;
                 });

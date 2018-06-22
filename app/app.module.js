@@ -10,6 +10,7 @@ angular.module('phonecatApp', [
   'phoneList',
   'deviceList',
   'deviceHistorical',
+  'sharedScreen',
   'deviceAlarm',
   'ngStorage',
   'ngCookies'
