@@ -43,7 +43,6 @@ angular.
       $rootScope.$on('$locationChangeStart', function (event, next, current) {
           var publicPages = ['/login'];
           var restrictedPage = (publicPages.indexOf($location.path()) === -1) || ($location.path().indexOf("sharedscreen") === -1);
-          restrictedPage = false;
           if (restrictedPage && !$cookies.get("auth_token")) {
               $location.path('/login');
           }
