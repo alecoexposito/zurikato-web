@@ -76,6 +76,7 @@ angular.module('deviceList').component('deviceList', {
             };
             self.generateSharedLink = function generateSharedLink() {
                 jQuery("#load-link").show();
+                jQuery("#show-link").hide("fast");
                 var expirationDate = jQuery("#shareDate").data("DateTimePicker").date();
                 var ids = jQuery("#chosenDevices").val();
                 var saveShareQuery = $http.post(window.__env.apiUrl + 'save-share', {
@@ -90,6 +91,10 @@ angular.module('deviceList').component('deviceList', {
                 });
 
             };
+            jQuery("#copy-button").click(function() {
+                jQuery("#shared-link")[0].select();
+                document.execCommand("copy");
+            });
             $('#createShareLink').on('shown.bs.modal', function (e) {
                 jQuery("#chosenDevices").html("");
                 jQuery("#load-link").hide();

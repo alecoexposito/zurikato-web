@@ -32,9 +32,14 @@
                     </div>
                     <div class="col-lg-12 text-lg-center">
                         <span id="load-link" style="display: none;"><i class="fa fa-spinner fa-spin"></i> Generando...</span>
-                        <div id="show-link" class="control-group" style="display: none;">
-                            <label>Copia esta url y compartela</label>
-                            <input id="shared-link" class="text-muted form-control-plaintext border p-1" readonly>
+                    </div>
+                    <div id="show-link" class="col-lg-12" style="display: none;">
+                        <label>La url ha sido generada, copiela utilizando el botón de copiar</label>
+                        <div class="input-group">
+                            <input id="shared-link" class="text-muted border p-1 form-control" readonly>
+                            <div class="input-group-append">
+                                <button id="copy-button" class="btn btn-primary" type="button"><i class="fa fa-copy"></i> Copiar</button>
+                            </div>
                         </div>
                     </div>
                 </div>
