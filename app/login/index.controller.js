@@ -11,8 +11,8 @@
         vm.login = login;
         vm.options = {
             secure: false,
-            hostname: "69.64.32.172",
-            port: 3001
+            hostname: window.__env.webSocketIp,
+            port: window.__env.webso
         };
         vm.socket = socketCluster.connect(vm.options);
         initController();
