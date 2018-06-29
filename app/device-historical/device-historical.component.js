@@ -35,7 +35,8 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                 }
                 console.log("pdf coordinates: ", pdfCoordinates);
                 html2canvas(document.querySelector("body"), {
-                    useCORS: true
+                    useCORS: true,
+                    imageTimeout: 30000
                 }).then(canvas => {
                     $("#pdf-loader").removeClass("fa-spinner fa-spin").addClass("fa-file-pdf");
                     var dataUrl = canvas.toDataURL();
