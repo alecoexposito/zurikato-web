@@ -46,10 +46,33 @@ angular.module('deviceList').component('deviceList', {
             self.features = null;
 
             self.test = function test() {
-                var groupsQuery = $http.get(window.__env.apiUrl + 'shared-screen/34');
-                groupsQuery.then(function(result) {
-                    console.log("result: ", result);
+
+                html2canvas(document.querySelector("body"), {
+                    useCORS: true
+                }).then(canvas => {
+                    console.log("canvas akiiiii", canvas);
+                    var dataUrl = canvas.toDataURL();
+                    // var imageFoo = document.createElement('img');
+                    // imageFoo.src = dataUrl;
+                    // $("#beforeMap").append(imageFoo);
+                    var docDefinition = { content: [
+                        'Pdf text',
+                            {
+                                image: dataUrl,
+                                width: '500'
+                            }
+                        ] };
+
+                    pdfMake.createPdf(docDefinition).open();
                 });
+
+
+                // var docDefinition = { content: 'Hellow World' };
+                // pdfMake.createPdf(docDefinition).open();
+                // var groupsQuery = $http.get(window.__env.apiUrl + 'shared-screen/34');
+                // groupsQuery.then(function(result) {
+                //     console.log("result: ", result);
+                // });
 
                 // self.disableFenceEditionMode();
                 // self.updateFences();

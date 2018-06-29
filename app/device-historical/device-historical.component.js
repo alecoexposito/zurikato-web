@@ -27,8 +27,59 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                 });
             };
 
+            self.exportToPdf = function exportToPdf() {
+                var pdfCoordinates = [];
+                console.log("coordinates: ", self.coordinates);
+                for(var i = 0; i < self.coordinates.length; i++) {
+                    pdfCoordinates.push("Fecha: " + self.coordinates[i].day + " Velocidad: " +  self.coordinates[i].speed + "\n Latitud: " + self.coordinates[i].lat + "Longitud: " + self.coordinates[i].lng + "\n --------------------------------------------------------------- \n");
+                }
+                console.log("pdf coordinates: ", pdfCoordinates);
+                html2canvas(document.querySelector("body"), {
+                    useCORS: true
+                }).then(canvas => {
+                    $("#pdf-loader").removeClass("fa-spinner fa-spin").addClass("fa-file-pdf");
+                    var dataUrl = canvas.toDataURL();
+                    var docDefinition = { content: [
+                            {
+                                text: 'Zurikato',
+                                style: 'header'
+                            },{
+                                text: 'Recorrido exportado'
+                            },{
+                                image: dataUrl,
+                                width: '500'
+                            },{
+                                text: 'Coordenadas',
+                                style: 'header'
+                            },{
+                                text: pdfCoordinates
+                            }
+                        ],
+                        styles: {
+                            header: {
+                                fontSize: 18,
+                                bold: true
+                            },
+                            subheader: {
+                                fontSize: 15,
+                                bold: true
+                            },
+                            quote: {
+                                italics: true
+                            },
+                            small: {
+                                fontSize: 8
+                            }
+                        }
+                    };
+
+                    pdfMake.createPdf(docDefinition).open();
+                });
+                $("#pdf-loader").removeClass("fa-file-pdf").addClass("fa-spinner fa-spin");
+
+            };
+
             self.shapeClick = function shapeClick(event ){
-                console.log(event);
                 // return;
                 var minDist = Number.MAX_VALUE;
                 var index = -1;

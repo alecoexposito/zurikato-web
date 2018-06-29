@@ -167,8 +167,11 @@
         </a>
     </div>
 
+    <!--<div id="beforeMap">-->
+        <!--<h4>Probando esto</h4>-->
+    <!--</div>-->
     <!--Body content-->
-    <div class="index-map" map-lazy-load="https://maps.google.com/maps/api/js"
+    <div id="map" class="index-map" map-lazy-load="https://maps.google.com/maps/api/js"
          map-lazy-load-params="{{$ctrl.googleMapsUrl}}">
         <ng-map center="[{{$ctrl.initialLatitude}}, {{$ctrl.initialLongitude}}]" zoom="10">
             <custom-control id="address-control" position="TOP_CENTER" index="2" class="justify-content-center"
@@ -256,9 +259,9 @@
                 <button type="button" style="display: none;" class="fence-edit-btn btn btn-sm btn-secondary" ng-click="$ctrl.updateFences()"><i class="fa fa-check"></i> Save</button>
                 <button type="button" style="display: none;" class="fence-edit-btn btn btn-sm btn-secondary" ng-click="$ctrl.disableFenceEditionMode()"><i class="fa fa-times"></i> Cancel</button>
             </custom-control>
-            <!--<custom-control id="test-control" position="TOP_LEFT" on-click="$ctrl.test()">-->
-                <!--<button type="button" class="btn btn-sm btn-secondary">Test</button>-->
-            <!--</custom-control>-->
+            <custom-control id="test-control" position="TOP_LEFT" on-click="$ctrl.test()">
+                <button type="button" class="btn btn-sm btn-secondary">Test</button>
+            </custom-control>
 
             <drawing-manager id="fenceDrawer"
                     on-overlaycomplete="$ctrl.addFeatureToData()"
