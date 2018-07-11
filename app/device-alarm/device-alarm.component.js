@@ -23,8 +23,8 @@ angular.module('deviceAlarm').component('deviceAlarm', {
             this.googleMapsUrl = "https://maps.googleapis.com/maps/api/js?key=AIzaSyBHsRJFKmB3_E_DGrluQKMRIYNdT8v8CwI";
             self.options = {
                 secure: false,
-                hostname: "69.64.32.172",
-                port: 3001
+                hostname: window.__env.webSocketIp,
+                port: window.__env.webSocketPort
             };
             self.setBackgroundColor = function setBackgroundColor() {
                 if(self.alarmType == 100) {

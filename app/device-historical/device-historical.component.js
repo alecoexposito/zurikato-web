@@ -29,11 +29,19 @@ angular.module('deviceHistorical').component('deviceHistorical', {
 
             self.exportToPdf = function exportToPdf() {
                 var pdfCoordinates = [];
-                console.log("coordinates: ", self.coordinates);
+                var lastDay = null;
+                var consec = 1;
                 for(var i = 0; i < self.coordinates.length; i++) {
-                    pdfCoordinates.push("Fecha: " + self.coordinates[i].day + " Velocidad: " +  self.coordinates[i].speed + "\n Latitud: " + self.coordinates[i].lat + "Longitud: " + self.coordinates[i].lng + "\n --------------------------------------------------------------- \n");
+                    if(lastDay == null || lastDay != self.coordinates[i].day){
+                        pdfCoordinates.push("\nFecha: " + self.coordinates[i].day + "\n--------------------------------\n");
+                        consec = 1;
+                    }
+                    lastDay = self.coordinates[i].day
+                    pdfCoordinates.push(consec + "- Hora: " + self.coordinates[i].time + "     Velocidad: " +  self.coordinates[i].speed + "     Latitud: " + self.coordinates[i].lat + "     Longitud: " + self.coordinates[i].lng);
+                    var linkToMap = self.coordinates[i].lat + ', ' + self.coordinates[i].lng;
+                    pdfCoordinates.push({text: ' Verenmapa', link: linkToMap});
+                    consec++;
                 }
-                console.log("pdf coordinates: ", pdfCoordinates);
                 html2canvas(document.querySelector("body"), {
                     useCORS: true,
                     imageTimeout: 30000
@@ -53,7 +61,12 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                                 text: 'Coordenadas',
                                 style: 'header'
                             },{
-                                text: pdfCoordinates
+                                text: 'hyperlink',
+                                link: 'http://www.google.com'
+                            },
+                            {
+                                text: pdfCoordinates,
+                                style: 'small'
                             }
                         ],
                         styles: {
@@ -106,7 +119,6 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                         index = i;
                     }
                 }
-                console.log("coordinates closest", self.coordinates[index]);
                 var content = "<p style='white-space: nowrap; margin-bottom: 3px;'>Velocidad: " + self.coordinates[index].speed + " </p>" +
                     "<p style='white-space: nowrap; margin-bottom: 3px; mx-1'>Fecha y hora: " + self.coordinates[index].day + "</p>" +
                     "<p id='address-info'><i class='fa fa-spinner fa-spin'></i> cargando...</p>";
@@ -170,8 +182,11 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                 }
 
                 var point = [parseFloat(historical[pos].lat), parseFloat(historical[pos].lng)];
+                var day = moment(historical[pos].day, "YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY");
+                var time = moment(historical[pos].day, "YYYY-MM-DD HH:mm:ss").format("HH:mm:ss")
                 var pointObj = {
-                    day: moment(historical[pos].day, "YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY HH:mm:ss"),
+                    day: day,
+                    time: time,
                     lat: parseFloat(historical[pos].lat),
                     lng: parseFloat(historical[pos].lng),
                     speed: historical[pos].speed + ' Km/h'

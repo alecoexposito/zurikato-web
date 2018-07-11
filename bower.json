@@ -24,6 +24,7 @@
     "ngstorage": "^0.3.11",
     "font-awsome": "^5.0.13",
     "html2canvas": "^1.0.0",
-    "pdfmake": "^0.1.37"
+    "pdfmake": "^0.1.37",
+    "chart.js": "^2.7.2"
   }
 }

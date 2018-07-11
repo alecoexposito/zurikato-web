@@ -12,7 +12,7 @@
         vm.options = {
             secure: false,
             hostname: window.__env.webSocketIp,
-            port: window.__env.webso
+            port: window.__env.webSocketPort
         };
         vm.socket = socketCluster.connect(vm.options);
         initController();

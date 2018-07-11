@@ -30,6 +30,9 @@ angular.
             controller: 'Login.IndexController',
             controllerAs: 'vm'
         }).
+        when('/device/:deviceId/charts', {
+            template: '<device-charts></device-charts>'
+        }).
         otherwise('/devices');
     }
   ]).run(run);

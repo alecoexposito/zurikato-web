@@ -66,6 +66,14 @@ angular.module('deviceList').component('deviceList', {
                     pdfMake.createPdf(docDefinition).open();
                 });
 
+                self.deviceCharts = function deviceCharts() {
+                    alert("jejejeje");
+                };
+
+                // jQuery("body").on("click", "#device-charts", function() {
+                //     alert("asdf");
+                // });
+
 
                 // var docDefinition = { content: 'Hellow World' };
                 // pdfMake.createPdf(docDefinition).open();
@@ -746,8 +754,8 @@ angular.module('deviceList').component('deviceList', {
                         applyLabel: '<i class="fa fa-arrow-right"></i> Go'
                     },
                     "alwaysShowCalendars": true,
-                    "startDate": moment().subtract(3, 'hours'),
-                    "endDate": moment()
+                    "startDate": moment().hour('00').minute('00'),
+                    "endDate": moment().hour('23').minute('00')
                 }, function(start, end, label) {
                     self.start = start;
                     self.end = end;
@@ -794,6 +802,13 @@ angular.module('deviceList').component('deviceList', {
                             var imei = jQuery(this).attr("imei");
                             self.currentIdDevice = idDevice;
                             self.currentImei = imei;
+                        }
+                    );
+                    jQuery('i[data-toolbar="device-menu-options"]').on('toolbarItemClick',
+                        function( event, itemClicked ) {
+                            if(jQuery(itemClicked).attr("id") == "device-charts") {
+                                window.open('#!device/' + self.currentIdDevice + '/charts', '_blank');
+                            }
                         }
                     );
 
@@ -879,8 +894,8 @@ angular.module('deviceList').component('deviceList', {
             // web sockets code
             self.options = {
                 secure: false,
-                hostname: "69.64.32.172",
-                port: 3001
+                hostname: window.__env.webSocketIp,
+                port: window.__env.webSocketPort
             };
             var socket = socketCluster.connect(self.options);
             // $localStorage.socket = socket;
