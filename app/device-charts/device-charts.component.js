@@ -61,7 +61,10 @@ angular.module('deviceCharts').component('deviceCharts', {
                     dataset.data.length = 0;
                 });
                 for(var i = 0; i < data.length; i++) {
-                    chart.data.labels.push(data[i].label);
+                    let l = data[i].label;
+                    // l = l.substr(l.length - 2, 2);
+                    // l = isNaN(l) == false ? data[i].label + "" : data[i].label;
+                    chart.data.labels.push(l);
                     chart.data.datasets.forEach((dataset) => {
                         dataset.data.push(data[i].data);
                     });
@@ -96,12 +99,32 @@ angular.module('deviceCharts').component('deviceCharts', {
                 self.chart = new Chart(ctx, {
                     // The type of chart we want to create
                     type: 'line',
+                    options: {
+                        title: {
+                            text: 'Velocidades Alcanzadas',
+                            display: true,
+                            position: 'top',
+                            fontSize: 20
+                        },
+                        scales: {
+                            xAxes: [{
+                                ticks: {
+                                    fontStyle: 'bold'
+                                }
+                            }],
+                            yAxes: [{
+                                ticks: {
+                                    fontStyle: 'bold',
+                                }
+                            }]
+                        }
+                    },
 
                     // The data for our dataset
                     data: {
                         labels: [],
                         datasets: [{
-                            label: "Velocidad promedio",
+                            label: "Velocidad (Km/h)",
                             backgroundColor: 'rgb(255, 99, 132)',
                             borderColor: 'rgb(255, 99, 132)',
                             fill: false,
@@ -110,7 +133,6 @@ angular.module('deviceCharts').component('deviceCharts', {
                     },
 
                     // Configuration options go here
-                    options: {}
                 });
 
                 var ctx2 = document.getElementById('alarmsByType').getContext('2d');
@@ -122,7 +144,7 @@ angular.module('deviceCharts').component('deviceCharts', {
                     data: {
                         labels: [],
                         datasets: [{
-                            label: "Alarmas por tipo",
+                            label: "Cantidad de alarmas",
                             backgroundColor: 'rgb(255, 99, 132)',
                             borderColor: 'rgb(255, 99, 132)',
                             fill: false,
@@ -131,7 +153,28 @@ angular.module('deviceCharts').component('deviceCharts', {
                     },
 
                     // Configuration options go here
-                    options: {}
+                    options: {
+                        title: {
+                            text: 'Alarmas por tipo',
+                            display: true,
+                            position: 'top',
+                            fontSize: 20
+                        },
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    stepSize: 1,
+                                    fontStyle: 'bold',
+                                }
+                            }],
+                            xAxes: [{
+                                ticks: {
+                                    fontStyle: 'bold',
+                                    fontSize: '16'
+                                }
+                            }]
+                        }
+                    }
                 });
 
                 var ctx3 = document.getElementById('distanceByDates').getContext('2d');
@@ -143,7 +186,7 @@ angular.module('deviceCharts').component('deviceCharts', {
                     data: {
                         labels: [],
                         datasets: [{
-                            label: "Kilometros recorridos",
+                            label: "Cantidad de kilometros",
                             backgroundColor: 'rgb(255, 99, 132)',
                             borderColor: 'rgb(255, 99, 132)',
                             fill: false,
@@ -152,7 +195,27 @@ angular.module('deviceCharts').component('deviceCharts', {
                     },
 
                     // Configuration options go here
-                    options: {}
+                    options: {
+                        title: {
+                            text: 'Kilometros recorridos',
+                            display: true,
+                            position: 'top',
+                            fontSize: 20
+                        },
+                        scales: {
+                            xAxes: [{
+                                ticks: {
+                                    fontStyle: 'bold'
+                                }
+                            }],
+                            yAxes: [{
+                                ticks: {
+                                    fontStyle: 'bold'
+                                }
+                            }]
+                        }
+
+                    }
                 });
 
 
