@@ -62,6 +62,8 @@ angular.module('deviceCharts').component('deviceCharts', {
                 });
                 for(var i = 0; i < data.length; i++) {
                     let l = data[i].label;
+                    let localDate = moment.utc(l, "MM/DD/YYYY H:mm").toDate();
+                    l = moment(localDate).format("MM/DD/YYYY HH:mm");
                     // l = l.substr(l.length - 2, 2);
                     // l = isNaN(l) == false ? data[i].label + "" : data[i].label;
                     chart.data.labels.push(l);
