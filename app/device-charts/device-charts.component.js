@@ -79,7 +79,7 @@ angular.module('deviceCharts').component('deviceCharts', {
                     "autoApply": true,
                     locale: {
                         format: 'MM/DD/YYYY HH:mm ',
-                        applyLabel: '<i class="fa fa-arrow-right"></i> Go'
+                        applyLabel: '<i class="fa fa-arrow-right"></i> Refrescar'
                     },
                     "alwaysShowCalendars": true,
                     "startDate": moment().hour('00').minute('00'),
