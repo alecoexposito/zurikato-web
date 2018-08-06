@@ -24,6 +24,7 @@
                             id: response.id,
                             automatic_imeis: response.automatic_imeis,
                             fences: response.fences,
+                            company_name: response.company_name,
                             fencesArray: []
                         };
                         SaveTokenInCookie(response.auth_token);
