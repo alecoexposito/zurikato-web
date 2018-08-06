@@ -218,7 +218,7 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                     "254" + d.peripheral_gps_data[0].orientation_plain + "254" + 1 + "254" + 1;
                 var pad = "0000000" + data.length.toString(16);
                 var start = pad.slice("-8");
-                console.log("start", start);
+                console.log("start", start + data);
                 $http.get('/api/alert-c5', {params: {data: start + data}}).then(function (result) {
                     console.log(result);
                 });
