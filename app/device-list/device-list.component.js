@@ -876,6 +876,7 @@ angular.module('deviceList').component('deviceList', {
                     return false;
                 for (var k = 0; k < $localStorage.devices.length; k++) {
                     var d = $localStorage.devices[k];
+                    console.log(d);
                     if(d.auth_device == imei)
                         return d;
                 }
