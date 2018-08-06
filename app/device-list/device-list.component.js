@@ -845,6 +845,8 @@ angular.module('deviceList').component('deviceList', {
             self.openAlarmWindow = function openAlarmWindow(linkUrl, width, height, d, geoJson) {
                 var w = window.open(linkUrl, 'newwindow-' + Date.now(), 'width=' + width + ',height=' + height + '  ');
                 w.device = d;
+                w.company_name = $localStorage.currentUser.company_name;
+                console.log("current user", $localStorage.currentUser);
                 if(geoJson){
                     w.geoJson = geoJson;
                 }

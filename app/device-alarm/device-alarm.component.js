@@ -15,6 +15,7 @@ angular.module('deviceAlarm').component('deviceAlarm', {
             self.backgroundColor = '#D93444';
             // self.devices = $localStorage.devices;
             self.device = window.device;
+            self.company_name = window.company_name;
             self.geoJson = window.geoJson;
             console.log("geojson stringified", self.geoJson);
             // self.label = $routeParams.label;
