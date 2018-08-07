@@ -214,9 +214,9 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                 var secondsDiff = (milisecondsNow - milisecondsMidnight) / 1000;
                 var speed = (d.peripheral_gps_data[0].speed * 3600)/1000;
                 console.log("device", d);
-                var data = "P   " + d.label + " + " + self.company_name + "   " + d.sim + "   " + d.auth_device + "   " + d.economic_number +
-                    "   " + secondsDiff + "   " + self.latitude + "   " + self.longitude + "    " + d.peripheral_gps_data[0].speed +
-                    "   " + d.peripheral_gps_data[0].orientation_plain + "   " + 1 + "   " + 1;
+                var data = "P" + String.fromCharCode(9) + d.label + " + " + self.company_name + String.fromCharCode(9) + d.sim + String.fromCharCode(9) + d.auth_device + String.fromCharCode(9) + d.economic_number +
+                    String.fromCharCode(9) + secondsDiff + String.fromCharCode(9) + self.latitude + String.fromCharCode(9) + self.longitude + String.fromCharCode(9) + d.peripheral_gps_data[0].speed +
+                    String.fromCharCode(9) + d.peripheral_gps_data[0].orientation_plain + String.fromCharCode(9) + 1 + String.fromCharCode(9) + 1;
                 var pad = "0000000" + data.length.toString(16);
                 var start = pad.slice("-8");
                 console.log("start", start + data);
