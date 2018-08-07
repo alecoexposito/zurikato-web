@@ -26,7 +26,7 @@ app.get('/api/alert-c5', function(req, res) {
     res.send('yeappppp');
     console.log(req.query);
     client.write(req.query.data);
-    client.watch(function(data) {
+    client.on('data', function(data) {
         console.log("response from c5 server", data);
     });
     // client.end();
