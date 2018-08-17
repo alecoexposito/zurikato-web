@@ -8,11 +8,18 @@
 
 
 
+// (function (window) {
+//     window.__env = window.__env || {};
+//     window.__env.apiUrl = 'http://189.207.202.64:3007/api/v1/';
+//     window.__env.webUrl = 'http://127.0.0.1:8000/#!/';
+//     window.__env.webSocketIp = '189.207.202.64';
+//     window.__env.webSocketPort = 3001;
+// }(this));
+
 (function (window) {
     window.__env = window.__env || {};
-    window.__env.apiUrl = 'http://189.207.202.64:3007/api/v1/';
-    window.__env.webUrl = 'http://127.0.0.1:8000/#!/';
-    window.__env.webSocketIp = '189.207.202.64';
+    window.__env.apiUrl = 'http://187.217.220.34:3007/api/v1/';
+    window.__env.webUrl = 'http://187.217.220.34:8000/#!/';
+    window.__env.webSocketIp = '187.217.220.34';
     window.__env.webSocketPort = 3001;
 }(this));
-
