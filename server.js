@@ -13,8 +13,11 @@ app.all("/*", function(req, res, next){
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
     next();
 });
-console.log("serverrrrrrrr");
 var client = new net.Socket();
+
+client.on('sampleClientEvent', function(data) {
+    console.log("recibido desde websocket del tracker: ", data);
+});
 
 client.on("error", function(error) {
     console.log("Problem connecting to C5 socket");
