@@ -904,6 +904,17 @@ angular.module('deviceList').component('deviceList', {
             // $localStorage.socket = socket;
             socket.on('connect', function () {
             });
+
+            var g = socket.subscribe('sampleClientEvent');
+            g.watch(function(data) {
+                console.log("recibido del tracker: ", data);
+            });
+
+            alarmsSocket.watch(function(data) {
+                self.openAlarm(data);
+            });
+
+
             // var socketBB = socketCluster.connect(self.optionsBB);
             // socketBB.on('connect', function () {
             // });

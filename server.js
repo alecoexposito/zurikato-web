@@ -15,10 +15,6 @@ app.all("/*", function(req, res, next){
 });
 var client = new net.Socket();
 
-client.on('sampleClientEvent', function(data) {
-    console.log("recibido desde websocket del tracker: ", data);
-});
-
 client.on("error", function(error) {
     console.log("Problem connecting to C5 socket");
 });
