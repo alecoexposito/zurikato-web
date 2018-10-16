@@ -905,7 +905,7 @@ angular.module('deviceList').component('deviceList', {
             socket.on('connect', function () {
             });
 
-            var mdvr = socket.subscribe('sampleClientEvent');
+            var mdvr = socket.subscribe('mdvr_channel');
             mdvr.watch(function(data) {
                 console.log("recibido del tracker: ", data);
             });
