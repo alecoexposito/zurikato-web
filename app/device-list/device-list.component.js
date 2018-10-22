@@ -445,6 +445,7 @@ angular.module('deviceList').component('deviceList', {
                     if(imeis == undefined)
                         imeis = "";
                     for(var j = 0; j < devices.length; j++) {
+                        console.log("device info: ", devices[j]);
                         var checked = imeis.indexOf(devices[j].auth_device) != -1;
                         root.nodes.push({
                             text: devices[j].label + "<i class='fa fa-ellipsis-v float-right px-1 test-toolbar' data-toolbar='device-menu-options' id='" + devices[j].id + "' data-toolbar-style='dark' id-device = '" + devices[j].id + "' imei = '" + devices[j].auth_device + "'></i>",
@@ -926,6 +927,7 @@ angular.module('deviceList').component('deviceList', {
             self.initialLatitude = null;
             self.initialLongitude = null;
             self.initializeMarkers = function initializeMarkers(devices) {
+                console.log("dispositivos a inicializar: ", devices);
                 for(var i = 0; i < devices.length; i++){
                     var device = devices[i];
                     if(device.peripheral_gps_data[0] == undefined)
