@@ -914,7 +914,7 @@ angular.module('deviceList').component('deviceList', {
             $localStorage.markers = [];
             self.markersInitialized = false;
             $localStorage.devices = Device.query({userId: $localStorage.currentUser.id}, function(devices){
-                console.log("devices from database");
+                console.log("devices from database", devices);
                 if(self.map != undefined)
                     self.initializeMarkers(devices);
 
