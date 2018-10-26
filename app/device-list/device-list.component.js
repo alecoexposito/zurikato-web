@@ -50,7 +50,6 @@ angular.module('deviceList').component('deviceList', {
                 html2canvas(document.querySelector("body"), {
                     useCORS: true
                 }).then(canvas => {
-                    console.log("canvas akiiiii", canvas);
                     var dataUrl = canvas.toDataURL();
                     // var imageFoo = document.createElement('img');
                     // imageFoo.src = dataUrl;
@@ -180,9 +179,7 @@ angular.module('deviceList').component('deviceList', {
                     fence.setMap(null);
                 });
                 delete self.fences;
-                console.log("antes de eliminar", self.fences);
                 self.fences = [];
-                console.log("despues de eliminar: ", self.fences);
                 $location.path("/login");
             };
             self.updateFences = function updateImeis() {
@@ -218,7 +215,6 @@ angular.module('deviceList').component('deviceList', {
                 // });
                 self.features.features.length = 0;
                 for(var i = 0; i < self.fences.length; i++) {
-                    console.log("En el ciclo de las features");
                     var polygon = self.fences[i];
                     var geoJson = self.getGeoJsonFromFence(polygon, false);
 
@@ -445,7 +441,6 @@ angular.module('deviceList').component('deviceList', {
                     if(imeis == undefined)
                         imeis = "";
                     for(var j = 0; j < devices.length; j++) {
-                        console.log("device info: ", devices[j]);
                         var checked = imeis.indexOf(devices[j].auth_device) != -1;
                         root.nodes.push({
                             text: devices[j].label + "<i class='fa fa-ellipsis-v float-right px-1 test-toolbar' data-toolbar='device-menu-options' id='" + devices[j].id + "' data-toolbar-style='dark' id-device = '" + devices[j].id + "' imei = '" + devices[j].auth_device + "'></i>",
@@ -596,6 +591,7 @@ angular.module('deviceList').component('deviceList', {
 
             self.addToGroups = function addToGroups(data) {
                 for(var j = 0; j < self.groups.length; j++) {
+                    console.log("adding to group: ", data);
                     var g = self.groups [j];
                     var groupId = data.group_id != undefined ? data.group_id : -1;
                     if(g.group_id == groupId) {
@@ -927,7 +923,6 @@ angular.module('deviceList').component('deviceList', {
             self.initialLatitude = null;
             self.initialLongitude = null;
             self.initializeMarkers = function initializeMarkers(devices) {
-                console.log("dispositivos a inicializar: ", devices);
                 for(var i = 0; i < devices.length; i++){
                     var device = devices[i];
                     if(device.peripheral_gps_data[0] == undefined)
@@ -1002,11 +997,21 @@ angular.module('deviceList').component('deviceList', {
                     });
 
                     $localStorage.markers[device.auth_device] = m;
-
-                    var g = socket.subscribe(devices[i].auth_device);
-                    var alarmsSocket = socket.subscribe("alarms_" + devices[i].auth_device);
+                    console.log("suscribiendo al canal: ", devices[i]);
+                    var g = null;
+                    var alarmsSocket = null;
+                    if(devices[i].mdvr_number == null) {
+                        g = socket.subscribe(devices[i].auth_device);
+                        alarmsSocket = socket.subscribe("alarms_" + devices[i].auth_device);
+                    } else {
+                        g = socket.subscribe(devices[i].mdvr_number);
+                        alarmsSocket = socket.subscribe("alarms_" + devices[i].mdvr_number);
+                    }
                     g.watch(function(data) {
-                        var m = $localStorage.markers[data.device_id];
+                        var imei = data.device_id;
+                        if(data.mdvr_number != undefined)
+                            imei = self.findImeiByMdvrNumber(data.device_id);
+                        var m = $localStorage.markers[imei];
                         if(m != undefined) {
                             m.setPosition(new google.maps.LatLng( data.latitude,data.longitude));
                             m.speed = data.speed;
@@ -1029,6 +1034,17 @@ angular.module('deviceList').component('deviceList', {
                     });
                 }
                 self.markersInitialized = true;
+            };
+
+            self.findImeiByMdvrNumber = function findImeiByMdvrNumber(mdvrNumber) {
+                if($localStorage.devices == undefined)
+                    return false;
+                for (var k = 0; k < $localStorage.devices.length; k++) {
+                    var d = $localStorage.devices[k];
+                    if(d.mdvr_number == mdvrNumber)
+                        return new String(d.auth_device).toString();
+                }
+                return false;
             };
 
             self.rotateMarker = function(m, degrees) {
