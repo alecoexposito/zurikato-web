@@ -640,7 +640,6 @@ angular.module('deviceList').component('deviceList', {
                     self.fences = [];
                     self.fenceIds = [];
                     google.maps.event.addListener(self.map.data, 'addfeature', function (event) {
-                        console.log("pasando por aki");
                         if (event.feature.getGeometry().getType() === 'Polygon') {
                             var posExists = false;
                             if(self.fenceIds.indexOf(event.feature.getProperty("id")) != -1) {
@@ -915,6 +914,7 @@ angular.module('deviceList').component('deviceList', {
             $localStorage.markers = [];
             self.markersInitialized = false;
             $localStorage.devices = Device.query({userId: $localStorage.currentUser.id}, function(devices){
+                console.log("devices from database");
                 if(self.map != undefined)
                     self.initializeMarkers(devices);
 
