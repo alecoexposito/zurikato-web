@@ -591,7 +591,7 @@ angular.module('deviceList').component('deviceList', {
 
             self.addToGroups = function addToGroups(data) {
                 for(var j = 0; j < self.groups.length; j++) {
-                    console.log("adding to group: ", data);
+                    // console.log("adding to group: ", data);
                     var g = self.groups [j];
                     var groupId = data.group_id != undefined ? data.group_id : -1;
                     if(g.group_id == groupId) {
@@ -997,7 +997,6 @@ angular.module('deviceList').component('deviceList', {
                     });
 
                     $localStorage.markers[device.auth_device] = m;
-                    console.log("suscribiendo al canal: ", devices[i]);
                     var g = null;
                     var alarmsSocket = null;
                     if(devices[i].mdvr_number == null) {
@@ -1008,6 +1007,7 @@ angular.module('deviceList').component('deviceList', {
                         alarmsSocket = socket.subscribe("alarms_" + devices[i].mdvr_number);
                     }
                     g.watch(function(data) {
+                        console.log("data en el g.watch: ", data);
                         var imei = data.device_id;
                         if(data.mdvr_number != undefined)
                             imei = self.findImeiByMdvrNumber(data.device_id);
