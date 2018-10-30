@@ -1013,11 +1013,17 @@ angular.module('deviceList').component('deviceList', {
                             imei = self.findImeiByMdvrNumber(data.device_id);
                         var m = $localStorage.markers[imei];
                         if(m != undefined) {
+                            var lastUpdate;
+                            if(data.mdvr_number) {
+                                lastUpdate = data.date;
+                            } else {
+                                lastUpdate = self.getDateByHex(data.date);
+                            }
                             m.setPosition(new google.maps.LatLng( data.latitude,data.longitude));
                             m.speed = data.speed;
                             m.orientation = data.orientation_plain;
                             m.gpsStatus = data.gps_status == 0 ? 'On' : 'Off';
-                            m.lastUpdate = self.getDateByHex(data.date);
+                            m.lastUpdate = lastUpdate;
                             self.rotateMarker(m, data.orientation_plain);
                             if(self.currentMenuImei == data.device_id){
                                 self.map.panTo(new google.maps.LatLng(data.latitude, data.longitude));
