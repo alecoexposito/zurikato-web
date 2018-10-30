@@ -1016,6 +1016,8 @@ angular.module('deviceList').component('deviceList', {
                             var lastUpdate;
                             if(data.mdvr_number) {
                                 lastUpdate = data.date;
+                                var momentDate = moment("2018-10-30 13:35:26.0", "YYYY-MM-DD HH:mm:s.S")
+                                lastUpdate = momentDate.format(DD/MM/YYYY HH:mm:ss);
                             } else {
                                 lastUpdate = self.getDateByHex(data.date);
                             }
