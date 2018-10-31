@@ -925,6 +925,7 @@ angular.module('deviceList').component('deviceList', {
             self.initializeMarkers = function initializeMarkers(devices) {
                 for(var i = 0; i < devices.length; i++){
                     var device = devices[i];
+                    console.log("peripheral gps data: ", device.peripheral_gps_data[0]);
                     if(device.peripheral_gps_data[0] == undefined)
                         continue;
                     if(self.initialLatitude == null) {
@@ -1007,7 +1008,6 @@ angular.module('deviceList').component('deviceList', {
                         alarmsSocket = socket.subscribe("alarms_" + devices[i].mdvr_number);
                     }
                     g.watch(function(data) {
-                        console.log("data en el g.watch: ", data);
                         var imei = data.device_id;
                         if(data.mdvr_number != undefined)
                             imei = self.findImeiByMdvrNumber(data.device_id);
