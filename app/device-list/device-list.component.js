@@ -1066,6 +1066,7 @@ angular.module('deviceList').component('deviceList', {
                 else if(m.speed == 0)
                     backgroundColor = '#248DFD'; // blue for stopped '#E1B300';
                 m.backgroundColor = backgroundColor;
+                console.log("updating color: ", m);
                 if(m.labelWindow != undefined && m.alarmed == false){
                     m.labelWindow._opts.backgroundColor = '#000000';
                 }
