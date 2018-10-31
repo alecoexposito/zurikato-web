@@ -925,7 +925,6 @@ angular.module('deviceList').component('deviceList', {
             self.initializeMarkers = function initializeMarkers(devices) {
                 for(var i = 0; i < devices.length; i++){
                     var device = devices[i];
-                    console.log("peripheral gps data: ", device.peripheral_gps_data[0]);
                     if(device.peripheral_gps_data[0] == undefined)
                         continue;
                     if(self.initialLatitude == null) {
@@ -1068,7 +1067,7 @@ angular.module('deviceList').component('deviceList', {
                     backgroundColor = '#248DFD'; // blue for stopped '#E1B300';
                 m.backgroundColor = backgroundColor;
                 if(m.labelWindow != undefined && m.alarmed == false){
-                    m.labelWindow._opts.backgroundColor = backgroundColor;
+                    m.labelWindow._opts.backgroundColor = '#000000';
                 }
             };
             self.updateAddressAndDetail = function updateAddressAndDetail(m) {
