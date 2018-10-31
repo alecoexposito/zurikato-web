@@ -1068,7 +1068,7 @@ angular.module('deviceList').component('deviceList', {
                 m.backgroundColor = backgroundColor;
                 console.log("updating color: ", m);
                 if(m.labelWindow != undefined && m.alarmed == false){
-                    m.labelWindow._opts.backgroundColor = '#000000';
+                    m.labelWindow._html._opts.backgroundColor = '#000000';
                 }
             };
             self.updateAddressAndDetail = function updateAddressAndDetail(m) {
