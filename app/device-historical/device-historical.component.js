@@ -27,7 +27,7 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                 });
             };
 
-             async self.exportToPdf = function exportToPdf() {
+             self.exportToPdf = function exportToPdf() {
                 var pdfCoordinates = [];
                 var lastDay = null;
                 var consec = 1;
@@ -37,7 +37,7 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                         consec = 1;
                     }
                     var latLngForAddress = new google.maps.LatLng(self.coordinates[i].lat, self.coordinates[i].lng);
-                    var address = await self.getAddressByLocation(latLngForAddress);
+                    var address = self.getAddressByLocation(latLngForAddress);
                     lastDay = self.coordinates[i].day
                     pdfCoordinates.push(consec + "- Hora: " + self.coordinates[i].time + "     Velocidad: " +  self.coordinates[i].speed + "     Dirección: " + address + "     Longitud: " + self.coordinates[i].lng + "\n");
                     var linkToMap = self.coordinates[i].lat + ', ' + self.coordinates[i].lng;
