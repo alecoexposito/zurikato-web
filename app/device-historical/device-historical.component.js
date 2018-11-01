@@ -56,7 +56,7 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                     var address = "por ver";
                     lastDay = self.coordinates[i].day
                     pdfCoordinates.push(consec + "- Hora: " + self.coordinates[i].time + "     Velocidad: " +  self.coordinates[i].speed + " ");
-                    var linkToMap = 'http://www.google.com.maps/place/' + self.coordinates[i].lat + ',' + self.coordinates[i].lng;
+                    var linkToMap = 'http://www.google.com/maps/place/' + self.coordinates[i].lat + ',' + self.coordinates[i].lng;
                     pdfCoordinates.push({text: ' Ver en mapa \n', link: linkToMap});
                     consec++;
                 }
