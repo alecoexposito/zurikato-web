@@ -36,8 +36,10 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                         pdfCoordinates.push("\nFecha: " + self.coordinates[i].day + "\n--------------------------------\n");
                         consec = 1;
                     }
+                    var latLngForAddress = new google.maps.LatLng(self.coordinates[i].lat, self.coordinates[i].lng);
+                    var address = await self.getAddressByLocation(latLngForAddress);
                     lastDay = self.coordinates[i].day
-                    pdfCoordinates.push(consec + "- Hora: " + self.coordinates[i].time + "     Velocidad: " +  self.coordinates[i].speed + "     Latitud: " + self.coordinates[i].lat + "     Longitud: " + self.coordinates[i].lng);
+                    pdfCoordinates.push(consec + "- Hora: " + self.coordinates[i].time + "     Velocidad: " +  self.coordinates[i].speed + "     Dirección: " + address + "     Longitud: " + self.coordinates[i].lng + "\n");
                     var linkToMap = self.coordinates[i].lat + ', ' + self.coordinates[i].lng;
                     pdfCoordinates.push({text: ' Verenmapa', link: linkToMap});
                     consec++;
@@ -93,8 +95,23 @@ angular.module('deviceHistorical').component('deviceHistorical', {
 
             };
 
+            async self.getAddressByLocation = function(latLng) {
+                self.geocoder.geocode({
+                    'latLng': latLng
+                }, function (results, status) {
+                    if (status === google.maps.GeocoderStatus.OK) {
+                        if (results[0]) {
+                            return results[0];
+                        } else {
+                            return false;
+                        }
+                    } else {
+                        return false;
+                    }
+                });
+            };
+
             self.shapeClick = function shapeClick(event ){
-                // return;
                 var minDist = Number.MAX_VALUE;
                 var index = -1;
                 self.geocoder.geocode({
