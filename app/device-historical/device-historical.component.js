@@ -27,7 +27,7 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                 });
             };
 
-            self.exportToPdf = function exportToPdf() {
+             async self.exportToPdf = function exportToPdf() {
                 var pdfCoordinates = [];
                 var lastDay = null;
                 var consec = 1;
@@ -95,7 +95,7 @@ angular.module('deviceHistorical').component('deviceHistorical', {
 
             };
 
-            async self.getAddressByLocation = function(latLng) {
+            self.getAddressByLocation = function(latLng) {
                 self.geocoder.geocode({
                     'latLng': latLng
                 }, function (results, status) {
