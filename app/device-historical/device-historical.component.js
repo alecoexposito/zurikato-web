@@ -55,9 +55,9 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                     var latLngForAddress = new google.maps.LatLng(self.coordinates[i].lat, self.coordinates[i].lng);
                     var address = "por ver";
                     lastDay = self.coordinates[i].day
-                    pdfCoordinates.push(consec + "- Hora: " + self.coordinates[i].time + "     Velocidad: " +  self.coordinates[i].speed + "     Dirección: " + address + "     Longitud: " + self.coordinates[i].lng + "\n");
-                    // var linkToMap = self.coordinates[i].lat + ', ' + self.coordinates[i].lng;
-                    // pdfCoordinates.push({text: ' Verenmapa', link: linkToMap});
+                    pdfCoordinates.push(consec + "- Hora: " + self.coordinates[i].time + "     Velocidad: " +  self.coordinates[i].speed + " ");
+                    var linkToMap = 'http://' + self.coordinates[i].lat + ', ' + self.coordinates[i].lng;
+                    pdfCoordinates.push({text: ' Ver en mapa \n', link: linkToMap});
                     consec++;
                 }
                 html2canvas(document.querySelector("body"), {
@@ -232,7 +232,7 @@ angular.module('deviceHistorical').component('deviceHistorical', {
 
                 google.maps.event.trigger(self.map, 'resize');
                 self.drawHistorical(historical, pos + 1);
-                self.setAddressesToCoordinates();
+                // self.setAddressesToCoordinates();
 
                 // $timeout(function() {
                 //         self.drawHistorical(historical, pos + 1);
