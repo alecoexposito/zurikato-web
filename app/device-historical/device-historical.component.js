@@ -30,7 +30,7 @@ angular.module('deviceHistorical').component('deviceHistorical', {
             self.getAllAddresses = function getAllAddresses() {
                 var addresses = [];
                 for(var i = 0; i < 10; i++) {
-                    var latLng = new google.maps.LatLng(parseFloat(self.historics[0].lat),parseFloat(self.historics[0].lng));
+                    var latLng = new google.maps.LatLng(parseFloat(self.coordinates[i].lat),parseFloat(self.coordinates[i].lng));
                     var address = self.getAddressByLocation(latLng);
                     addresses.push(address);
                 }
@@ -39,7 +39,7 @@ angular.module('deviceHistorical').component('deviceHistorical', {
             self.setAddressesToCoordinates = function setAddressesToCoordinates() {
                 var addresses = self.getAllAddresses();
                 Promise.all(addresses).then(function(values) {
-                    console.log(values);
+                    console.log("promesas: ", values);
                 });
             }
 
