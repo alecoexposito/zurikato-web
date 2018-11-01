@@ -27,6 +27,22 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                 });
             };
 
+            self.getAllAddresses = function getAllAddresses() {
+                var addresses = [];
+                for(var i = 0; i < 10; i++) {
+                    var latLng = new google.maps.LatLng(parseFloat(self.historics[0].lat),parseFloat(self.historics[0].lng));
+                    var address = self.getAddressByLocation(latLng);
+                    addresses.push(address);
+                }
+                return addresses;
+            };
+            self.setAddressesToCoordinates = function setAddressesToCoordinates() {
+                var addresses = self.getAllAddresses();
+                Promise.all(addresses).then(function(values) {
+                    console.log(values);
+                });
+            }
+
              self.exportToPdf = function exportToPdf() {
                 var pdfCoordinates = [];
                 var lastDay = null;
@@ -37,11 +53,11 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                         consec = 1;
                     }
                     var latLngForAddress = new google.maps.LatLng(self.coordinates[i].lat, self.coordinates[i].lng);
-                    var address = self.getAddressByLocation(latLngForAddress);
+                    var address = "por ver";
                     lastDay = self.coordinates[i].day
                     pdfCoordinates.push(consec + "- Hora: " + self.coordinates[i].time + "     Velocidad: " +  self.coordinates[i].speed + "     Dirección: " + address + "     Longitud: " + self.coordinates[i].lng + "\n");
-                    var linkToMap = self.coordinates[i].lat + ', ' + self.coordinates[i].lng;
-                    pdfCoordinates.push({text: ' Verenmapa', link: linkToMap});
+                    // var linkToMap = self.coordinates[i].lat + ', ' + self.coordinates[i].lng;
+                    // pdfCoordinates.push({text: ' Verenmapa', link: linkToMap});
                     consec++;
                 }
                 html2canvas(document.querySelector("body"), {
@@ -96,19 +112,22 @@ angular.module('deviceHistorical').component('deviceHistorical', {
             };
 
             self.getAddressByLocation = function(latLng) {
-                self.geocoder.geocode({
-                    'latLng': latLng
-                }, function (results, status) {
-                    if (status === google.maps.GeocoderStatus.OK) {
-                        if (results[0]) {
-                            return results[0];
+                return new Promise(function(resolve, reject) {
+                    self.geocoder.geocode({
+                        'latLng': latLng
+                    }, function (results, status) {
+                        if (status === google.maps.GeocoderStatus.OK) {
+                            if (results[0]) {
+                                resolve(results[0]);
+                            } else {
+                                reject(new Error('Couldnt\'t find the location '));
+                            }
                         } else {
-                            return false;
+                            reject(new Error('Couldnt\'t find the location '));
                         }
-                    } else {
-                        return false;
-                    }
+                    });
                 });
+
             };
 
             self.shapeClick = function shapeClick(event ){
@@ -212,6 +231,7 @@ angular.module('deviceHistorical').component('deviceHistorical', {
 
                 google.maps.event.trigger(self.map, 'resize');
                 self.drawHistorical(historical, pos + 1);
+                self.setAddressesToCoordinates();
 
                 // $timeout(function() {
                 //         self.drawHistorical(historical, pos + 1);
@@ -228,7 +248,6 @@ angular.module('deviceHistorical').component('deviceHistorical', {
             self.playIncreaseSpeed = function playIncreaseSpeed() {
                 if(self.playSpeed > 0)
                     self.playSpeed -= self.speedChangeValue;
-                console.log("current speed: ", self.playSpeed);
             };
             self.playDecreaseSpeed = function playDecreaseSpeed() {
                 self.playSpeed += self.speedChangeValue;
