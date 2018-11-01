@@ -112,6 +112,7 @@ angular.module('deviceHistorical').component('deviceHistorical', {
             };
 
             self.getAddressByLocation = function(latLng) {
+                console.log("get address for: ", latLng);
                 return new Promise(function(resolve, reject) {
                     self.geocoder.geocode({
                         'latLng': latLng
