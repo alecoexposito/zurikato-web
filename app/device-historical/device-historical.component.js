@@ -384,7 +384,7 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                         bounds.extend(latLng);
                     }
                 }
-                // self.map.fitBounds(bounds);
+                self.map.fitBounds(bounds);
             };
         }
     ]
