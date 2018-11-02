@@ -348,7 +348,7 @@ angular.module('deviceHistorical').component('deviceHistorical', {
             });
             self.drawPoints = function drawPoints() {
                 var bounds = new google.maps.LatLngBounds();
-                var everyCount = parseInt(self.coordinates.length / 10);
+                var everyCount = parseInt(self.coordinates.length / 30);
                 if(everyCount <= 2) {
                     bounds.extend(new google.maps.LatLng(self.coordinates[0]));
                     bounds.extend(new google.maps.LatLng(self.coordinates[self.coordinates.length - 1]));
