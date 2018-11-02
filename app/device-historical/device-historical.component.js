@@ -35,7 +35,7 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                         addresses.push(addresses[addresses.length - 1]);
                         continue;
                     }
-                    console.log("llamando a geoloc: ", ++count);
+                    console.log("llamando a geoloc: ", ++counter);
 
                     var latLng = new google.maps.LatLng(parseFloat(self.coordinates[i].lat),parseFloat(self.coordinates[i].lng));
                     var address = self.getAddressByLocation(latLng);
