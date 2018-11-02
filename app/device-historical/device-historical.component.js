@@ -358,7 +358,8 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                         var marker = new google.maps.Marker({
                             position: latLng,
                             map: self.map,
-                            title: 'i'
+                            title: i,
+                            label: i
                         });
 
                         bounds.extend(latLng);
