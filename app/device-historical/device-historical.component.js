@@ -371,7 +371,7 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                             showCloseButton: false,
                             backgroundColor: 'black',
                             fontColor: 'white',
-                            fontSize: 10px,
+                            fontSize: '10px',
                             maxWidth: 300,
                             // maxHeight: 35,
                             pointer: '7px',
