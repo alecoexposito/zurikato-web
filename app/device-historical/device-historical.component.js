@@ -73,28 +73,28 @@ angular.module('deviceHistorical').component('deviceHistorical', {
 
              self.exportToPdf = function exportToPdf() {
                 self.drawPoints();
-                // return;
-                var pdfCoordinates = [];
-                var lastDay = null;
-                var consec = 1;
-                for(var i = 0; i < self.coordinates.length; i++) {
-                    if(lastDay == null || lastDay != self.coordinates[i].day){
-                        pdfCoordinates.push("\nFecha: " + self.coordinates[i].day + "\n--------------------------------\n");
-                        consec = 1;
+                setTimeout(function() {
+                    var pdfCoordinates = [];
+                    var lastDay = null;
+                    var consec = 1;
+                    for(var i = 0; i < self.coordinates.length; i++) {
+                        if(lastDay == null || lastDay != self.coordinates[i].day){
+                            pdfCoordinates.push("\nFecha: " + self.coordinates[i].day + "\n--------------------------------\n");
+                            consec = 1;
+                        }
+                        var latLngForAddress = new google.maps.LatLng(self.coordinates[i].lat, self.coordinates[i].lng);
+                        var address = "por ver";
+                        lastDay = self.coordinates[i].day
+                        pdfCoordinates.push(consec + "- Hora: " + self.coordinates[i].time + "     Velocidad: " +  self.coordinates[i].speed + " ");
+                        var linkToMap = 'http://www.google.com/maps/place/' + self.coordinates[i].lat + ',' + self.coordinates[i].lng;
+                        pdfCoordinates.push({text: ' Ver en mapa \n', link: linkToMap});
+                        consec++;
                     }
-                    var latLngForAddress = new google.maps.LatLng(self.coordinates[i].lat, self.coordinates[i].lng);
-                    var address = "por ver";
-                    lastDay = self.coordinates[i].day
-                    pdfCoordinates.push(consec + "- Hora: " + self.coordinates[i].time + "     Velocidad: " +  self.coordinates[i].speed + " ");
-                    var linkToMap = 'http://www.google.com/maps/place/' + self.coordinates[i].lat + ',' + self.coordinates[i].lng;
-                    pdfCoordinates.push({text: ' Ver en mapa \n', link: linkToMap});
-                    consec++;
-                }
-                html2canvas(document.querySelector("body"), {
-                    useCORS: true,
-                    imageTimeout: 30000
-                }).then(canvas => {
-                    $("#pdf-loader").removeClass("fa-spinner fa-spin").addClass("fa-file-pdf");
+                    html2canvas(document.querySelector("body"), {
+                        useCORS: true,
+                        imageTimeout: 30000
+                    }).then(canvas => {
+                        $("#pdf-loader").removeClass("fa-spinner fa-spin").addClass("fa-file-pdf");
                     var dataUrl = canvas.toDataURL();
                     var docDefinition = { content: [
                             {
@@ -131,10 +131,11 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                         }
                     };
 
-                    pdfMake.createPdf(docDefinition).open();
-                });
-                $("#pdf-loader").removeClass("fa-file-pdf").addClass("fa-spinner fa-spin");
+                        pdfMake.createPdf(docDefinition).open();
+                    });
+                    $("#pdf-loader").removeClass("fa-file-pdf").addClass("fa-spinner fa-spin");
 
+                }, 1000);
             };
 
             self.shapeClick = function shapeClick(event ){
