@@ -37,6 +37,27 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                 }
                 return addresses;
             };
+            self.getAddressByLocation = function getAddressByLocation(latLng) {
+                console.log("get address for: ", latLng);
+                return new Promise(function(resolve, reject) {
+                    self.geocoder.geocode({
+                        'latLng': latLng
+                    }, function (results, status) {
+                        if (status === google.maps.GeocoderStatus.OK) {
+                            if (results[0]) {
+                                resolve(results[0]);
+                            } else {
+                                reject(new Error('Couldn\'t find the location '));
+                            }
+                        } else {
+                            console.log(status);
+                            reject(new Error('Couldn\'t find the location '));
+                        }
+                    });
+                });
+
+            };
+
             self.setAddressesToCoordinates = function setAddressesToCoordinates() {
                 var addresses = self.getAllAddresses();
                 Promise.all(addresses).then(function(values) {
@@ -105,26 +126,6 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                     pdfMake.createPdf(docDefinition).open();
                 });
                 $("#pdf-loader").removeClass("fa-file-pdf").addClass("fa-spinner fa-spin");
-
-            };
-
-            self.getAddressByLocation = function(latLng) {
-                console.log("get address for: ", latLng);
-                return new Promise(function(resolve, reject) {
-                    self.geocoder.geocode({
-                        'latLng': latLng
-                    }, function (results, status) {
-                        if (status === google.maps.GeocoderStatus.OK) {
-                            if (results[0]) {
-                                resolve(results[0]);
-                            } else {
-                                reject(new Error('Couldnt\'t find the location '));
-                            }
-                        } else {
-                            reject(new Error('Couldnt\'t find the location '));
-                        }
-                    });
-                });
 
             };
 
