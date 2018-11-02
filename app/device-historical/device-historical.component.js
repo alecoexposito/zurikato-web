@@ -354,8 +354,14 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                     bounds.extend(new google.maps.LatLng(self.coordinates[self.coordinates.length - 1]));
                 } else {
                     for(var i = 0; i < self.coordinates.length; i+=everyCount) {
-                        bounds.extend(new google.maps.LatLng(self.coordinates[i]));
-                        bounds.extend(new google.maps.LatLng(self.coordinates[self.coordinates.length - 1]));
+                        var latLng = new google.maps.LatLng(self.coordinates[i]);
+                        var marker = new google.maps.Marker({
+                            position: latLng,
+                            map: self.map,
+                            title: 'i'
+                        });
+
+                        bounds.extend(latLng);
                     }
                 }
                 self.map.fitBounds(bounds);
