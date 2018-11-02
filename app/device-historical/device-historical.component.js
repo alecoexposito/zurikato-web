@@ -73,7 +73,7 @@ angular.module('deviceHistorical').component('deviceHistorical', {
 
              self.exportToPdf = function exportToPdf() {
                 self.drawPoints();
-                return;
+                // return;
                 var pdfCoordinates = [];
                 var lastDay = null;
                 var consec = 1;
