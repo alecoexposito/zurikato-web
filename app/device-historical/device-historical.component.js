@@ -155,7 +155,7 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                     }
                 }
                 var content = "<p style='white-space: nowrap; margin-bottom: 3px;'>Velocidad: " + self.coordinates[index].speed + " </p>" +
-                    "<p style='white-space: nowrap; margin-bottom: 3px; mx-1'>Fecha y hora: " + self.coordinates[index].day + " " + self.coordinates[index].day + "</p>" +
+                    "<p style='white-space: nowrap; margin-bottom: 3px; mx-1'>Fecha y hora: " + self.coordinates[index].day + " " + self.coordinates[index].time + "</p>" +
                     "<p id='address-info'><i class='fa fa-spinner fa-spin'></i> cargando...</p>";
                 self.infoWindow.setContent(content);
                 self.infoWindow.setPosition(event.latLng);
