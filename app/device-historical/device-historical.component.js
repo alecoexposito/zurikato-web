@@ -348,7 +348,7 @@ angular.module('deviceHistorical').component('deviceHistorical', {
             });
             self.drawPoints = function drawPoints() {
                 var bounds = new google.maps.LatLngBounds();
-                var everyCount = parseInt(self.coordinates.length / 50);
+                var everyCount = parseInt(self.coordinates.length / 100);
                 if(everyCount <= 2) {
                     bounds.extend(new google.maps.LatLng(self.coordinates[0]));
                     bounds.extend(new google.maps.LatLng(self.coordinates[self.coordinates.length - 1]));
@@ -385,12 +385,12 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                     }
                 }
                 // Don't zoom in too far on only one marker
-                if (bounds.getNorthEast().equals(bounds.getSouthWest())) {
-                    var extendPoint1 = new google.maps.LatLng(bounds.getNorthEast().lat() + 0.01, bounds.getNorthEast().lng() + 0.01);
-                    var extendPoint2 = new google.maps.LatLng(bounds.getNorthEast().lat() - 0.01, bounds.getNorthEast().lng() - 0.01);
-                    bounds.extend(extendPoint1);
-                    bounds.extend(extendPoint2);
-                }
+                // if (bounds.getNorthEast().equals(bounds.getSouthWest())) {
+                //     var extendPoint1 = new google.maps.LatLng(bounds.getNorthEast().lat() + 0.01, bounds.getNorthEast().lng() + 0.01);
+                //     var extendPoint2 = new google.maps.LatLng(bounds.getNorthEast().lat() - 0.01, bounds.getNorthEast().lng() - 0.01);
+                //     bounds.extend(extendPoint1);
+                //     bounds.extend(extendPoint2);
+                // }
 
                 self.map.fitBounds(bounds);
             };
