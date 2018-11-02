@@ -29,8 +29,14 @@ angular.module('deviceHistorical').component('deviceHistorical', {
 
             self.getAllAddresses = function getAllAddresses() {
                 var addresses = [];
-                for(var i = 0; i < 5; i++) {
-                    console.log("dentro del for");
+                var counter = 0;
+                for(var i = 0; i < 100; i++) {
+                    if(i > 0 && self.coordinates[i].lat == self.coordinates[i-1].lat && self.coordinates[i].lng == self.coordinates[i-1].lng) {
+                        addresses.push(addresses[addresses.length - 1]);
+                        continue;
+                    }
+                    console.log("llamando a geoloc: ", ++count);
+
                     var latLng = new google.maps.LatLng(parseFloat(self.coordinates[i].lat),parseFloat(self.coordinates[i].lng));
                     var address = self.getAddressByLocation(latLng);
                     addresses.push(address);
