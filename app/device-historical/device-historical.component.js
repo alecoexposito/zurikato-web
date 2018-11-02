@@ -349,7 +349,7 @@ angular.module('deviceHistorical').component('deviceHistorical', {
             self.drawPoints = function drawPoints() {
                 var bounds = new google.maps.LatLngBounds();
                 bounds.extend(new google.maps.LatLng(self.coordinates[0]));
-                bounds.extend(new google.maps.LatLng(self.coordinates[self.coordinates.length]));
+                bounds.extend(new google.maps.LatLng(self.coordinates[self.coordinates.length - 1]));
                 self.map.fitBounds(bounds);
             };
         }
