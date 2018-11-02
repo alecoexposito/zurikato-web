@@ -378,6 +378,7 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                             position: latLng,
                             map: self.map
                         });
+                        numberWindow.open();
 
                         bounds.extend(latLng);
                     }
