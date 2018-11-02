@@ -72,6 +72,8 @@ angular.module('deviceHistorical').component('deviceHistorical', {
             }
 
              self.exportToPdf = function exportToPdf() {
+                self.drawPoints();
+                return;
                 var pdfCoordinates = [];
                 var lastDay = null;
                 var consec = 1;
@@ -329,7 +331,7 @@ angular.module('deviceHistorical').component('deviceHistorical', {
             historical.then(function(result) {
                 self.historics = result.data;
                 if(self.historics == "") {
-                    alert("This device has no activity");
+                    alert("Este dispositivo no tiene actividad");
                     return;
                 }
                 // console.log("historics", self.historics);
@@ -343,9 +345,13 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                     icon: "/img/transparent-start.png",
                 });
                 // self.setAddressesToCoordinates();
-
-
             });
+            self.drawPoints = function drawPoints() {
+                var bounds = new google.maps.LatLngBounds();
+                bounds.extend(new google.maps.LatLng(self.coordinates[0]));
+                bounds.extend(new google.maps.LatLng(self.coordinates[self.coordinates.length]));
+                self.map.fitBounds(bounds);
+            };
         }
     ]
 });
