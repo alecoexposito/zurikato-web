@@ -230,8 +230,6 @@ angular.module('deviceHistorical').component('deviceHistorical', {
 
                 google.maps.event.trigger(self.map, 'resize');
                 self.drawHistorical(historical, pos + 1);
-                // self.setAddressesToCoordinates();
-
                 // $timeout(function() {
                 //         self.drawHistorical(historical, pos + 1);
                 // }, 0);
@@ -338,6 +336,8 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                     // imei: device.auth_device,
                     icon: "/img/transparent-start.png",
                 });
+                self.setAddressesToCoordinates();
+
 
             });
         }
