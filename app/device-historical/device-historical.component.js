@@ -342,7 +342,7 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                     // imei: device.auth_device,
                     icon: "/img/transparent-start.png",
                 });
-                self.setAddressesToCoordinates();
+                // self.setAddressesToCoordinates();
 
 
             });
