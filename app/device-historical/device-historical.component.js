@@ -364,7 +364,7 @@ angular.module('deviceHistorical').component('deviceHistorical', {
 
                         var numberWindow = new SnazzyInfoWindow({
                             content: i.toString(),
-                            // padding: '4px',
+                            padding: '1px',
                             // openOnMarkerClick: false,
                             // closeOnMapClick: true,
                             // closeWhenOthersOpen: true,
