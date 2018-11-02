@@ -366,24 +366,25 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                             content: i.toString(),
                             padding: '2px',
                             // openOnMarkerClick: false,
-                            // closeOnMapClick: true,
+                            closeOnMapClick: false,
                             // closeWhenOthersOpen: true,
-                            // showCloseButton: true,
-                            // fontColor: 'white',
+                            showCloseButton: false,
+                            backgroundColor: 'black',
+                            fontColor: 'white',
                             maxWidth: 300,
                             // maxHeight: 35,
                             pointer: '7px',
                             // wrapperClass: 'label-window label-' + m.imei
-                            // disableAutoPan: true
+                            disableAutoPan: false,
                             position: latLng,
                             map: self.map
                         });
                         numberWindow.open();
 
-                        bounds.extend(latLng);
+                        // bounds.extend(latLng);
                     }
                 }
-                self.map.fitBounds(bounds);
+                // self.map.fitBounds(bounds);
             };
         }
     ]
