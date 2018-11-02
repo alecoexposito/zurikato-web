@@ -375,13 +375,13 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                             // maxHeight: 35,
                             pointer: '7px',
                             // wrapperClass: 'label-window label-' + m.imei
-                            disableAutoPan: false,
+                            // disableAutoPan: true,
                             position: latLng,
                             map: self.map
                         });
                         numberWindow.open();
 
-                        // bounds.extend(latLng);
+                        bounds.extend(latLng);
                     }
                 }
                 // self.map.fitBounds(bounds);
