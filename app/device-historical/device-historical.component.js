@@ -355,11 +355,28 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                 } else {
                     for(var i = 0; i < self.coordinates.length; i+=everyCount) {
                         var latLng = new google.maps.LatLng(self.coordinates[i]);
-                        var marker = new google.maps.Marker({
+                        // var marker = new google.maps.Marker({
+                        //     position: latLng,
+                        //     map: self.map,
+                        //     title: i.toString(),
+                        //     label: i.toString()
+                        // });
+
+                        var numberWindow = new SnazzyInfoWindow({
+                            content: i.toString(),
+                            // padding: '4px',
+                            // openOnMarkerClick: false,
+                            // closeOnMapClick: true,
+                            // closeWhenOthersOpen: true,
+                            // showCloseButton: true,
+                            // fontColor: 'white',
+                            maxWidth: 300,
+                            // maxHeight: 35,
+                            pointer: '7px',
+                            // wrapperClass: 'label-window label-' + m.imei
+                            // disableAutoPan: true
                             position: latLng,
-                            map: self.map,
-                            title: i.toString(),
-                            label: i.toString()
+                            map: self.map
                         });
 
                         bounds.extend(latLng);
