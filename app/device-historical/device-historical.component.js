@@ -348,8 +348,16 @@ angular.module('deviceHistorical').component('deviceHistorical', {
             });
             self.drawPoints = function drawPoints() {
                 var bounds = new google.maps.LatLngBounds();
-                bounds.extend(new google.maps.LatLng(self.coordinates[0]));
-                bounds.extend(new google.maps.LatLng(self.coordinates[self.coordinates.length - 1]));
+                var everyCount = parseInt(self.coordinates.length / 20);
+                if(everyCount <= 2) {
+                    bounds.extend(new google.maps.LatLng(self.coordinates[0]));
+                    bounds.extend(new google.maps.LatLng(self.coordinates[self.coordinates.length - 1]));
+                } else {
+                    for(var i = 0; i < self.coordinates.length; i+=everyCount) {
+                        bounds.extend(new google.maps.LatLng(self.coordinates[i]));
+                        bounds.extend(new google.maps.LatLng(self.coordinates[self.coordinates.length - 1]));
+                    }
+                }
                 self.map.fitBounds(bounds);
             };
         }
