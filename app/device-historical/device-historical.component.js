@@ -29,7 +29,8 @@ angular.module('deviceHistorical').component('deviceHistorical', {
 
             self.getAllAddresses = function getAllAddresses() {
                 var addresses = [];
-                for(var i = 0; i < 10; i++) {
+                for(var i = 0; i < 5; i++) {
+                    console.log("dentro del for");
                     var latLng = new google.maps.LatLng(parseFloat(self.coordinates[i].lat),parseFloat(self.coordinates[i].lng));
                     var address = self.getAddressByLocation(latLng);
                     addresses.push(address);
@@ -228,7 +229,7 @@ angular.module('deviceHistorical').component('deviceHistorical', {
 
                 google.maps.event.trigger(self.map, 'resize');
                 self.drawHistorical(historical, pos + 1);
-                // self.setAddressesToCoordinates();
+                self.setAddressesToCoordinates();
 
                 // $timeout(function() {
                 //         self.drawHistorical(historical, pos + 1);
