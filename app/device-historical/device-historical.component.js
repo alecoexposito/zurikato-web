@@ -74,6 +74,7 @@ angular.module('deviceHistorical').component('deviceHistorical', {
              self.exportToPdf = function exportToPdf() {
                 self.drawPoints();
                  $("#pdf-loader").removeClass("fa-file-pdf").addClass("fa-spinner fa-spin");
+                 $("#historicControls").hide();
                 setTimeout(function() {
                     var pdfCoordinates = [];
                     var lastDay = null;
@@ -95,6 +96,10 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                         useCORS: true,
                         imageTimeout: 30000
                     }).then(canvas => {
+                        for(var j = 0; j < self.pointWindows.length; j++) {
+                            self.pointWindows[j].map = null;
+                        }
+                    $("#historicControls").show();
                         $("#pdf-loader").removeClass("fa-spinner fa-spin").addClass("fa-file-pdf");
                     var dataUrl = canvas.toDataURL();
                     var docDefinition = { content: [
@@ -347,7 +352,8 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                 });
                 // self.setAddressesToCoordinates();
             });
-            self.drawPoints = function drawPoints() {
+            self.pointWindows = [];
+                self.drawPoints = function drawPoints() {
                 var bounds = new google.maps.LatLngBounds();
                 var everyCount = parseInt(self.coordinates.length / 100);
                 if(everyCount <= 2) {
@@ -381,6 +387,7 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                             position: latLng,
                             map: self.map
                         });
+                        self.pointWindows.push(numberWindow);
                         numberWindow.open();
 
                         bounds.extend(latLng);
