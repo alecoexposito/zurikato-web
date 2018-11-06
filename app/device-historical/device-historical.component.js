@@ -73,6 +73,7 @@ angular.module('deviceHistorical').component('deviceHistorical', {
 
              self.exportToPdf = function exportToPdf() {
                 self.drawPoints();
+                 $("#pdf-loader").removeClass("fa-file-pdf").addClass("fa-spinner fa-spin");
                 setTimeout(function() {
                     var pdfCoordinates = [];
                     var lastDay = null;
@@ -133,7 +134,6 @@ angular.module('deviceHistorical').component('deviceHistorical', {
 
                         pdfMake.createPdf(docDefinition).open();
                     });
-                    $("#pdf-loader").removeClass("fa-file-pdf").addClass("fa-spinner fa-spin");
 
                 }, 5000);
             };
