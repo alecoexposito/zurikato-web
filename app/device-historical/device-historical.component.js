@@ -135,7 +135,7 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                     });
                     $("#pdf-loader").removeClass("fa-file-pdf").addClass("fa-spinner fa-spin");
 
-                }, 1000);
+                }, 5000);
             };
 
             self.shapeClick = function shapeClick(event ){
