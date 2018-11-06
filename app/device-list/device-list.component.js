@@ -1031,6 +1031,8 @@ angular.module('deviceList').component('deviceList', {
                                 self.updateMarkerColor(m);
                                 self.getAddress(data.latitude, data.longitude, true, m.backgroundColor);
                                 self.refreshDetailWindow(m);
+                                self.updateTreeColors();
+                                console.log("marker color: ", m.backgroundColor);
                             }
                             self.alarmFenceMarker(m);
                         }
