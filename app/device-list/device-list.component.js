@@ -976,7 +976,13 @@ angular.module('deviceList').component('deviceList', {
                         maxHeight: 35,
                         pointer: '7px',
                         wrapperClass: 'label-window label-' + m.imei,
-                        panOnOpen: false
+                        panOnOpen: false,
+                        callbacks: {
+                            open: function() {
+                                console.log("background color antes de cambiar: ", this.backgroundColor);
+                                this.backgroundColor = "black";
+                            }
+                        }
                     });
                     m.labelWindow = infoWindow;
                     infoWindow.open();
