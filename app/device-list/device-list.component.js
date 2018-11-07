@@ -1026,6 +1026,7 @@ angular.module('deviceList').component('deviceList', {
                             m.gpsStatus = data.gps_status == 0 ? 'On' : 'Off';
                             m.lastUpdate = lastUpdate;
                             self.rotateMarker(m, data.orientation_plain);
+                            self.updateMarkerColor(m);
                             if(self.currentMenuImei == data.device_id){
                                 self.map.panTo(new google.maps.LatLng(data.latitude, data.longitude));
                                 self.updateMarkerColor(m);
@@ -1061,15 +1062,16 @@ angular.module('deviceList').component('deviceList', {
                 m.setIcon(icon2);
             };
             self.updateMarkerColor = function updateMarkerColor(m) {
-                var backgroundColor = '#1C9918'; // default for when is moving
-                if(m.gpsStatus === 'Off')
-                    backgroundColor = '#6A7272'; // dark for statos off
-                else if(m.speed == 0)
-                    backgroundColor = '#248DFD'; // blue for stopped '#E1B300';
-                m.backgroundColor = backgroundColor;
-                if(m.labelWindow != undefined && m.alarmed == false){
-                    m.labelWindow._html._opts.backgroundColor = backgroundColor;
-                }
+                m.labelWindow._opts.backgroundColor = 'blue';
+                // var backgroundColor = '#1C9918'; // default for when is moving
+                // if(m.gpsStatus === 'Off')
+                //     backgroundColor = '#6A7272'; // dark for statos off
+                // else if(m.speed == 0)
+                //     backgroundColor = '#248DFD'; // blue for stopped '#E1B300';
+                // m.backgroundColor = backgroundColor;
+                // if(m.labelWindow != undefined && m.alarmed == false){
+                //     m.labelWindow._html._opts.backgroundColor = backgroundColor;
+                // }
             };
             self.updateAddressAndDetail = function updateAddressAndDetail(m) {
                 self.getAddress(m.getPosition().lat(), m.getPosition().lng(), true, m.backgroundColor);
