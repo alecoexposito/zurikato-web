@@ -965,7 +965,7 @@ angular.module('deviceList').component('deviceList', {
                     var infoWindow = new SnazzyInfoWindow({
                         content: "<p style='white-space: nowrap'>" + device.label + "</p>",
                         marker: m,
-                        backgroundColor: m.backgroundColor,
+                        backgroundColor: 'black', // m.backgroundColor,
                         padding: '4px',
                         openOnMarkerClick: false,
                         closeOnMapClick: false,
@@ -977,12 +977,6 @@ angular.module('deviceList').component('deviceList', {
                         pointer: '7px',
                         wrapperClass: 'label-window label-' + m.imei,
                         panOnOpen: false,
-                        callbacks: {
-                            open: function() {
-                                console.log("background color antes de cambiar: ", this.backgroundColor);
-                                this.backgroundColor = "black";
-                            }
-                        }
                     });
                     m.labelWindow = infoWindow;
                     infoWindow.open();
@@ -1038,7 +1032,6 @@ angular.module('deviceList').component('deviceList', {
                                 self.getAddress(data.latitude, data.longitude, true, m.backgroundColor);
                                 self.refreshDetailWindow(m);
                                 self.updateTreeColors();
-                                console.log("marker color: ", m.backgroundColor);
                             }
                             self.alarmFenceMarker(m);
                         }
@@ -1074,7 +1067,6 @@ angular.module('deviceList').component('deviceList', {
                 else if(m.speed == 0)
                     backgroundColor = '#248DFD'; // blue for stopped '#E1B300';
                 m.backgroundColor = backgroundColor;
-                console.log("updating color: ", m);
                 if(m.labelWindow != undefined && m.alarmed == false){
                     m.labelWindow._html._opts.backgroundColor = backgroundColor;
                 }
