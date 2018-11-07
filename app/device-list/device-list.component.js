@@ -965,7 +965,7 @@ angular.module('deviceList').component('deviceList', {
                     var infoWindow = new SnazzyInfoWindow({
                         content: "<p style='white-space: nowrap'>" + device.label + "</p>",
                         marker: m,
-                        backgroundColor: 'black', // m.backgroundColor,
+                        backgroundColor: m.backgroundColor,
                         padding: '4px',
                         openOnMarkerClick: false,
                         closeOnMapClick: false,
@@ -1071,10 +1071,7 @@ angular.module('deviceList').component('deviceList', {
                     backgroundColor = '#248DFD'; // blue for stopped '#E1B300';
                 m.backgroundColor = backgroundColor;
                 if(m.labelWindow != undefined && (m.alarmed == undefined || m.alarmed == false)){
-                    console.log("changing de color for imei: ", m.imei);
-                    console.log("current color: ", m.labelWindow._opts.backgroundColor);
                     m.labelWindow._opts.backgroundColor = backgroundColor;
-                    console.log("changed to: ", backgroundColor);
                 }
             };
             self.updateAddressAndDetail = function updateAddressAndDetail(m) {
