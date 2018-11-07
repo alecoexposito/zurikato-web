@@ -1070,7 +1070,7 @@ angular.module('deviceList').component('deviceList', {
                 else if(m.speed == 0)
                     backgroundColor = '#248DFD'; // blue for stopped '#E1B300';
                 m.backgroundColor = backgroundColor;
-                if(m.labelWindow != undefined && m.alarmed == false){
+                if(m.labelWindow != undefined && (m.alarmed == undefined || m.alarmed == false)){
                     console.log("changing de color for imei: ", m.imei);
                     console.log("current color: ", m.labelWindow._opts.backgroundColor);
                     m.labelWindow._opts.backgroundColor = backgroundColor;
