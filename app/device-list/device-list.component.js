@@ -1062,7 +1062,7 @@ angular.module('deviceList').component('deviceList', {
                 m.setIcon(icon2);
             };
             self.updateMarkerColor = function updateMarkerColor(m) {
-                if(m.labelWindow == undefined)
+                if(m.labelWindow != undefined)
                     m.labelWindow._opts.backgroundColor = 'blue';
                 // var backgroundColor = '#1C9918'; // default for when is moving
                 // if(m.gpsStatus === 'Off')
