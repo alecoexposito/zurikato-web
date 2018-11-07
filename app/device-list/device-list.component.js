@@ -1062,17 +1062,20 @@ angular.module('deviceList').component('deviceList', {
                 m.setIcon(icon2);
             };
             self.updateMarkerColor = function updateMarkerColor(m) {
-                if(m.labelWindow != undefined)
-                    m.labelWindow._opts.backgroundColor = 'blue';
-                // var backgroundColor = '#1C9918'; // default for when is moving
-                // if(m.gpsStatus === 'Off')
-                //     backgroundColor = '#6A7272'; // dark for statos off
-                // else if(m.speed == 0)
-                //     backgroundColor = '#248DFD'; // blue for stopped '#E1B300';
-                // m.backgroundColor = backgroundColor;
-                // if(m.labelWindow != undefined && m.alarmed == false){
-                //     m.labelWindow._html._opts.backgroundColor = backgroundColor;
-                // }
+                // if(m.labelWindow != undefined)
+                //     m.labelWindow._opts.backgroundColor = 'blue';
+                var backgroundColor = '#1C9918'; // default for when is moving
+                if(m.gpsStatus === 'Off')
+                    backgroundColor = '#6A7272'; // dark for status off
+                else if(m.speed == 0)
+                    backgroundColor = '#248DFD'; // blue for stopped '#E1B300';
+                m.backgroundColor = backgroundColor;
+                if(m.labelWindow != undefined && m.alarmed == false){
+                    console.log("changing de color for imei: ", m.imei);
+                    console.log("current color: ", m.labelWindow._opts.backgroundColor);
+                    m.labelWindow._opts.backgroundColor = backgroundColor;
+                    console.log("changed to: ", backgroundColor);
+                }
             };
             self.updateAddressAndDetail = function updateAddressAndDetail(m) {
                 self.getAddress(m.getPosition().lat(), m.getPosition().lng(), true, m.backgroundColor);
