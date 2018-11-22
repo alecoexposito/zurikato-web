@@ -1119,15 +1119,19 @@ angular.module('deviceList').component('deviceList', {
                 // }
             };
             self.getDateByHex = function getDateByHex(str) {
-                var year = parseInt(str.substr(0, 2), 16).toString();
-                var month = parseInt(str.substr(2, 2), 16).toString();
-                var day = parseInt(str.substr(4, 2), 16).toString();
-                var hour = parseInt(str.substr(6, 2), 16).toString();
-                var min = parseInt(str.substr(8, 2), 16).toString();
-                var sec = parseInt(str.substr(10, 2), 16).toString();
-                var dateStr = year + "/" + month + "/" + day + " " + hour + ":" + min + ":" + sec;
-                var dateFormatted = moment(dateStr, "YY/M/D H:m:s").format("DD/MM/YYYY HH:mm:ss");
-                return dateFormatted;
+                if(str != undefined) {
+                    var year = parseInt(str.substr(0, 2), 16).toString();
+                    var month = parseInt(str.substr(2, 2), 16).toString();
+                    var day = parseInt(str.substr(4, 2), 16).toString();
+                    var hour = parseInt(str.substr(6, 2), 16).toString();
+                    var min = parseInt(str.substr(8, 2), 16).toString();
+                    var sec = parseInt(str.substr(10, 2), 16).toString();
+                    var dateStr = year + "/" + month + "/" + day + " " + hour + ":" + min + ":" + sec;
+                    var dateFormatted = moment(dateStr, "YY/M/D H:m:s").format("DD/MM/YYYY HH:mm:ss");
+                    return dateFormatted;
+                } else {
+                    return "";
+                }
             };
 
 
