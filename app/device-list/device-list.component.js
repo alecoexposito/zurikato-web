@@ -908,6 +908,11 @@ angular.module('deviceList').component('deviceList', {
                 console.log("recibido del tracker: ", data);
             });
 
+            self.cameraChannel = socket.subscribe('camera_channel');
+            self.cameraChannel.watch(function(data) {
+                console.log("enviado en el camera channel: ", data);
+            });
+
 
             // var socketBB = socketCluster.connect(self.optionsBB);
             // socketBB.on('connect', function () {
@@ -1138,6 +1143,7 @@ angular.module('deviceList').component('deviceList', {
 
             self.menuCameraClick = function menuCameraClick(id) {
                 console.log("device id: ", id);
+                self.cameraChannel.publish({ message: 'enviado desde la web' });
             };
 
 
