@@ -1134,6 +1134,9 @@ angular.module('deviceList').component('deviceList', {
                 }
             };
 
+            self.menuCameraClick = function menuCameraClick() {
+                $(this)
+            };
 
 
 
