@@ -804,6 +804,8 @@ angular.module('deviceList').component('deviceList', {
                         function( event, itemClicked ) {
                             if(jQuery(itemClicked).attr("id") == "device-charts") {
                                 window.open('#!device/' + self.currentIdDevice + '/charts', '_blank');
+                            } else if(jQuery(itemClicked).attr("id") == "menu-device-camera") {
+                                self.menuCameraClick(self.currentIdDevice);
                             }
                         }
                     );
