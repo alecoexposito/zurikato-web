@@ -1143,7 +1143,7 @@ angular.module('deviceList').component('deviceList', {
 
             self.menuCameraClick = function menuCameraClick(id) {
                 console.log("device id: ", id);
-                self.cameraChannel.publish({ message: 'enviado desde la web' });
+                self.cameraChannel.publish({ type: 'start-streaming', message: 'enviado desde la web' });
             };
 
 
