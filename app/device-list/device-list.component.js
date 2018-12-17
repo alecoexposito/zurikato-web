@@ -45,6 +45,10 @@ angular.module('deviceList').component('deviceList', {
 
             self.features = null;
 
+            $('#watchVideoModal').on('shown.bs.modal', function (e) {
+                $("#watchVideoSource").attr("src", "")
+            });
+
             self.test = function test() {
 
                 html2canvas(document.querySelector("body"), {
@@ -1145,9 +1149,6 @@ angular.module('deviceList').component('deviceList', {
                 console.log("device id: ", id);
                 self.cameraChannel.publish({ type: 'start-streaming', message: 'enviado desde la web' });
             };
-
-
-
         }
     ]
 });

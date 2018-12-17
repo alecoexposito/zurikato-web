@@ -7,6 +7,34 @@
 
 <div class="container-fluid">
 
+    <div class="modal fade" id="watchVideoModal" tabindex="-1" role="dialog" aria-labelledby="watchVideoModal"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Camara del veh&iacute;culo</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body fow">
+                    <video id="video1" class="video-js vjs-default-skin" width="640" height="360"
+                           data-setup='{"controls" : true, "autoplay" : false, "preload" : "auto"}'>
+                        <source id="watchVideoSource" src="http://187.162.125.161:8090/stream" type="video/x-flv">
+                    </video>
+                </div>
+                <div class="modal-footer">
+                    <!--<button type="button" class="btn btn-primary" ng-click="$ctrl.generateSharedLink()">-->
+                        <!--<i class="fa fa-check"></i> Generar-->
+                    <!--</button>-->
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i> Cerrar</button>
+                    <!--<a id="modal-historical" target="_blank" href="" class="btn btn-primary"><i class="fa fa-road"> Watch historical</i></a>-->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
     <div class="modal fade" id="createShareLink" tabindex="-1" role="dialog" aria-labelledby="createShareLink"
          aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -168,7 +196,7 @@
         <a id="device-charts" href="/device/{{ ctrl.currentIdDevice }}/charts">
             <i class="fa fa-chart-line"></i>
         </a>
-        <a href="javascript:void(0)" id="menu-device-camera" data-id="{{ ctrl.currentIdDevice }}" >
+        <a href="javascript:void(0)" id="menu-device-camera" data-id="{{ ctrl.currentIdDevice }}" data-target="#watchVideoModal" >
             <i class="fa fa-camera"></i>
         </a>
     </div>
