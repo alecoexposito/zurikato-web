@@ -912,6 +912,10 @@ angular.module('deviceList').component('deviceList', {
             var socket = socketCluster.connect(self.options);
             // $localStorage.socket = socket;
             socket.on('connect', function () {
+                console.log("socket connected");
+            });
+            socket.on('error', function(e) {
+                console.log("error connecting: ", e);
             });
 
             var mdvr = socket.subscribe('mdvr_channel');
