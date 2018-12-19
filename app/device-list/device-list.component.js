@@ -45,9 +45,15 @@ angular.module('deviceList').component('deviceList', {
 
             self.features = null;
 
-            $('#watchVideoModal').on('shown.bs.modal', function (e) {
+            $('#watchVideoModal').on('show.bs.modal', function (e) {
                 console.log("levantando modal");
                 var player = videojs("video1");
+            });
+            $('#watchVideoModal').on('hide.bs.modal', function (e) {
+                console.log("deteniendo streaming modal");
+                self.cameraChannel.publish({ type: 'stop-streaming', message: 'enviado desde la web' });
+                var player = videojs("video1");
+                player.stop();
             });
 
             self.test = function test() {
