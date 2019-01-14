@@ -65,7 +65,9 @@ angular.module('deviceList').component('deviceList', {
             $('#watchVideoModal').on('hide.bs.modal', function (e) {
                 console.log("deteniendo streaming modal");
                 self.cameraOn = false;
-                self.cameraChannel.publish({ type: 'stop-streaming', message: 'enviado desde la web' });
+                self.cameraChannel.publish({ type: 'stop-streaming', message: 'enviado desde la web', id: self.currentIdDevice });
+                var imgElem = document.getElementById("cameraImage");
+                imgElem.setAttribute("src", "");
                 // var player = videojs("video1");
                 // player.stop();
             });
