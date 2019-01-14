@@ -77,7 +77,7 @@ angular.module('deviceList').component('deviceList', {
                 });
 
                 self.deviceCharts = function deviceCharts() {
-                    alert("jejejeje");
+                    // alert("jejejeje");
                 };
 
                 // jQuery("body").on("click", "#device-charts", function() {
