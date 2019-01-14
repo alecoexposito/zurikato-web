@@ -47,7 +47,7 @@ angular.module('deviceList').component('deviceList', {
 
             $('#watchVideoModal').on('show.bs.modal', function (e) {
                 console.log("levantando modal");
-                var player = videojs("video1");
+                // var player = videojs("video1");
             });
             $('#watchVideoModal').on('hide.bs.modal', function (e) {
                 console.log("deteniendo streaming modal");
