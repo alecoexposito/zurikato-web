@@ -47,18 +47,18 @@ angular.module('deviceList').component('deviceList', {
 
             $('#watchVideoModal').on('show.bs.modal', function (e) {
                 console.log("levantando modal");
-                self.cameraOn = true;
-                var imgElem = document.getElementById("cameraImage");
-                imgElem.onload = function() {
-                    setTimeout(function() {
-                        if(self.cameraOn == true) {
-                            imgElem.setAttribute("src", "http://187.162.125.161:3009/cameras/cam1/camera.jpg?" + Math.random());
-                        }
-                    }, 100);
-                };
-                setTimeout(function() {
-                    imgElem.setAttribute("src", "http://187.162.125.161:3009/cameras/cam1/camera.jpg");
-                }, 200);
+                // self.cameraOn = true;
+                // var imgElem = document.getElementById("cameraImage");
+                // imgElem.onload = function() {
+                //     setTimeout(function() {
+                //         if(self.cameraOn == true) {
+                //             imgElem.setAttribute("src", "http://187.162.125.161:3009/cameras/cam1/camera.jpg?" + Math.random());
+                //         }
+                //     }, 100);
+                // };
+                // setTimeout(function() {
+                //     imgElem.setAttribute("src", "http://187.162.125.161:3009/cameras/cam1/camera.jpg");
+                // }, 200);
             });
             $('#watchVideoModal').on('hide.bs.modal', function (e) {
                 console.log("deteniendo streaming modal");
