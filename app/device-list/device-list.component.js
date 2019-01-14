@@ -48,7 +48,7 @@ angular.module('deviceList').component('deviceList', {
             $('#watchVideoModal').on('show.bs.modal', function (e) {
                 console.log("levantando modal");
                 self.cameraOn = true;
-                var imgElem = document.getElementById("testImg");
+                var imgElem = document.getElementById("cameraImage");
                 imgElem.onload = function() {
                     setTimeout(function() {
                         if(self.cameraOn == true) {
