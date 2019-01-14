@@ -22,6 +22,7 @@
     window.__env.webUrl = 'http://187.162.125.161:8000/#!/';
     window.__env.webSocketIp = '187.162.125.161';
     window.__env.webSocketPort = 3001;
+    window.__env.cameraUrl = 'http://187.162.125.161:3009/cameras/';
 }(this));
 
 // server dipepsa
