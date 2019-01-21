@@ -32,12 +32,36 @@
                         <!--<i class="fa fa-check"></i> Generar-->
                     <!--</button>-->
                     <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i> Cerrar</button>
-                    <!--<a id="modal-historical" target="_blank" href="" class="btn btn-primary"><i class="fa fa-road"> Watch historical</i></a>-->
                 </div>
             </div>
         </div>
-
     </div>
+
+    <div class="modal fade" id="watchVideoBackupModal" tabindex="-1" role="dialog" aria-labelledby="watchVideoBackupModal"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Grabaci&oacute;n</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body row">
+                    <div id="video-dates-div" class="col-12 pb-2">
+                        <input id="video-dates" type="text" class="form-control mt-1" />
+                    </div>
+                    <video id="video1" class="video-js vjs-default-skin" width="540" height="360" controls preload="auto" style="display: none;" >
+                        <source src="http://187.162.125.161:3009/cameras/386/playlist.m3u8" type="application/x-mpegURL">
+                    </video>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i> Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <div class="modal fade" id="createShareLink" tabindex="-1" role="dialog" aria-labelledby="createShareLink"
          aria-hidden="true">
@@ -204,7 +228,7 @@
             <i class="fa fa-camera"></i>
         </a>
         <a href="" id="menu-device-video" data-id="{{ ctrl.currentIdDevice }}" data-toggle="modal" data-target="#watchVideoBackupModal" >
-            <i class="fa fa-camera-retro"></i>
+            <i class="fa fa-video"></i>
         </a>
     </div>
 
