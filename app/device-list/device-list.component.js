@@ -72,6 +72,10 @@ angular.module('deviceList').component('deviceList', {
                 // player.stop();
             });
 
+            $('#watchVideoBackupModal').on('show.bs.modal', function (e) {
+                // TODO Do something when video backup modal is up
+            });
+
             self.test = function test() {
 
                 html2canvas(document.querySelector("body"), {
@@ -833,6 +837,8 @@ angular.module('deviceList').component('deviceList', {
                                 window.open('#!device/' + self.currentIdDevice + '/charts', '_blank');
                             } else if(jQuery(itemClicked).attr("id") == "menu-device-camera") {
                                 self.menuCameraClick(self.currentIdDevice);
+                            } else if(jQuery(itemClicked).attr("id") == "menu-device-video") {
+                                self.menuVideoClick(self.currentIdDevice);
                             }
                         }
                     );
@@ -1175,6 +1181,11 @@ angular.module('deviceList').component('deviceList', {
             self.menuCameraClick = function menuCameraClick(id) {
                 console.log("camera click, device id: ", id);
                 self.cameraChannel.publish({ type: 'start-streaming', message: 'enviado desde la web', id: id });
+            };
+
+            self.menuVideoClick = function menuVideoClick(id) {
+                console.log("camera click, device id: ", id);
+                self.cameraChannel.publish({ type: 'start-video-backup', message: 'enviado desde la web', id: id });
             };
         }
     ]
