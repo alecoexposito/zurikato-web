@@ -92,8 +92,6 @@ angular.module('deviceList').component('deviceList', {
                     "startDate": moment().hour('00').minute('00'),
                     "endDate": moment().hour('23').minute('00')
                 }, function(start, end, label) {
-                    self.start = start;
-                    self.end = end;
 
                     var id = self.currentIdDevice;
                     self.cameraChannel.publish({
@@ -101,10 +99,14 @@ angular.module('deviceList').component('deviceList', {
                         message: 'enviado desde la web',
                         id: id,
                         initialDate: start.format("YYYY-MM-DD_HH-mm-ss") + "_hls.ts",
-                        endDate: start.format("YYYY-MM-DD_HH-mm-ss") + "_hls.ts"
+                        endDate: end.format("YYYY-MM-DD_HH-mm-ss") + "_hls.ts"
                     });
-                    jQuery("#video1").show();
-                    var player = videojs("video1");
+                    jQuery("#waitingVideo").show();
+                    setTimeout(function(){
+                        jQuery("#waitingVideo").fadeOut();
+                        jQuery("#video1").fadeIn();
+                        var player = videojs("video1");
+                    }, 3000);
                     // player.stop();
 
                 });
