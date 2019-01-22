@@ -71,27 +71,28 @@ angular.module('deviceList').component('deviceList', {
             });
 
             $('#watchVideoBackupModal').on('shown.bs.modal', function (e) {
-                // TODO Do something when video backup modal is up
-                // self.cameraChannel.publish({ type: 'start-video-backup', message: 'enviado desde la web', id: self.currentIdDevice });
-
-                // var player = videojs("video1");
-                // player.stop();
-
+                jQuery("#video-dates-div").fadeIn();
                 $('#video-dates').daterangepicker({
                     opens: "center",
                     timePicker: true,
-                    "timePicker24Hour": true,
+                    timePicker24Hour: true,
                     timePickerSeconds: true,
-                    "autoApply": true,
+                    autoApply: true,
+                    // autoUpdateInput: false,
                     locale: {
                         format: 'MM/DD/YYYY HH:mm:ss ',
                         applyLabel: '<i class="fa fa-check"></i> Aceptar',
                         cancelLabel: '<i class="fa fa-times"></i> Cancelar'
                     },
-                    "alwaysShowCalendars": true,
-                    "startDate": moment().hour('00').minute('00'),
-                    "endDate": moment().hour('23').minute('00')
+                    alwaysShowCalendars: true,
+                    startDate: moment().hour('18').minute('00'),
+                    endDate: moment().hour('18').minute('00')
                 }, function(start, end, label) {
+
+                });
+                $('#video-dates').on('apply.daterangepicker', function(ev, picker) {
+                    var start = picker.startDate;
+                    var end = picker.endDate;
 
                     var id = self.currentIdDevice;
                     self.cameraChannel.publish({
@@ -102,17 +103,27 @@ angular.module('deviceList').component('deviceList', {
                         endDate: end.format("YYYY-MM-DD_HH-mm-ss") + "_hls.ts"
                     });
                     jQuery("#waitingVideo").show();
+                    jQuery("#video-dates-div").fadeOut();
                     setTimeout(function(){
                         jQuery("#waitingVideo").fadeOut();
-                        jQuery("#video1").fadeIn();
+                        jQuery("#video1").show();
                         var player = videojs("video1");
                     }, 3000);
                     // player.stop();
-
-                });
+                })
                 var drp = $('#video-dates').data('daterangepicker');
                 self.start = drp.startDate;
                 self.end = drp.endDate;
+            });
+
+
+            $('#watchVideoBackupModal').on('hide.bs.modal', function (e) {
+                self.cameraChannel.publish({ type: 'stop-video-backup', message: 'enviado desde la web', id: self.currentIdDevice });
+                var player = videojs('video1');
+                player.dispose();
+                var v = $("#videoToClone").clone();
+                v.attr("id", "video1");
+                $("#video-modal-body").append(v);
             });
 
             self.test = function test() {

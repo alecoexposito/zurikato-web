@@ -47,13 +47,19 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body row">
+                <div id="video-modal-body" class="modal-body row">
                     <div id="video-dates-div" class="col-12 pb-2">
-                        <input id="video-dates" type="text" class="form-control mt-1" />
+                        <button id="video-dates" type="text" class="btn btn-primary mt-1">Escoger rango de fechas</button>
                     </div>
-                    <i id="waitingVideo" class="fa fa-spinner fa-spin fa-4x text-center" style="display: none;"></i>
+                    <div id="waitingVideo" class="col-12 text-center" style="display: none;">
+                        <i class="fa fa-spinner fa-spin fa-4x text-center"></i>
+                    </div>
+                    <video id="videoToClone" class="video-js vjs-default-skin" width="540" height="360" controls preload="auto" style="display: none;" >
+                        <source src="http://187.162.125.161:3009/cameras/386/video/playlist.m3u8" type="application/x-mpegURL">
+                    </video>
+
                     <video id="video1" class="video-js vjs-default-skin" width="540" height="360" controls preload="auto" style="display: none;" >
-                        <source src="http://187.162.125.161:3009/cameras/386/playlist.m3u8" type="application/x-mpegURL">
+                        <source src="http://187.162.125.161:3009/cameras/386/video/playlist.m3u8" type="application/x-mpegURL">
                     </video>
                 </div>
                 <div class="modal-footer">
