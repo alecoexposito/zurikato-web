@@ -85,8 +85,8 @@ angular.module('deviceList').component('deviceList', {
                         cancelLabel: '<i class="fa fa-times"></i> Cancelar'
                     },
                     alwaysShowCalendars: true,
-                    startDate: moment().hour('18').minute('00'),
-                    endDate: moment().hour('18').minute('00')
+                    startDate: moment(),
+                    endDate: moment()
                 }, function(start, end, label) {
 
                 });
