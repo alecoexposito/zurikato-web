@@ -93,6 +93,8 @@ angular.module('deviceList').component('deviceList', {
                 $('#video-dates').on('apply.daterangepicker', function(ev, picker) {
                     var start = picker.startDate;
                     var end = picker.endDate;
+                    var playlistName = moment().valueOf();
+                    self.playlistName = playlistName;
 
                     var id = self.currentIdDevice;
                     self.cameraChannel.publish({
@@ -100,14 +102,17 @@ angular.module('deviceList').component('deviceList', {
                         message: 'enviado desde la web',
                         id: id,
                         initialDate: start.format("YYYY-MM-DD_HH-mm-ss") + "_hls.ts",
-                        endDate: end.format("YYYY-MM-DD_HH-mm-ss") + "_hls.ts"
+                        endDate: end.format("YYYY-MM-DD_HH-mm-ss") + "_hls.ts",
+                        playlistName: playlistName
                     });
                     jQuery("#waitingVideo").show();
                     jQuery("#video-dates-div").fadeOut();
                     setTimeout(function(){
                         jQuery("#waitingVideo").fadeOut();
+                        jQuery("#video1 source").attr("src", "http://187.162.125.161:3009/cameras/" + id + "/video/" + playlistName + "/playlist.m3u8");
                         jQuery("#video1").show();
                         var player = videojs("video1");
+                        // player.src({ type: 'application/x-mpegURL', src: "http://187.162.125.161:3009/cameras/" + id + "/video/" + playlistName + "/playlist.m3u8" });
                     }, 3000);
                     // player.stop();
                 })
@@ -118,7 +123,7 @@ angular.module('deviceList').component('deviceList', {
 
 
             $('#watchVideoBackupModal').on('hide.bs.modal', function (e) {
-                self.cameraChannel.publish({ type: 'stop-video-backup', message: 'enviado desde la web', id: self.currentIdDevice });
+                self.cameraChannel.publish({ type: 'stop-video-backup', message: 'enviado desde la web', id: self.currentIdDevice, playlistName: self.playlistName });
                 var player = videojs('video1');
                 player.dispose();
                 var v = $("#videoToClone").clone();
