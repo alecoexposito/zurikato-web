@@ -105,15 +105,33 @@ angular.module('deviceList').component('deviceList', {
                         endDate: end.format("YYYY-MM-DD_HH-mm-ss") + "_hls.ts",
                         playlistName: playlistName
                     });
+
+                    self.playlistChannel = socket.subscribe(playlistName + '_channel');
+                    self.playlistChannel.watch(function(data) {
+                        console.log("enviado en el playlist channel: ", data);
+                        if(data.type == "no-video-available") {
+                            jQuery("#waitingVideo").fadeOut();
+                            // jQuery("#video1").fadeOut();
+                            jQuery("#video-dates-div").fadeIn();
+                            jQuery("#no-video-message").fadeIn();
+                        } else if (data.type == "play-recorded-video") {
+                            jQuery("#waitingVideo").fadeOut();
+                            jQuery("#no-video-message").fadeOut();
+                            jQuery("#video1 source").attr("src", "http://187.162.125.161:3009/cameras/" + id + "/video/" + playlistName + "/playlist.m3u8");
+                            jQuery("#video1").show();
+                            var player = videojs("video1");
+                        }
+                    });
+
                     jQuery("#waitingVideo").show();
                     jQuery("#video-dates-div").fadeOut();
-                    setTimeout(function(){
-                        jQuery("#waitingVideo").fadeOut();
-                        jQuery("#video1 source").attr("src", "http://187.162.125.161:3009/cameras/" + id + "/video/" + playlistName + "/playlist.m3u8");
-                        jQuery("#video1").show();
-                        var player = videojs("video1");
-                        // player.src({ type: 'application/x-mpegURL', src: "http://187.162.125.161:3009/cameras/" + id + "/video/" + playlistName + "/playlist.m3u8" });
-                    }, 3000);
+                    // setTimeout(function(){
+                    //     jQuery("#waitingVideo").fadeOut();
+                    //     jQuery("#video1 source").attr("src", "http://187.162.125.161:3009/cameras/" + id + "/video/" + playlistName + "/playlist.m3u8");
+                    //     jQuery("#video1").show();
+                    //     var player = videojs("video1");
+                    //     // player.src({ type: 'application/x-mpegURL', src: "http://187.162.125.161:3009/cameras/" + id + "/video/" + playlistName + "/playlist.m3u8" });
+                    // }, 3000);
                     // player.stop();
                 })
                 var drp = $('#video-dates').data('daterangepicker');
@@ -123,6 +141,7 @@ angular.module('deviceList').component('deviceList', {
 
 
             $('#watchVideoBackupModal').on('hide.bs.modal', function (e) {
+                jQuery("#no-video-message").fadeOut();
                 self.cameraChannel.publish({ type: 'stop-video-backup', message: 'enviado desde la web', id: self.currentIdDevice, playlistName: self.playlistName });
                 var player = videojs('video1');
                 player.dispose();
