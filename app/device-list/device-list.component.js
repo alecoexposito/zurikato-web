@@ -116,10 +116,37 @@ angular.module('deviceList').component('deviceList', {
                             jQuery("#no-video-message").fadeIn();
                         } else if (data.type == "play-recorded-video") {
                             jQuery("#waitingVideo").fadeOut();
+                            self.downloadUrl = "http://187.162.125.161:3009/cameras/" + id + "/video/" + playlistName + "/download.mp4";
                             jQuery("#no-video-message").fadeOut();
                             jQuery("#video1 source").attr("src", "http://187.162.125.161:3009/cameras/" + id + "/video/" + playlistName + "/playlist.m3u8");
                             jQuery("#video1").show();
-                            var player = videojs("video1");
+                            var player = videojs("video1", {
+                                plugins: {
+                                    alecoRangeslider: {
+                                        downloadUrl: "http://187.162.125.161:3009/cameras/" + id + "/video/" + playlistName,
+                                        downloadCallback: function(minTime, maxTime) {
+                                            console.log("begin download");
+                                            self.cameraChannel.publish({
+                                                id: id,
+                                                type: 'begin-download',
+                                                message: 'enviado desde la web',
+                                                initialTime: minTime,
+                                                endTime: maxTime,
+                                                playlistName: playlistName
+                                            });
+                                        }
+                                    }
+                                }
+                            });
+                        } else if(data.type == "download-ready") {
+                            jQuery(".vjs-download-button span").removeClass("fa-spinner fa-spin").addClass("fa-download");
+
+                            var link = document.createElement('a');
+                            link.download = "video.mp4";
+                            link.href = self.downloadUrl;
+                            link.target = "_blank";
+                            link.click();
+                            console.log(self.downloadUrl);
                         }
                     });
 
@@ -129,7 +156,7 @@ angular.module('deviceList').component('deviceList', {
                     //     jQuery("#waitingVideo").fadeOut();
                     //     jQuery("#video1 source").attr("src", "http://187.162.125.161:3009/cameras/" + id + "/video/" + playlistName + "/playlist.m3u8");
                     //     jQuery("#video1").show();
-                    //     var player = videojs("video1");
+                    //     var player = videojs("video1");fa-downloadfa-download
                     //     // player.src({ type: 'application/x-mpegURL', src: "http://187.162.125.161:3009/cameras/" + id + "/video/" + playlistName + "/playlist.m3u8" });
                     // }, 3000);
                     // player.stop();
@@ -142,6 +169,7 @@ angular.module('deviceList').component('deviceList', {
 
             $('#watchVideoBackupModal').on('hide.bs.modal', function (e) {
                 jQuery("#no-video-message").fadeOut();
+                jQuery("#waitingVideo").fadeOut();
                 self.cameraChannel.publish({ type: 'stop-video-backup', message: 'enviado desde la web', id: self.currentIdDevice, playlistName: self.playlistName });
                 var player = videojs('video1');
                 player.dispose();

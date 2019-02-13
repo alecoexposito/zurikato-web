@@ -39,7 +39,7 @@
                 if (result === true) {
                     $location.path('/');
                 } else {
-                    vm.error = 'Username or password is incorrect';
+                    vm.error = 'Credenciales incorrectas';
                     vm.loading = false;
                 }
             });
