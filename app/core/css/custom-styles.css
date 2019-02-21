@@ -58,3 +58,7 @@ ng-map {width:100%; height:100%;position: absolute;}
 .label-345807109 div.si-content-wrapper {
     background-color: blue;
 }
+
+.vjs-time-tooltip {
+    top: -4.4em !important;
+}

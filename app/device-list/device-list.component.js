@@ -47,6 +47,7 @@ angular.module('deviceList').component('deviceList', {
 
             $('#watchVideoModal').on('show.bs.modal', function (e) {
                 console.log("levantando modal");
+
                 var cameraFullUrl = window.__env.cameraUrl + self.currentIdDevice  + "/camera.jpg";
                 console.log("url", cameraFullUrl);
                 self.cameraOn = true;
@@ -202,40 +203,6 @@ angular.module('deviceList').component('deviceList', {
                     // alert("jejejeje");
                 };
 
-                // jQuery("body").on("click", "#device-charts", function() {
-                //     alert("asdf");
-                // });
-
-
-                // var docDefinition = { content: 'Hellow World' };
-                // pdfMake.createPdf(docDefinition).open();
-                // var groupsQuery = $http.get(window.__env.apiUrl + 'shared-screen/34');
-                // groupsQuery.then(function(result) {
-                //     console.log("result: ", result);
-                // });
-
-                // self.disableFenceEditionMode();
-                // self.updateFences();
-                // return;
-                // self.map.data.forEach(function(feat) {
-                //     self.map.data.remove(feat);
-                // });
-
-                // self.fences.forEach(function(fence) {
-                //     console.log("kitando el map al poly con id: ", fence.id);
-                //     fence.setMap(null);
-                // });
-                // console.log("antes de eliminar", self.fences);
-                // self.fences = [];
-                // console.log("despues de eliminar: ", self.fences);
-
-                // self.map.data.forEach(function(feat) {
-                //     self.map.data.remove(feat);
-                // });
-                // self.fences = [];
-
-                // var m = self.findMarkerByImei("0353701090075181");
-                // self.alarmFenceMarker(m);
             };
             self.generateSharedLink = function generateSharedLink() {
                 jQuery("#load-link").show();
@@ -351,19 +318,6 @@ angular.module('deviceList').component('deviceList', {
                     var polygon = self.fences[i];
                     var geoJson = self.getGeoJsonFromFence(polygon, false);
 
-                    // var geoJson = {
-                    //     type: 'Feature',
-                    //     geometry: {
-                    //         type: 'Polygon',
-                    //         coordinates: [[]]
-                    //     },
-                    //     properties: {}
-                    // }
-                    // for (let point of polygon.getPath().getArray()) {
-                    //     geoJson.geometry.coordinates[0].push([point.lng(), point.lat()]);
-                    // }
-                    // var point = polygon.getPath().getArray()[0];
-                    // geoJson.geometry.coordinates[0].push([point.lng(), point.lat()]);
                     self.features.features.push(geoJson);
                 }
                 return JSON.stringify(self.features);
@@ -552,6 +506,7 @@ angular.module('deviceList').component('deviceList', {
                 }, 1000);
             };
             self.updateTreeColors = function updateTreeColors() {
+                console.log("updating colors");
                 var nodes = $('#treeMenu').treeview('getNodes');
                 var l = Object.keys(nodes).length;
                 for(var i = 0; i < l; i++) {
@@ -563,6 +518,7 @@ angular.module('deviceList').component('deviceList', {
                 }
             };
             self.generateMenu = function generateMenu() {
+                console.log("generarting menu");
                 var data2 = [];
                 for(var i = 0; i < self.groups.length; i++) {
                     var root = {
