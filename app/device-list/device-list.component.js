@@ -107,38 +107,48 @@ angular.module('deviceList').component('deviceList', {
                         playlistName: playlistName
                     });
 
+                    setTimeout(function() {
+                        if(self.noVideo == true) {
+                            self.noVideo = false;
+                            jQuery("#video1").hide();
+                            return;
+                        }
+                        jQuery("#waitingVideo").fadeOut();
+                        self.downloadUrl = "http://187.162.125.161:3009/cameras/" + id + "/video/" + playlistName + "/download.mp4";
+                        jQuery("#no-video-message").fadeOut();
+                        jQuery("#video1 source").attr("src", "http://187.162.125.161:3009/cameras/" + id + "/video/" + playlistName + "/playlist.m3u8");
+                        jQuery("#video1").show();
+                        var player = videojs("video1", {
+                            plugins: {
+                                alecoRangeslider: {
+                                    downloadUrl: "http://187.162.125.161:3009/cameras/" + id + "/video/" + playlistName,
+                                    downloadCallback: function(minTime, maxTime) {
+                                        console.log("begin download");
+                                        self.cameraChannel.publish({
+                                            id: id,
+                                            type: 'begin-download',
+                                            message: 'enviado desde la web',
+                                            initialTime: minTime,
+                                            endTime: maxTime,
+                                            playlistName: playlistName
+                                        });
+                                    }
+                                }
+                            }
+                        });
+                    }, 3000);
+
                     self.playlistChannel = socket.subscribe(playlistName + '_channel');
                     self.playlistChannel.watch(function(data) {
                         console.log("enviado en el playlist channel: ", data);
                         if(data.type == "no-video-available") {
+                            self.noVideo = true;
                             jQuery("#waitingVideo").fadeOut();
                             // jQuery("#video1").fadeOut();
                             jQuery("#video-dates-div").fadeIn();
                             jQuery("#no-video-message").fadeIn();
                         } else if (data.type == "play-recorded-video") {
-                            jQuery("#waitingVideo").fadeOut();
-                            self.downloadUrl = "http://187.162.125.161:3009/cameras/" + id + "/video/" + playlistName + "/download.mp4";
-                            jQuery("#no-video-message").fadeOut();
-                            jQuery("#video1 source").attr("src", "http://187.162.125.161:3009/cameras/" + id + "/video/" + playlistName + "/playlist.m3u8");
-                            jQuery("#video1").show();
-                            var player = videojs("video1", {
-                                plugins: {
-                                    alecoRangeslider: {
-                                        downloadUrl: "http://187.162.125.161:3009/cameras/" + id + "/video/" + playlistName,
-                                        downloadCallback: function(minTime, maxTime) {
-                                            console.log("begin download");
-                                            self.cameraChannel.publish({
-                                                id: id,
-                                                type: 'begin-download',
-                                                message: 'enviado desde la web',
-                                                initialTime: minTime,
-                                                endTime: maxTime,
-                                                playlistName: playlistName
-                                            });
-                                        }
-                                    }
-                                }
-                            });
+
                         } else if(data.type == "download-ready") {
                             jQuery(".vjs-download-button span").removeClass("fa-spinner fa-spin").addClass("fa-download");
 
