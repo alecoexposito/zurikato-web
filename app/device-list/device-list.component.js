@@ -108,16 +108,17 @@ angular.module('deviceList').component('deviceList', {
                     });
 
                     setTimeout(function() {
-                        if(self.noVideo == true) {
-                            self.noVideo = false;
-                            jQuery("#video1").hide();
-                            return;
-                        }
+                        // if(self.noVideo == true) {
+                        //     self.noVideo = false;
+                        //     jQuery("#video1").hide();
+                        //     return;
+                        // }
                         jQuery("#waitingVideo").fadeOut();
                         self.downloadUrl = "http://187.162.125.161:3009/cameras/" + id + "/video/" + playlistName + "/download.mp4";
                         jQuery("#no-video-message").fadeOut();
                         jQuery("#video1 source").attr("src", "http://187.162.125.161:3009/cameras/" + id + "/video/" + playlistName + "/playlist.m3u8");
                         jQuery("#video1").show();
+
                         var player = videojs("video1", {
                             plugins: {
                                 alecoRangeslider: {
@@ -136,6 +137,7 @@ angular.module('deviceList').component('deviceList', {
                                 }
                             }
                         });
+
                     }, 3000);
 
                     self.playlistChannel = socket.subscribe(playlistName + '_channel');
@@ -148,7 +150,8 @@ angular.module('deviceList').component('deviceList', {
                             jQuery("#video-dates-div").fadeIn();
                             jQuery("#no-video-message").fadeIn();
                         } else if (data.type == "play-recorded-video") {
-
+                            console.log('play-recorded-video');
+                            // jQuery(".vjs-download-button").removeClass("download-hidden");
                         } else if(data.type == "download-ready") {
                             jQuery(".vjs-download-button span").removeClass("fa-spinner fa-spin").addClass("fa-download");
 
