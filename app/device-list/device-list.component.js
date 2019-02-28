@@ -108,11 +108,11 @@ angular.module('deviceList').component('deviceList', {
                     });
 
                     setTimeout(function() {
-                        // if(self.noVideo == true) {
-                        //     self.noVideo = false;
-                        //     jQuery("#video1").hide();
-                        //     return;
-                        // }
+                        if(self.noVideo == true) {
+                            self.noVideo = false;
+                            // jQuery("#video1").hide();
+                            return;
+                        }
                         jQuery("#waitingVideo").fadeOut();
                         self.downloadUrl = "http://187.162.125.161:3009/cameras/" + id + "/video/" + playlistName + "/download.mp4";
                         jQuery("#no-video-message").fadeOut();
@@ -146,7 +146,7 @@ angular.module('deviceList').component('deviceList', {
                         if(data.type == "no-video-available") {
                             self.noVideo = true;
                             jQuery("#waitingVideo").fadeOut();
-                            // jQuery("#video1").fadeOut();
+                            // jQuery("#video1").hide();
                             jQuery("#video-dates-div").fadeIn();
                             jQuery("#no-video-message").fadeIn();
                         } else if (data.type == "play-recorded-video") {
@@ -1258,6 +1258,26 @@ angular.module('deviceList').component('deviceList', {
                 console.log("camera click, device id: ", id);
 
             };
+
+            self.makeFullScreen = function(id) {
+                var divObj = document.getElementById(id);
+                //Use the specification method before using prefixed versions
+                if (divObj.requestFullscreen) {
+                    divObj.requestFullscreen();
+                }
+                else if (divObj.msRequestFullscreen) {
+                    divObj.msRequestFullscreen();
+                }
+                else if (divObj.mozRequestFullScreen) {
+                    divObj.mozRequestFullScreen();
+                }
+                else if (divObj.webkitRequestFullscreen) {
+                    divObj.webkitRequestFullscreen();
+                } else {
+                    console.log("Fullscreen API is not supported");
+                }
+
+            }
         }
     ]
 });
