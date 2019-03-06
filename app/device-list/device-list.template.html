@@ -6,15 +6,16 @@
 </audio>
 
 <div class="container-fluid">
-
-    <div class="modal fade" id="watchVideoModal" tabindex="-1" role="dialog" aria-labelledby="watchVideoModal"
+    <div class="minmaxCon">
+        <div class="modal fade mymodal" id="watchVideoModal" tabindex="-1" role="dialog" aria-labelledby="watchVideoModal"
          aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Camara del veh&iacute;culo</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                    <button type="button" class="close modalMinimize" style="font-size: 16px"> <i class='fa fa-minus fa-sm'></i> </button>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="margin-left: 5px; font-size: 16px;">
+                        <i class="fa fa-times fa-sm"></i>
                     </button>
                 </div>
                 <!--<div class="modal-body row">-->
@@ -23,9 +24,9 @@
                     <!--</video>-->
                 <!--</div>-->
 
-
-                <img id="cameraImage" height="400" src=""/>
-
+                <div class="modal-body row">
+                    <img id="cameraImage" height="400" src="" style="width: 100%;"/>
+                </div>
 
                 <div class="modal-footer">
                     <!--<button type="button" class="btn btn-primary" ng-click="$ctrl.generateSharedLink()">-->
@@ -37,44 +38,46 @@
             </div>
         </div>
     </div>
+    </div>
+    <div class="minmaxCon">
+        <div class="modal fade mymodal" id="watchVideoBackupModal" tabindex="-1" role="dialog" aria-labelledby="watchVideoBackupModal"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Grabaci&oacute;n</h5>
+                        <button type="button" class="close modalMinimize" style="font-size: 16px"> <i class='fa fa-minus fa-sm'></i> </button>
 
-    <div class="modal fade" id="watchVideoBackupModal" tabindex="-1" role="dialog" aria-labelledby="watchVideoBackupModal"
-         aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Grabaci&oacute;n</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div id="video-modal-body" class="modal-body row">
-                    <div id="no-video-message" class="col-12" style="display: none">
-                        <h3>No hay grabaciones en el rango de fecha específicado</h3>
+                        <button type="button" class="close" style="font-size: 16px; margin-left: 5px;" data-dismiss="modal" aria-label="Close">
+                            <i class="fa fa-times fa-sm"></i>
+                        </button>
                     </div>
-                    <div id="video-dates-div" class="col-12 pb-2">
-                        <button id="video-dates" type="text" class="btn btn-primary mt-1">Escoger rango de fechas</button>
-                    </div>
+                    <div id="video-modal-body" class="modal-body row">
+                        <div id="no-video-message" class="col-12" style="display: none">
+                            <h3>No hay grabaciones en el rango de fecha especificado</h3>
+                        </div>
+                        <div id="video-dates-div" class="col-12 pb-2">
+                            <button id="video-dates" type="text" class="btn btn-primary mt-1">Escoger rango de fechas</button>
+                        </div>
 
-                    <div id="waitingVideo" class="col-12 text-center" style="display: none;">
-                        <i class="fa fa-spinner fa-spin fa-4x text-center"></i>
-                    </div>
-                    <video id="videoToClone" class="video-js vjs-default-skin" width="540" height="360" controls preload="auto" style="display: none;" >
-                        <source src="" type="application/x-mpegURL">
-                    </video>
+                        <div id="waitingVideo" class="col-12 text-center" style="display: none;">
+                            <i class="fa fa-spinner fa-spin fa-4x text-center"></i>
+                        </div>
+                        <video id="videoToClone" class="video-js vjs-default-skin" width="540" height="360" controls preload="auto" style="display: none;" >
+                            <source src="" type="application/x-mpegURL">
+                        </video>
 
-                    <video id="video1" class="video-js vjs-default-skin" width="540" height="360" controls preload="auto" style="display: none;" >
-                        <source src="" type="application/x-mpegURL">
-                    </video>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i> Cerrar</button>
+                        <video id="video1" class="video-js vjs-default-skin" width="540" height="360" controls preload="auto" style="display: none;" >
+                            <source src="" type="application/x-mpegURL">
+                        </video>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i> Cerrar</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
-
     <div class="modal fade" id="createShareLink" tabindex="-1" role="dialog" aria-labelledby="createShareLink"
          aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -187,6 +190,7 @@
         </div>
 
     </div>
+
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
          aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -349,53 +353,6 @@
                     markerOptions="{icon:'www.example.com/icon'}"
                     polygonOptions="{fillColor: 'red', strokeWeight: 1, editable: true, draggable: true}",
             </drawing-manager>
-            <!--<marker position="[{{$ctrl.coordinates[0].origin}}, {{$ctrl.coordinates[0].destination}}]" title="Begin"></marker>-->
-            <!--<directions-->
-            <!--draggable="false"-->
-            <!--travel-mode="DRIVING"-->
-            <!--origin="{{$ctrl.originLocation}}"-->
-            <!--destination="{{$ctrl.destinationLocation}}"-->
-            <!--waypoints="{{$ctrl.coordinates}}">-->
-            <!--</directions>-->
-
-            <!--<shape name="polyline"-->
-            <!--path="{{$ctrl.coordinates}}"-->
-            <!--geodesic="true"-->
-            <!--stroke-color="#FF0000"-->
-            <!--stroke-opacity="1.0"-->
-            <!--stroke-weight="2">-->
-            <!--</shape>-->
-
-            <!--<directions-->
-            <!--draggable="false"-->
-            <!--travel-mode="DRIVING"-->
-            <!--suppress-markers="true"-->
-            <!--origin="19.26966,-99.57630222222222"-->
-            <!--destination="19.2577,-99.57401777777778">-->
-            <!--</directions>-->
-            <!--<marker position="[19.2577, -99.57401777777778]" title="End"></marker>-->
-
-            <!--<directions draggable="true" panel="directions-panel" travel-mode="DRIVING" waypoints="[{&quot;location&quot;:{&quot;lat&quot;:44.32384807250689,&quot;lng&quot;:-78.079833984375},&quot;stopover&quot;:true},{&quot;location&quot;:{&quot;lat&quot;:44.55916341529184,&quot;lng&quot;:-76.17919921875},&quot;stopover&quot;:true}]" origin="toronto" destination="ottawa">-->
-            <!--</directions>-->
-
-            <!--<directions-->
-            <!--draggable="true"-->
-            <!--panel="directions-panel"-->
-            <!--travel-mode="DRIVING"-->
-            <!--origin="1135 Karamea-Kohaihai Rd, Kahurangi National Park, Tasman"-->
-            <!--destination="Pier St, Jackson Bay, West Coast, New Zeland">-->
-            <!--</directions>-->
-
-            <!--<marker id="{{device.idDevice}}" ng-repeat="device in $ctrl.devices" position="[{{device.peripheral_gps_data[0].lat}}, {{device.peripheral_gps_data[0].lng}}]" title="{{device.label}}" imei="{{device.auth_device}}"></marker>-->
-            <!--<marker position="[19.454941666666667, -99.2195535]" title="hello"></marker>-->
-            <!--<marker position="[40.72, -74.20]" title="marker" animation="Animation.DROP"></marker>-->
-            <!--<marker position="[40.73, -74.19]" title="drag me" draggable="true"></marker>-->
-            <!--<marker position="[40.74, -74.18]" title="how" animation="Animation.BOUNCE"></marker>-->
-            <!--<marker position="[40.75, -74.17]" title="are"></marker>-->
-            <!--<marker position="[40.76, -74.16]" title="you"-->
-            <!--icon="https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png"></marker>-->
-            <!--<marker position="[40.77, -74.15]" title="from"></marker>-->
-            <!--<marker position="[40.78, -74.14]" title="allen"></marker>-->
 
         </ng-map>
     </div>

@@ -1277,7 +1277,32 @@ angular.module('deviceList').component('deviceList', {
                     console.log("Fullscreen API is not supported");
                 }
 
-            }
+            };
+
+        //    code for minimize modal
+
+            var $content, $modal, $apnData, $modalCon;
+
+            $content = $(".min");
+
+            $(".modalMinimize").on("click", function() {
+                $modalCon = $(this).closest(".mymodal").attr("id");
+                $apnData = $(this).closest(".mymodal");
+                $modal = "#" + $modalCon;
+                $(".modal-backdrop").addClass("display-none");
+                $($modal).toggleClass("min");
+
+                if ($($modal).hasClass("min")) {
+                    $(this).closest(".minmaxCon").addClass("big-z-index").append($apnData);
+                    $(this).find("i").toggleClass('fa-minus').toggleClass('fa-clone');
+                } else {
+                    $(".modal-backdrop").removeClass("display-none");
+                    $(".container").append($apnData);
+                    $(this).find("i").toggleClass('fa-clone').toggleClass('fa-minus');
+                    $(this).closest(".minmaxCon").removeClass("big-z-index")
+                }
+            });
+
         }
     ]
 });
