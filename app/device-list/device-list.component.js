@@ -1304,8 +1304,9 @@ angular.module('deviceList').component('deviceList', {
             });
 
             $("body").on("click", ".min button.minimize-close", function() {
-
+                $(this).closest(".minmaxCon").find(".modalMinimize i").toggleClass('fa-clone').toggleClass('fa-minus');
                 $(this).closest(".minmaxCon").removeClass("big-z-index");
+                $(this).closest(".min").toggleClass("min");
             });
 
         }
