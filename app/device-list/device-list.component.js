@@ -1299,8 +1299,13 @@ angular.module('deviceList').component('deviceList', {
                     $(".modal-backdrop").removeClass("display-none");
                     $(".container").append($apnData);
                     $(this).find("i").toggleClass('fa-clone').toggleClass('fa-minus');
-                    $(this).closest(".minmaxCon").removeClass("big-z-index")
+                    $(this).closest(".minmaxCon").removeClass("big-z-index");
                 }
+            });
+
+            $("body").on("click", ".min button.minimize-close", function() {
+
+                $(this).closest(".minmaxCon").removeClass("big-z-index");
             });
 
         }
