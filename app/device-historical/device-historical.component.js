@@ -95,7 +95,6 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                         useCORS: true,
                         imageTimeout: 30000
                     }).then(canvas => {
-                        console.log("point windows: ", self.pointWindows);
                         for(var j = 0; j < self.pointWindows.length; j++)
                             self.pointWindows[j].close();
                         $("#historicControls").show();

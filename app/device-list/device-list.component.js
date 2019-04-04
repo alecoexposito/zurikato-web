@@ -42,7 +42,6 @@ angular.module('deviceList').component('deviceList', {
             //     console.log("estoy aki");
             //     self.editPolygonInfo();
             // });
-
             self.features = null;
 
             $('#watchVideoModal').on('show.bs.modal', function (e) {
@@ -114,15 +113,15 @@ angular.module('deviceList').component('deviceList', {
                             return;
                         }
                         jQuery("#waitingVideo").fadeOut();
-                        self.downloadUrl = "http://187.162.125.161:3009/cameras/" + id + "/video/" + playlistName + "/download.mp4";
+                        self.downloadUrl = "http://69.64.32.172/cameras/" + id + "/video/" + playlistName + "/download.mp4";
                         jQuery("#no-video-message").fadeOut();
-                        jQuery("#video1 source").attr("src", "http://187.162.125.161:3009/cameras/" + id + "/video/" + playlistName + "/playlist.m3u8");
+                        jQuery("#video1 source").attr("src", "http://69.64.32.172/cameras/" + id + "/video/" + playlistName + "/playlist.m3u8");
                         jQuery("#video1").show();
 
                         var player = videojs("video1", {
                             plugins: {
                                 alecoRangeslider: {
-                                    downloadUrl: "http://187.162.125.161:3009/cameras/" + id + "/video/" + playlistName,
+                                    downloadUrl: "http://69.64.32.172/cameras/" + id + "/video/" + playlistName,
                                     downloadCallback: function(minTime, maxTime) {
                                         console.log("begin download");
                                         self.cameraChannel.publish({
@@ -191,6 +190,11 @@ angular.module('deviceList').component('deviceList', {
                 v.attr("id", "video1");
                 $("#video-modal-body").append(v);
             });
+
+            self.obdMenu = function obdMenu(deviceId) {
+                console.log("device id: ", deviceId);
+                self.obdChannel.publish({ type: 'obd-info', id: deviceId });
+            }
 
             self.test = function test() {
 
@@ -910,10 +914,11 @@ angular.module('deviceList').component('deviceList', {
                                 self.menuCameraClick(self.currentIdDevice);
                             } else if(jQuery(itemClicked).attr("id") == "menu-device-video") {
                                 self.menuVideoClick(self.currentIdDevice);
+                            } else if(jQuery(itemClicked).attr("id") == "menu-device-obd") {
+                                self.obdMenu(self.currentIdDevice);
                             }
                         }
                     );
-
                 }
                 $("#left-menu").toggle("fast");
             };
@@ -1019,6 +1024,13 @@ angular.module('deviceList').component('deviceList', {
             self.cameraChannel = socket.subscribe('camera_channel');
             self.cameraChannel.watch(function(data) {
                 console.log("enviado en el camera channel: ", data);
+            });
+
+            self.obdChannel = socket.subscribe('obd_channel');
+            self.obdChannel.watch(function(data) {
+                if(data.type == 'obd-info-response') {
+                    console.log("from python: ", data.message);
+                }
             });
 
 
