@@ -515,7 +515,7 @@ angular.module('deviceList').component('deviceList', {
                 for(var i = 0; i < result.data.length; i++) {
                     self.addToGroups(result.data[i]);
                 }
-                self.generateMenu();
+                // self.generateMenu();
             });
             self.hideMenu = function hideMenu() {
                 $timeout(function() {
