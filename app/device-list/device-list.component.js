@@ -1130,49 +1130,49 @@ angular.module('deviceList').component('deviceList', {
                     // if(device.auth_device != "345807163")
                     $localStorage.markers[device.auth_device] = m;
                     var g = null;
-                    // var alarmsSocket = null;
-                    // if(devices[i].mdvr_number == null) {
-                    //     g = socket.subscribe(devices[i].auth_device);
-                    //     alarmsSocket = socket.subscribe("alarms_" + devices[i].auth_device);
-                    // } else {
-                    //     g = socket.subscribe(devices[i].mdvr_number);
-                    //     alarmsSocket = socket.subscribe("alarms_" + devices[i].mdvr_number);
-                    // }
-                    // g.watch(function(data) {
-                    //     var imei = data.device_id;
-                    //     if(data.mdvr_number != undefined)
-                    //         imei = self.findImeiByMdvrNumber(data.device_id);
-                    //     var m = $localStorage.markers[imei];
-                    //     if(m != undefined) {
-                    //         var lastUpdate;
-                    //         if(data.mdvr_number) {
-                    //             lastUpdate = data.date;
-                    //             var momentDate = moment(lastUpdate, "YYYY-MM-DD HH:mm:s.S")
-                    //             lastUpdate = momentDate.format("DD/MM/YYYY HH:mm:ss");
-                    //         } else {
-                    //             lastUpdate = self.getDateByHex(data.date);
-                    //         }
-                    //         m.setPosition(new google.maps.LatLng( data.latitude,data.longitude));
-                    //         m.speed = data.speed;
-                    //         m.orientation = data.orientation_plain;
-                    //         m.gpsStatus = data.gps_status == 0 ? 'On' : 'Off';
-                    //         m.lastUpdate = lastUpdate;
-                    //         self.rotateMarker(m, data.orientation_plain);
-                    //         self.updateMarkerColor(m);
-                    //         if(self.currentMenuImei == data.device_id){
-                    //             self.map.panTo(new google.maps.LatLng(data.latitude, data.longitude));
-                    //             self.updateMarkerColor(m);
-                    //             self.getAddress(data.latitude, data.longitude, true, m.backgroundColor);
-                    //             self.refreshDetailWindow(m);
-                    //             self.updateTreeColors();
-                    //         }
-                    //         self.alarmFenceMarker(m);
-                    //     }
-                    // });
-                    //
-                    // alarmsSocket.watch(function(data) {
-                    //     self.openAlarm(data);
-                    // });
+                    var alarmsSocket = null;
+                    if(devices[i].mdvr_number == null) {
+                        g = socket.subscribe(devices[i].auth_device);
+                        alarmsSocket = socket.subscribe("alarms_" + devices[i].auth_device);
+                    } else {
+                        g = socket.subscribe(devices[i].mdvr_number);
+                        alarmsSocket = socket.subscribe("alarms_" + devices[i].mdvr_number);
+                    }
+                    g.watch(function(data) {
+                        var imei = data.device_id;
+                        if(data.mdvr_number != undefined)
+                            imei = self.findImeiByMdvrNumber(data.device_id);
+                        var m = $localStorage.markers[imei];
+                        if(m != undefined) {
+                            var lastUpdate;
+                            if(data.mdvr_number) {
+                                lastUpdate = data.date;
+                                var momentDate = moment(lastUpdate, "YYYY-MM-DD HH:mm:s.S")
+                                lastUpdate = momentDate.format("DD/MM/YYYY HH:mm:ss");
+                            } else {
+                                lastUpdate = self.getDateByHex(data.date);
+                            }
+                            m.setPosition(new google.maps.LatLng( data.latitude,data.longitude));
+                            m.speed = data.speed;
+                            m.orientation = data.orientation_plain;
+                            m.gpsStatus = data.gps_status == 0 ? 'On' : 'Off';
+                            m.lastUpdate = lastUpdate;
+                            self.rotateMarker(m, data.orientation_plain);
+                            self.updateMarkerColor(m);
+                            if(self.currentMenuImei == data.device_id){
+                                self.map.panTo(new google.maps.LatLng(data.latitude, data.longitude));
+                                self.updateMarkerColor(m);
+                                self.getAddress(data.latitude, data.longitude, true, m.backgroundColor);
+                                self.refreshDetailWindow(m);
+                                self.updateTreeColors();
+                            }
+                            self.alarmFenceMarker(m);
+                        }
+                    });
+
+                    alarmsSocket.watch(function(data) {
+                        self.openAlarm(data);
+                    });
                 }
                 self.markersInitialized = true;
             };
