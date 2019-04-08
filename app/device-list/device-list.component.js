@@ -890,6 +890,7 @@ angular.module('deviceList').component('deviceList', {
                 $('#historical-custom').data('daterangepicker').toggle();
             };
             self.displayHideMenu = function displayHideMenu() {
+                console.log("begininig function displayHideMenu");
                 if(jQuery("#treeMenu ul").length == 0) {
                     self.generateMenu();
                     $('i[data-toolbar="device-menu-options"]').toolbar({
@@ -1038,19 +1039,22 @@ angular.module('deviceList').component('deviceList', {
             // socketBB.on('connect', function () {
             // });
 
-            $localStorage.markers = [];
+            $localStorage.markers = {};
             self.markersInitialized = false;
             $localStorage.devices = Device.query({userId: $localStorage.currentUser.id}, function(devices){
                 console.log("devices from database", devices);
-                if(self.map != undefined)
+                if(self.map != undefined) {
                     self.initializeMarkers(devices);
+                    console.log("all markers initialized");
+                }
 
 
             });
+            console.log("adispues");
             self.initialLatitude = null;
             self.initialLongitude = null;
             self.initializeMarkers = function initializeMarkers(devices) {
-                for(var i = 0; i < devices.length; i++){
+                for(var i = 0; i < devices.length; i++) {
                     var device = devices[i];
                     if(device.peripheral_gps_data[0] == undefined)
                         continue;
@@ -1123,51 +1127,52 @@ angular.module('deviceList').component('deviceList', {
                         self.alarmFenceMarker(this);
                     });
 
+                    // if(device.auth_device != "345807163")
                     $localStorage.markers[device.auth_device] = m;
                     var g = null;
-                    var alarmsSocket = null;
-                    if(devices[i].mdvr_number == null) {
-                        g = socket.subscribe(devices[i].auth_device);
-                        alarmsSocket = socket.subscribe("alarms_" + devices[i].auth_device);
-                    } else {
-                        g = socket.subscribe(devices[i].mdvr_number);
-                        alarmsSocket = socket.subscribe("alarms_" + devices[i].mdvr_number);
-                    }
-                    g.watch(function(data) {
-                        var imei = data.device_id;
-                        if(data.mdvr_number != undefined)
-                            imei = self.findImeiByMdvrNumber(data.device_id);
-                        var m = $localStorage.markers[imei];
-                        if(m != undefined) {
-                            var lastUpdate;
-                            if(data.mdvr_number) {
-                                lastUpdate = data.date;
-                                var momentDate = moment(lastUpdate, "YYYY-MM-DD HH:mm:s.S")
-                                lastUpdate = momentDate.format("DD/MM/YYYY HH:mm:ss");
-                            } else {
-                                lastUpdate = self.getDateByHex(data.date);
-                            }
-                            m.setPosition(new google.maps.LatLng( data.latitude,data.longitude));
-                            m.speed = data.speed;
-                            m.orientation = data.orientation_plain;
-                            m.gpsStatus = data.gps_status == 0 ? 'On' : 'Off';
-                            m.lastUpdate = lastUpdate;
-                            self.rotateMarker(m, data.orientation_plain);
-                            self.updateMarkerColor(m);
-                            if(self.currentMenuImei == data.device_id){
-                                self.map.panTo(new google.maps.LatLng(data.latitude, data.longitude));
-                                self.updateMarkerColor(m);
-                                self.getAddress(data.latitude, data.longitude, true, m.backgroundColor);
-                                self.refreshDetailWindow(m);
-                                self.updateTreeColors();
-                            }
-                            self.alarmFenceMarker(m);
-                        }
-                    });
-
-                    alarmsSocket.watch(function(data) {
-                        self.openAlarm(data);
-                    });
+                    // var alarmsSocket = null;
+                    // if(devices[i].mdvr_number == null) {
+                    //     g = socket.subscribe(devices[i].auth_device);
+                    //     alarmsSocket = socket.subscribe("alarms_" + devices[i].auth_device);
+                    // } else {
+                    //     g = socket.subscribe(devices[i].mdvr_number);
+                    //     alarmsSocket = socket.subscribe("alarms_" + devices[i].mdvr_number);
+                    // }
+                    // g.watch(function(data) {
+                    //     var imei = data.device_id;
+                    //     if(data.mdvr_number != undefined)
+                    //         imei = self.findImeiByMdvrNumber(data.device_id);
+                    //     var m = $localStorage.markers[imei];
+                    //     if(m != undefined) {
+                    //         var lastUpdate;
+                    //         if(data.mdvr_number) {
+                    //             lastUpdate = data.date;
+                    //             var momentDate = moment(lastUpdate, "YYYY-MM-DD HH:mm:s.S")
+                    //             lastUpdate = momentDate.format("DD/MM/YYYY HH:mm:ss");
+                    //         } else {
+                    //             lastUpdate = self.getDateByHex(data.date);
+                    //         }
+                    //         m.setPosition(new google.maps.LatLng( data.latitude,data.longitude));
+                    //         m.speed = data.speed;
+                    //         m.orientation = data.orientation_plain;
+                    //         m.gpsStatus = data.gps_status == 0 ? 'On' : 'Off';
+                    //         m.lastUpdate = lastUpdate;
+                    //         self.rotateMarker(m, data.orientation_plain);
+                    //         self.updateMarkerColor(m);
+                    //         if(self.currentMenuImei == data.device_id){
+                    //             self.map.panTo(new google.maps.LatLng(data.latitude, data.longitude));
+                    //             self.updateMarkerColor(m);
+                    //             self.getAddress(data.latitude, data.longitude, true, m.backgroundColor);
+                    //             self.refreshDetailWindow(m);
+                    //             self.updateTreeColors();
+                    //         }
+                    //         self.alarmFenceMarker(m);
+                    //     }
+                    // });
+                    //
+                    // alarmsSocket.watch(function(data) {
+                    //     self.openAlarm(data);
+                    // });
                 }
                 self.markersInitialized = true;
             };
@@ -1178,7 +1183,7 @@ angular.module('deviceList').component('deviceList', {
                 for (var k = 0; k < $localStorage.devices.length; k++) {
                     var d = $localStorage.devices[k];
                     if(d.mdvr_number == mdvrNumber)
-                        return new String(d.auth_device).toString();
+                        return d.auth_device.toString();
                 }
                 return false;
             };
