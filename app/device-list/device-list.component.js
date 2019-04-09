@@ -301,9 +301,13 @@ angular.module('deviceList').component('deviceList', {
             };
             self.updateFences = function updateImeis() {
                 var fences2 = self.getGeoJson();
+                jQuery("#saveFencesIcon").removeClass("fa-check").addClass("fa-spinner fa-spin");
                 var fencesUpdate = $http.put(window.__env.apiUrl + 'users/' + $localStorage.currentUser.id + '/updfences', {fences: fences2});
                 fencesUpdate.then(function(result) {
+                    jQuery("#saveFencesIcon").removeClass("fa-spinner fa-spin").addClass("fa-check");
                     $localStorage.currentUser.fences = fences2;
+                    self.disableFenceEditionMode();
+
                 });
             };
             jQuery("body").on("click", ".clear-radios-button", function() {
@@ -1039,7 +1043,7 @@ angular.module('deviceList').component('deviceList', {
             // socketBB.on('connect', function () {
             // });
 
-            $localStorage.markers = {};
+            $localStorage.markers = [];
             self.markersInitialized = false;
             $localStorage.devices = Device.query({userId: $localStorage.currentUser.id}, function(devices){
                 console.log("devices from database", devices);
