@@ -56,7 +56,7 @@ angular.module('deviceList').component('deviceList', {
                         if(self.cameraOn == true) {
                             imgElem.setAttribute("src", cameraFullUrl + "?" + Math.random());
                         }
-                    }, 100);
+                    }, 1000);
                 };
                 setTimeout(function() {
                     imgElem.setAttribute("src", cameraFullUrl);
@@ -464,15 +464,15 @@ angular.module('deviceList').component('deviceList', {
                     "<h5 class='' style='white-space: nowrap' id='titleLabel'>" +
                     polygon.title +
                     "</h5>" +
-                    "<input id='titleInput' class='border rounded' type='text' style='display: none;' value='" +
+                    "<div><input id='titleInput' class='border rounded' type='text' style='display: none; padding: 5px;' value='" +
                     polygon.title +
-                    "'>" +
+                    "'></div>" +
                     "<div class='text-muted mb-2' style='white-space: nowrap' id='descriptionLabel'>" +
                     polygon.description +
                     "</div> " +
-                    "<textarea id='descriptionInput' class='rounded my-2 border' style='display: none'>" +
+                    "<div><textarea id='descriptionInput' class='rounded my-2 border' style='display: none; padding: 5px;'>" +
                     polygon.description +
-                    "</textarea>" +
+                    "</textarea></div>" +
                     "<button type='button' class='btn btn-sm btn-outline-secondary float-right infoEdit' id='infoEdit'><i class='fa fa-cog'> Editar</i></button>" +
                     "<button type='button' class='btn btn-sm btn-outline-secondary float-right infoSave' id='infoSave' style='display: none'><i class='fa fa-check'> Guardar</i></button>" +
                     "</div>";
@@ -1043,7 +1043,7 @@ angular.module('deviceList').component('deviceList', {
             // socketBB.on('connect', function () {
             // });
 
-            $localStorage.markers = [];
+            $localStorage.markers = {};
             self.markersInitialized = false;
             $localStorage.devices = Device.query({userId: $localStorage.currentUser.id}, function(devices){
                 console.log("devices from database", devices);
