@@ -13,22 +13,29 @@ app.all("/*", function(req, res, next){
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
     next();
 });
-var client = new net.Socket();
 
-client.on("error", function(error) {
-    console.log("Problem connecting to C5 socket");
-});
+
 app.get('/api/alert-c5', function(req, res) {
-    client.connect(4105, '201.144.252.139', function() {
-        console.log('Connected to socket');
+    var client = new net.Socket();
+    client.on("error", function(error) {
+        console.log("Problem connecting to C5 socket");
     });
-    res.send('yeappppp');
+
+    // client.connect(4105, '201.144.252.139', function() {
+    //     console.log('Connected to socket');
+    // });
+
+    client.connect(26, '187.162.125.161', function() {
+        console.log('Connected to socket');
+        client.write(req.query.data);
+        client.destroy();
+    });
     console.log(req.query);
-    client.write(req.query.data);
+
     client.on('data', function(data) {
         console.log("response from c5 server", data);
     });
-    // client.end();
+    res.send('yeappppp3');
 });
 
 app.get('/', function (req, res) {
@@ -38,4 +45,4 @@ app.get('/', function (req, res) {
 
   
 app.listen(8000, '0.0.0.0');
-console.log("Zurikato web is listening on port 8000");  
+console.log("Zurikato web is listening on port 8000");
