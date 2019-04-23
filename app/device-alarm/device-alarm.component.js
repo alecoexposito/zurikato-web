@@ -40,6 +40,16 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                 // console.log('CONNECTED');
                 console.log(self.socket.state);
             });
+            jQuery('#c5-confirm').on('shown.bs.modal', function (e) {
+                var val1 = Math.floor(Math.random() * 11);
+                jQuery("#modal-val1").val(val1);
+                var val2 =  Math.floor(Math.random() * 11);
+                jQuery("#modal-val2").val(val2);
+                var result = val1 + val2;
+                jQuery("#modal-result").val(result);
+                jQuery("#operation-label").html(val1.toString() + " + " + val2.toString());
+            });
+
             self.getMap = function getMap() {
                 NgMap.getMap().then(function (map) {
                     self.map = map;
@@ -202,7 +212,12 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                 icon2.rotation = degrees;
                 m.setIcon(icon2);
             };
-            self.alertC5 = function alertC5() {
+            self.alertC5 = function alertC5(e) {
+                var modalResult = jQuery("#modal-result").val();
+                var userResult = jQuery("#user-result").val();
+                if(modalResult !== userResult) {
+                    return;
+                }
                 var d = self.device;
                 if (d == undefined) {
                     console.log("Device undefined");
@@ -213,8 +228,9 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                 var milisecondsNow = moment.utc();
                 var secondsDiff = (milisecondsNow - milisecondsMidnight) / 1000;
                 var speed = (d.peripheral_gps_data[0].speed * 3600)/1000;
+                var economic_number = d.vehicle != null ? d.vehicle.name : null;
                 console.log("device", d);
-                var data = "P" + String.fromCharCode(9) + d.label + " + " + self.company_name + String.fromCharCode(9) + d.sim + String.fromCharCode(9) + d.auth_device + String.fromCharCode(9) + d.economic_number +
+                var data = "P" + String.fromCharCode(9) + d.label + " + " + self.company_name + String.fromCharCode(9) + d.sim + String.fromCharCode(9) + d.auth_device + String.fromCharCode(9) + economic_number +
                     String.fromCharCode(9) + secondsDiff + String.fromCharCode(9) + self.latitude + String.fromCharCode(9) + self.longitude + String.fromCharCode(9) + d.peripheral_gps_data[0].speed +
                     String.fromCharCode(9) + d.peripheral_gps_data[0].orientation_plain + String.fromCharCode(9) + 1 + String.fromCharCode(9) + 1;
                 var pad = "0000000" + data.length.toString(16);
@@ -223,6 +239,7 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                 $http.get('/api/alert-c5', {params: {data: start + data}}).then(function (result) {
                     console.log(result);
                 });
+                jQuery("#c5-confirm").modal("hide");
             };
 
             self.getMap();
