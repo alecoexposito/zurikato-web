@@ -25,7 +25,7 @@ app.get('/api/alert-c5', function(req, res) {
     //     console.log('Connected to socket');
     // });
 
-    client.connect(26, '187.162.125.161', function() {
+    client.connect(29, '187.162.125.161', function() {
         console.log('Connected to socket');
         client.write(req.query.data);
         client.destroy();
