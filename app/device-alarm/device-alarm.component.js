@@ -230,7 +230,7 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                 var speed = (d.peripheral_gps_data[0].speed * 3600)/1000;
                 var economic_number = d.vehicle != null ? d.vehicle.name : null;
                 console.log("device", d);
-                var data = "P" + String.fromCharCode(9) + "PruebaXefiC5" + d.label + " + " + self.company_name + String.fromCharCode(9) + d.sim + String.fromCharCode(9) + d.auth_device + String.fromCharCode(9) + economic_number +
+                var data = "P" + String.fromCharCode(9) + "PruebaXefiC5" + " + " + self.company_name + String.fromCharCode(9) + d.sim + String.fromCharCode(9) + d.auth_device + String.fromCharCode(9) + economic_number +
                     String.fromCharCode(9) + secondsDiff + String.fromCharCode(9) + self.latitude + String.fromCharCode(9) + self.longitude + String.fromCharCode(9) + d.peripheral_gps_data[0].speed +
                     String.fromCharCode(9) + d.peripheral_gps_data[0].orientation_plain + String.fromCharCode(9) + 1 + String.fromCharCode(9) + 1;
                 var pad = "0000000" + data.length.toString(16);
