@@ -1058,10 +1058,10 @@ angular.module('deviceList').component('deviceList', {
                 var devices = result.data;
                 console.log("devices from database2: ",    devices);
                 $localStorage.devices = devices;
-                if(self.map != undefined) {
-                    self.initializeMarkers(devices);
-                    console.log("all markers initialized");
-                }
+                // if(self.map != undefined) {
+                //     self.initializeMarkers(devices);
+                //     console.log("all markers initialized");
+                // }
             });
 
             // Device.query({userId: $localStorage.currentUser.id}).$promise.then(result => {
