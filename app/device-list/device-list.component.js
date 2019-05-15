@@ -795,7 +795,7 @@ angular.module('deviceList').component('deviceList', {
                             self.fenceIds.push(poly.id);
                         }
                     });
-                    if($localStorage.devices.length > 0) {
+                    if($localStorage.devices.length > 0 && self.markersInitialized == false) {
                         self.initializeMarkers($localStorage.devices);
                     }
                     google.maps.event.addListener(self.map, 'click', function() {
