@@ -1074,6 +1074,8 @@ angular.module('deviceList').component('deviceList', {
             self.initialLongitude = null;
             self.initializeMarkers = function initializeMarkers(devices) {
                 console.log("devices en el initialize markers: ", devices);
+                self.markersInitialized = true;
+
                 for(var i = 0; i < devices.length; i++) {
                     var device = devices[i];
                         if(device.peripheral_gps_data[0] == undefined)
@@ -1194,7 +1196,6 @@ angular.module('deviceList').component('deviceList', {
                         self.openAlarm(data);
                     });
                 }
-                self.markersInitialized = true;
             };
 
             self.findImeiByMdvrNumber = function findImeiByMdvrNumber(mdvrNumber) {
