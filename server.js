@@ -14,8 +14,8 @@ app.all("/*", function(req, res, next){
     next();
 });
 
-var client = new net.Socket();
 app.get('/api/alert-c5', function(req, res) {
+    var client = new net.Socket();
 
     client.on("error", function(error) {
         console.log("Problem connecting to C5 socket");
