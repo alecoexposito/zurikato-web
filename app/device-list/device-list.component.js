@@ -1045,22 +1045,38 @@ angular.module('deviceList').component('deviceList', {
 
             $localStorage.markers = {};
             self.markersInitialized = false;
-            $localStorage.devices = Device.query({userId: $localStorage.currentUser.id}, function(devices){
-                console.log("devices from database", devices);
+            console.log("voy a pedir los devices");
+            // $localStorage.devices = Device.query({userId: $localStorage.currentUser.id}, function(devices){
+            //     console.log("devices from database",    devices);
+            //     if(self.map != undefined) {
+            //         self.initializeMarkers(devices);
+            //         console.log("all markers initialized");
+            //     }
+            // });
+
+            $http.get(window.__env.apiUrl + 'users/' + $localStorage.currentUser.id + '/devices').then(result => {
+                var devices = result.data;
+                console.log("devices from database2: ",    devices);
+                $localStorage.devices = devices;
                 if(self.map != undefined) {
                     self.initializeMarkers(devices);
                     console.log("all markers initialized");
                 }
-
-
             });
+
+            // Device.query({userId: $localStorage.currentUser.id}).$promise.then(result => {
+            //     console.log("dentro del promise nuevo: ", result);
+            // });
+
+
             console.log("adispues");
             self.initialLatitude = null;
             self.initialLongitude = null;
             self.initializeMarkers = function initializeMarkers(devices) {
+                console.log("devices en el initialize markers: ", devices);
                 for(var i = 0; i < devices.length; i++) {
                     var device = devices[i];
-                    if(device.peripheral_gps_data[0] == undefined)
+                        if(device.peripheral_gps_data[0] == undefined)
                         continue;
                     if(self.initialLatitude == null) {
                         self.initialLatitude = device.peripheral_gps_data[0].lat;
