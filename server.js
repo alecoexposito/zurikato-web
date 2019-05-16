@@ -24,12 +24,14 @@ app.get('/api/alert-c5', function(req, res) {
     client.connect(28, '187.162.125.161', function() {
         console.log('Connected to socket');
         client.write(req.query.data);
+        // client.destroy();
     });
 
 
     // client.connect(4105, '189.203.208.13', function() {
     //     console.log('Connected to socket');
     //     client.write(req.query.data);
+    //     // client.destroy();
     // });
 
 
