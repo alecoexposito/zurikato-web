@@ -741,12 +741,18 @@ angular.module('deviceList').component('deviceList', {
             self.getMap = function getMap() {
                 NgMap.getMap().then(function (map) {
                     self.map = map;
-                    // self.fences.forEach(function(fence){
-                    //     self.fence.setMap(null);
-                    // });
-                    // self.fences.splice(0,1);
-                    // self.fences = null;
-                    // self.features = null;
+
+                    $http.get(window.__env.apiUrl + 'users/' + $localStorage.currentUser.id + '/devices').then(result => {
+                        var devices = result.data;
+                        console.log("devices from database2: ",    devices);
+                        $localStorage.devices = devices;
+                        if($localStorage.devices.length > 0 && self.markersInitialized == false) {
+                            self.initializeMarkers($localStorage.devices);
+                        }
+
+                    });
+
+
                     self.fences = [];
                     self.fenceIds = [];
                     google.maps.event.addListener(self.map.data, 'addfeature', function (event) {
@@ -795,9 +801,6 @@ angular.module('deviceList').component('deviceList', {
                             self.fenceIds.push(poly.id);
                         }
                     });
-                    if($localStorage.devices.length > 0 && self.markersInitialized == false) {
-                        self.initializeMarkers($localStorage.devices);
-                    }
                     google.maps.event.addListener(self.map, 'click', function() {
                         self.hideMenu();
                     });
@@ -1042,37 +1045,19 @@ angular.module('deviceList').component('deviceList', {
             // var socketBB = socketCluster.connect(self.optionsBB);
             // socketBB.on('connect', function () {
             // });
-
             $localStorage.markers = {};
             self.markersInitialized = false;
             console.log("voy a pedir los devices");
-            // $localStorage.devices = Device.query({userId: $localStorage.currentUser.id}, function(devices){
-            //     console.log("devices from database",    devices);
-            //     if(self.map != undefined) {
-            //         self.initializeMarkers(devices);
-            //         console.log("all markers initialized");
-            //     }
-            // });
 
-            $http.get(window.__env.apiUrl + 'users/' + $localStorage.currentUser.id + '/devices').then(result => {
-                var devices = result.data;
-                console.log("devices from database2: ",    devices);
-                $localStorage.devices = devices;
-                // if(self.map != undefined) {
-                //     self.initializeMarkers(devices);
-                //     console.log("all markers initialized");
-                // }
-            });
-
-            // Device.query({userId: $localStorage.currentUser.id}).$promise.then(result => {
-            //     console.log("dentro del promise nuevo: ", result);
-            // });
+            // if(self.map != undefined) {
+            // }
 
 
             console.log("adispues");
             self.initialLatitude = null;
             self.initialLongitude = null;
             self.initializeMarkers = function initializeMarkers(devices) {
+
                 console.log("devices en el initialize markers: ", devices);
                 self.markersInitialized = true;
 
