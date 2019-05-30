@@ -50,17 +50,17 @@ angular.module('deviceList').component('deviceList', {
                 var cameraFullUrl = window.__env.cameraUrl + self.currentIdDevice  + "/camera.jpg";
                 console.log("url", cameraFullUrl);
                 self.cameraOn = true;
-                var imgElem = document.getElementById("cameraImage");
-                imgElem.onload = function() {
-                    setTimeout(function() {
-                        if(self.cameraOn == true) {
-                            imgElem.setAttribute("src", cameraFullUrl + "?" + Math.random());
-                        }
-                    }, 1000);
-                };
-                setTimeout(function() {
-                    imgElem.setAttribute("src", cameraFullUrl);
-                }, 200);
+                // var imgElem = document.getElementById("cameraImage");
+                // imgElem.onload = function() {
+                //     setTimeout(function() {
+                //         if(self.cameraOn == true) {
+                //             imgElem.setAttribute("src", cameraFullUrl + "?" + Math.random());
+                //         }
+                //     }, 1000);
+                // };
+                // setTimeout(function() {
+                //     imgElem.setAttribute("src", cameraFullUrl);
+                // }, 200);
             });
             $('#watchVideoModal').on('hide.bs.modal', function (e) {
                 console.log("deteniendo streaming modal");
@@ -1032,6 +1032,9 @@ angular.module('deviceList').component('deviceList', {
             self.cameraChannel = socket.subscribe('camera_channel');
             self.cameraChannel.watch(function(data) {
                 console.log("enviado en el camera channel: ", data);
+                let base64Start = "data:image/jpeg;base64, ";
+                var imgElem = document.getElementById("cameraImage");
+                imgElem.setAttribute("src", base64Start + data.image);
             });
 
             self.obdChannel = socket.subscribe('obd_channel');
