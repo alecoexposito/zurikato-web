@@ -50,6 +50,15 @@ angular.module('deviceList').component('deviceList', {
                 var cameraFullUrl = window.__env.cameraUrl + self.currentIdDevice  + "/camera.jpg";
                 console.log("url", cameraFullUrl);
                 self.cameraOn = true;
+
+                self.cameraVideoChannel = socket.subscribe("camera_" + self.currentIdDevice + "_channel");
+                self.cameraVideoChannel.watch(function(data) {
+                    console.log("camera video in: ", data);
+                    let base64Start = "data:image/jpeg;base64, ";
+                    var imgElem = document.getElementById("cameraImage");
+                    imgElem.setAttribute("src", base64Start + data.image);
+                });
+
                 // var imgElem = document.getElementById("cameraImage");
                 // imgElem.onload = function() {
                 //     setTimeout(function() {
@@ -68,6 +77,7 @@ angular.module('deviceList').component('deviceList', {
                 self.cameraChannel.publish({ type: 'stop-streaming', message: 'enviado desde la web', id: self.currentIdDevice });
                 var imgElem = document.getElementById("cameraImage");
                 imgElem.setAttribute("src", "");
+                self.cameraVideoChannel.unsubscribe("camera_" + self.currentIdDevice + "_channel");
             });
 
             $('#watchVideoBackupModal').on('shown.bs.modal', function (e) {
@@ -1032,9 +1042,9 @@ angular.module('deviceList').component('deviceList', {
             self.cameraChannel = socket.subscribe('camera_channel');
             self.cameraChannel.watch(function(data) {
                 console.log("enviado en el camera channel: ", data);
-                let base64Start = "data:image/jpeg;base64, ";
-                var imgElem = document.getElementById("cameraImage");
-                imgElem.setAttribute("src", base64Start + data.image);
+                // let base64Start = "data:image/jpeg;base64, ";
+                // var imgElem = document.getElementById("cameraImage");
+                // imgElem.setAttribute("src", base64Start + data.image);
             });
 
             self.obdChannel = socket.subscribe('obd_channel');
