@@ -21,17 +21,17 @@ app.get('/api/alert-c5', function(req, res) {
         console.log("Problem connecting to C5 socket");
     });
 
-    client.connect(29, '187.162.125.161', function() {
-        console.log('Connected to socket');
-        client.write(req.query.data);
-    });
-
-
-
-    // client.connect(4105, '189.203.208.13', function() {
+    // client.connect(29, '187.162.125.161', function() {
     //     console.log('Connected to socket');
     //     client.write(req.query.data);
     // });
+
+
+
+    client.connect(4105, '189.203.208.13', function() {
+        console.log('Connected to socket');
+        client.write(req.query.data);
+    });
 
 
     console.log(req.query);
