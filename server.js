@@ -21,7 +21,7 @@ app.get('/api/alert-c5', function(req, res) {
         console.log("Problem connecting to C5 socket");
     });
 
-    client.connect(28, '187.162.125.161', function() {
+    client.connect(29, '187.162.125.161', function() {
         console.log('Connected to socket');
         client.write(req.query.data);
     });
@@ -36,12 +36,17 @@ app.get('/api/alert-c5', function(req, res) {
 
     console.log(req.query);
 
+    var c5Response = "";
     client.on('data', function(data) {
-        console.log("response from c5 server", data);
-        console.log("response in toString: ", data.toString());
+        console.log("partial response: ", data.toString());
+        c5Response += data.toString();
+    });
+    
+    client.once('end', function (data) {
+        console.log("complete response: ", c5Response);
+        c5Response = "";
         client.destroy();
     });
-    res.send('yeappppp3');
 });
 
 app.get('/', function (req, res) {
