@@ -27,8 +27,10 @@
                 console.log(vm.socket.state);
             });
             // reset login status
-            // console.log(Object.keys($localStorage.markers));
+            console.log("before clear markers: ", Object.keys($localStorage.markers));
+
             clearMarkers();
+            console.log("after clear markers: ", Object.keys($localStorage.markers));
             clearDevices();
             AuthenticationService.Logout();
         }
@@ -49,7 +51,7 @@
             if($localStorage.devices == undefined)
                 return;
             for (var k = 0; k < $localStorage.devices.length; k++) {
-                var d = $localStorage.devices[k];
+                var d = $localStorage.devices.pop();
                 vm.socket.unsubscribe(d.auth_device);
                 vm.socket.unsubscribe("alarms_" + d.auth_device);
             }
@@ -60,7 +62,7 @@
                 return;
             Object.keys($localStorage.markers).forEach(function (key, index) {
                 this[key].setMap(null);
-
+                this[key].labelWindow.close();
                 delete this[key];
 
             }, $localStorage.markers);
