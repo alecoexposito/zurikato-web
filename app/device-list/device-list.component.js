@@ -529,7 +529,15 @@ angular.module('deviceList').component('deviceList', {
                     d.alarmOnEntering = alarmOnEntering;
                 }
             };
-            var groupsQuery = $http.get(window.__env.apiUrl + 'users/' + $localStorage.currentUser.id + '/groups');
+
+            var groupsQuery = "";
+            if($localStorage.currentUser.username == "admin") {
+                groupsQuery = $http.get(window.__env.apiUrl + 'users/' + $localStorage.currentUser.id + '/groups/' + true);
+
+            } else {
+                groupsQuery = $http.get(window.__env.apiUrl + 'users/' + $localStorage.currentUser.id + '/groups/' + false);
+            }
+
             groupsQuery.then(function(result) {
                 // self.groups = result.data;
                 for(var i = 0; i < result.data.length; i++) {
@@ -757,8 +765,13 @@ angular.module('deviceList').component('deviceList', {
             self.getMap = function getMap() {
                 NgMap.getMap().then(function (map) {
                     self.map = map;
-
-                    $http.get(window.__env.apiUrl + 'users/' + $localStorage.currentUser.id + '/devices').then(result => {
+                    var devicesUrl = "";
+                    if($localStorage.currentUser.username == "admin") {
+                        devicesUrl = window.__env.apiUrl + 'users/' + $localStorage.currentUser.id + '/devices/' + true;
+                    } else {
+                        devicesUrl = window.__env.apiUrl + 'users/' + $localStorage.currentUser.id + '/devices/' + false;
+                    }
+                    $http.get(devicesUrl).then(result => {
                         var devices = result.data;
                         console.log("devices from database2: ",    devices);
                         $localStorage.devices = devices;
