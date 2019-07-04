@@ -212,7 +212,9 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                 return false;
             };
             self.getMap();
+            var inc = 0;
             self.drawHistorical = function drawHistorical(historical, pos){
+                inc++;
                 var len = historical.length;
                 if(pos == len) {
                     var lastPos = len - 1;
@@ -241,10 +243,14 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                 self.coordinates.push(pointObj);
 
                 google.maps.event.trigger(self.map, 'resize');
-                self.drawHistorical(historical, pos + 1);
-                // $timeout(function() {
-                //         self.drawHistorical(historical, pos + 1);
-                // }, 0);
+                var is_thousand = !(inc % 1000);
+                if(is_thousand) {
+                    $timeout(function() {
+                        self.drawHistorical(historical, pos + 1);
+                    }, 0);
+                } else {
+                    self.drawHistorical(historical, pos + 1);
+                }
             };
             self.rotateMarker = function(m, degrees) {
                 var icon2 = m.icon;
