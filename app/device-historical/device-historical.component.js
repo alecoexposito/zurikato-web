@@ -9,6 +9,7 @@ angular.module('deviceHistorical').component('deviceHistorical', {
             var map = null;
             var pos = null;
             self.coordinates = [];
+            self.coordinatesShape = [];
             this.googleMapsUrl = "https://maps.googleapis.com/maps/api/js?key=AIzaSyBHsRJFKmB3_E_DGrluQKMRIYNdT8v8CwI";
             self.geocoder = new google.maps.Geocoder();
             self.getMap = function getMap() {
@@ -241,6 +242,15 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                     speed: historical[pos].speed + ' Km/h'
                 };
                 self.coordinates.push(pointObj);
+                if(pos > 0) {
+                    let latBefore = parseFloat(historical[pos - 1].lat);
+                    let lngBefore = parseFloat(historical[pos - 1].lng);
+                    let latNow = parseFloat(historical[pos].lat);
+                    let lngNow = parseFloat(historical[pos].lng);
+                    if(latBefore != latNow || lngBefore != lngNow) {
+                        self.coordinatesShape.push(pointObj);
+                    }
+                }
 
                 google.maps.event.trigger(self.map, 'resize');
                 var is_thousand = !(inc % 1000);
