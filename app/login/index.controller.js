@@ -27,10 +27,10 @@
                 console.log(vm.socket.state);
             });
             // reset login status
-            console.log("before clear markers: ", Object.keys($localStorage.markers));
+            // console.log("before clear markers: ", Object.keys($localStorage.markers));
 
             clearMarkers();
-            console.log("after clear markers: ", Object.keys($localStorage.markers));
+            // console.log("after clear markers: ", Object.keys($localStorage.markers));
             clearDevices();
             AuthenticationService.Logout();
         }
