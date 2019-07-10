@@ -240,10 +240,10 @@
         <a id="device-charts" href="/device/{{ ctrl.currentIdDevice }}/charts">
             <i class="fa fa-chart-line"></i>
         </a>
-        <a href="" id="menu-device-camera" data-id="{{ ctrl.currentIdDevice }}" data-toggle="modal" data-target="#watchVideoModal" >
+        <a href="" id="menu-device-camera" class="video-option" data-id="{{ ctrl.currentIdDevice }}" data-toggle="modal" data-target="#watchVideoModal" >
             <i class="fa fa-camera"></i>
         </a>
-        <a href="" id="menu-device-video" data-id="{{ ctrl.currentIdDevice }}" data-toggle="modal" data-target="#watchVideoBackupModal" >
+        <a href="" id="menu-device-video" class="video-backup-option" data-id="{{ ctrl.currentIdDevice }}" data-toggle="modal" data-target="#watchVideoBackupModal" >
             <i class="fa fa-video"></i>
         </a>
         <!--<a href="" id="menu-device-obd" class="obd-menu-item" data-id="{{ ctrl.currentIdDevice }}" >-->
@@ -292,43 +292,6 @@
                     <div id="treeMenu" style="overflow-y: scroll; max-height: 850px">
 
                     </div>
-                    <!--<ul class="list-group" style="overflow-y: scroll; max-height: 500px">-->
-                        <!--<li class="list-group-item"><h6>Groups</h6></li>-->
-                        <!--<ul class="list-group" ng-repeat="group in $ctrl.groups" id="{{group.group_id}}">-->
-                            <!--<a class="text-muted" style="text-decoration: none;" data-toggle="collapse"-->
-                               <!--href=".group-{{group.group_id}}">-->
-                                <!--<li class="list-group-item"><h6>{{group.group_label}}</h6>-->
-                                <!--</li>-->
-                            <!--</a>-->
-                            <!--<div class="collapse group-{{group.group_id}}">-->
-                                <!--<li class="list-group-item " ng-repeat="device in group.devices"-->
-                                    <!--id-device="{{device.id}}" imei="{{device.auth_device}}">-->
-                                    <!--<span ng-click="$ctrl.markerOptionClick(device.auth_device, $event)"-->
-                                          <!--style="cursor: pointer; width: 100%;">{{device.label}}</span>-->
-                                    <!--<div class="btn-group dropright">-->
-                                        <!--<button class="btn btn-outline-dark btn-sm dropdown-toggle p-0"-->
-                                                <!--style="margin: 2px;" type="button" id="menu-{{device.id}}"-->
-                                                <!--data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">-->
-                                            <!--<i class="fa fa-cog"></i>-->
-                                        <!--</button>-->
-                                    <!--</div>-->
-                                    <!--<div class="dropdown-menu p-0" style="min-width: 0px !important;">-->
-                                        <!--<button class="btn btn-small dropdown-item p-1" data-toggle="modal"-->
-                                                <!--data-target="#myModal" href="">-->
-                                            <!--<i class="fa fa-road"></i>-->
-                                        <!--</button>-->
-                                        <!--<button class="btn btn-small dropdown-item p-1" href="#"-->
-                                                <!--ng-click="$ctrl.markerOptionClick(device.auth_device, $event)">-->
-                                            <!--<i class="fa fa-map-marker"></i>-->
-                                        <!--</button>-->
-                                    <!--</div>-->
-                                    <!--<div data-toolbar="device-menu-options" id="{{device.id}}" class="float-right  mt-2 ml-2 test-toolbar" data-toolbar-style="dark">-->
-                                    <!--<i class="fa fa-cog" style="font-size: 12px; cursor: pointer;"></i>-->
-                                    <!--</div>-->
-                                <!--</li>-->
-                            <!--</div>-->
-                        <!--</ul>-->
-                    <!--</ul>-->
                 </div>
             </custom-control>
             <custom-control id="detail-control" position="BOTTOM_CENTER" index="2"

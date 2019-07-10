@@ -11,6 +11,7 @@ angular.module('deviceList').component('deviceList', {
             self.end = null;
             self.currentIdDevice = null;
             self.currentImei = null;
+            self.currentModel = null;
             self.todayStart = moment().set({hour:0,minute:0,second:0,millisecond:0});
             self.yesterdayStart = moment().subtract(1, 'days').set({hour:0,minute:0,second:0,millisecond:0});
             self.yesterdayEnd = moment().subtract(1, 'days').set({hour:23,minute:59,second:0,millisecond:0});
@@ -574,16 +575,18 @@ angular.module('deviceList').component('deviceList', {
                     var imeis = $localStorage.currentUser.automatic_imeis;
                     if(imeis == undefined)
                         imeis = "";
+
                     for(var j = 0; j < devices.length; j++) {
                         var checked = imeis.indexOf(devices[j].auth_device) != -1;
                         root.nodes.push({
-                            text: devices[j].label + "<i class='fa fa-ellipsis-v float-right px-1 test-toolbar' data-toolbar='device-menu-options' id='" + devices[j].id + "' data-toolbar-style='dark' id-device = '" + devices[j].id + "' imei = '" + devices[j].auth_device + "'></i>",
+                            text: devices[j].label + "<i class='fa fa-ellipsis-v float-right px-1 test-toolbar' data-toolbar='device-menu-options' id='" + devices[j].id + "' data-toolbar-style='dark' device-model = '" + devices[j].device_model + "' id-device = '" + devices[j].id + "' imei = '" + devices[j].auth_device + "'></i>",
                             // state: {
                             //     checked: checked
                             // },
                             dataAttr: {
                                 imei: devices[j].auth_device,
-                                device_id: devices[j].id
+                                device_id: devices[j].id,
+                                device_model: devices[j].device_model
                             }
                         });
                     }
@@ -608,6 +611,7 @@ angular.module('deviceList').component('deviceList', {
                         var imei = data.dataAttr.imei;
                         self.currentImei = imei;
                         self.currentIdDevice =  data.dataAttr.device_id;
+                        self.currentModel = data.dataAttr.device_model;
                         self.markerOptionClick(imei);
                     },
                     onNodeChecked: function(event, data) {
@@ -732,7 +736,8 @@ angular.module('deviceList').component('deviceList', {
                         g.devices.push({
                             id: data.device_id,
                             label: data.device_label,
-                            auth_device: data.auth_device
+                            auth_device: data.auth_device,
+                            device_model: data.device_model
                         });
                         return;
                     }
@@ -746,7 +751,8 @@ angular.module('deviceList').component('deviceList', {
                         devices: [{
                             id: data.device_id,
                             label: data.device_label,
-                            auth_device: data.auth_device
+                            auth_device: data.auth_device,
+                            device_model: data.device_model
                         }]
                     });
                 } else
@@ -756,7 +762,8 @@ angular.module('deviceList').component('deviceList', {
                         devices: [{
                             id: data.device_id,
                             label: data.device_label,
-                            auth_device: data.auth_device
+                            auth_device: data.auth_device,
+                            device_model: data.device_model
                         }]
                     });
 
@@ -856,21 +863,6 @@ angular.module('deviceList').component('deviceList', {
                 console("setting automatic wait time for this device");
             }
             self.markerOptionClick = function markerOptionClick(imei) {
-                // var invoker = $('div[data-toolbar="device-menu-options"].pressed');
-                // if (invoker.length > 0) {
-                //     self.currentIdDevice = invoker.attr("id-device");
-                //     self.currentImei = invoker.attr("imei");
-                // } else {
-                //     self.currentImei = imei;
-                // }
-                // if(jQuery($event.currentTarget).parent().hasClass("active")) {
-                //     jQuery($event.currentTarget).parent().removeClass("active");
-                //     self.currentMenuImei = null;
-                // }else{
-                //     jQuery($event.currentTarget).closest("#left-menu").find("li").removeClass("active");
-                //     jQuery($event.currentTarget).parent().addClass("active");
-                //     self.currentMenuImei = param;
-                // }
                 self.currentMenuImei = imei;
                 var m = self.findMarkerByImei(imei);
                 var lat = m.getPosition().lat();
@@ -939,8 +931,21 @@ angular.module('deviceList').component('deviceList', {
                         function( event ) {
                             var idDevice = jQuery(this).attr("id-device");
                             var imei = jQuery(this).attr("imei");
+                            var model = jQuery(this).attr("device-model");
                             self.currentIdDevice = idDevice;
                             self.currentImei = imei;
+                            self.currentModel = model;
+                            if(model == 'GT06') {
+                                $(".video-option, .video-backup-option").hide();
+                                $(".video-option").attr("data-toggle", "modal");
+                            } else if(model == "MDVR") {
+                                $(".video-option").show();
+                                $(".video-option").removeAttr("data-toggle");
+                                $(".video-backup-option").hide();
+                            } else {
+                                $(".video-option, .video-backup-option").show();
+                                $(".video-option").attr("data-toggle", "modal");
+                            }
                         }
                     );
                     jQuery('i[data-toolbar="device-menu-options"]').on('toolbarItemClick',
@@ -948,7 +953,15 @@ angular.module('deviceList').component('deviceList', {
                             if(jQuery(itemClicked).attr("id") == "device-charts") {
                                 window.open('#!device/' + self.currentIdDevice + '/charts', '_blank');
                             } else if(jQuery(itemClicked).attr("id") == "menu-device-camera") {
-                                self.menuCameraClick(self.currentIdDevice);
+                                if(self.currentModel == "MDVR") {
+                                    var resp = $http.get(window.__env.apiUrl + 'mdvr/video-url/' + self.currentImei);
+                                    resp.then(function(result) {
+                                        console.log("respuesta: ", result);
+                                        var urlCamera = result.data.url;
+                                        window.open(urlCamera, '_blank');
+                                    });
+                                } else
+                                    self.menuCameraClick(self.currentIdDevice);
                             } else if(jQuery(itemClicked).attr("id") == "menu-device-video") {
                                 self.menuVideoClick(self.currentIdDevice);
                             } else if(jQuery(itemClicked).attr("id") == "menu-device-obd") {
@@ -1305,7 +1318,6 @@ angular.module('deviceList').component('deviceList', {
             };
 
             self.menuCameraClick = function menuCameraClick(id) {
-                console.log("camera click, device id: ", id);
                 self.cameraChannel.publish({ type: 'start-streaming', message: 'enviado desde la web', id: id });
             };
 
