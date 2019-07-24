@@ -1098,7 +1098,6 @@ angular.module('deviceList').component('deviceList', {
             // }
 
 
-            console.log("adispues");
             self.initialLatitude = null;
             self.initialLongitude = null;
             self.initializeMarkers = function initializeMarkers(devices) {
@@ -1116,8 +1115,9 @@ angular.module('deviceList').component('deviceList', {
                     }
                     var local = moment.utc(device.peripheral_gps_data[0].updatedAt).toDate();
                     var lastUpdate = moment(local).format("DD/MM/YYYY HH:mm:ss");
+                    var offText =  moment(local).fromNow();
                     var speed = device.peripheral_gps_data[0].speed;
-                    var gpsStatus = device.peripheral_gps_data[0].gps_status == 0 ? 'On' : 'Off';
+                    var gpsStatus = device.peripheral_gps_data[0].gps_status == 1 ? 'Off' : 'On';
                     // var image = "http://127.0.0.1:8000/img/car-marker48.png";
                     var rotation = parseInt(device.peripheral_gps_data[0].orientation_plain);
                     var car = "M17.402,0H5.643C2.526,0,0,3.467,0,6.584v34.804c0,3.116,2.526,5.644,5.643,5.644h11.759c3.116,0,5.644-2.527,5.644-5.644 V6.584C23.044,3.467,20.518,0,17.402,0z M22.057,14.188v11.665l-2.729,0.351v-4.806L22.057,14.188z M20.625,10.773 c-1.016,3.9-2.219,8.51-2.219,8.51H4.638l-2.222-8.51C2.417,10.773,11.3,7.755,20.625,10.773z M3.748,21.713v4.492l-2.73-0.349 V14.502L3.748,21.713z M1.018,37.938V27.579l2.73,0.343v8.196L1.018,37.938z M2.575,40.882l2.218-3.336h13.771l2.219,3.336H2.575z M19.328,35.805v-7.872l2.729-0.355v10.048L19.328,35.805z";
@@ -1145,8 +1145,13 @@ angular.module('deviceList').component('deviceList', {
                     });
                     self.updateMarkerColor(m);
 
+                    var content = "<p style='white-space: nowrap'>" + device.label + "<span id='offtext-" + device.idDevice + "'></span></p>";
+                    if(m.gpsStatus == "Off") {
+                        var offText = self.getOffText(moment.utc(device.peripheral_gps_data[0].updatedAt));
+                        content = "<p style='white-space: nowrap'>" + device.label + "<span id='offtext-" + device.idDevice + "'> - " + offText + "</span></p>";
+                    }
                     var infoWindow = new SnazzyInfoWindow({
-                        content: "<p style='white-space: nowrap'>" + device.label + "</p>",
+                        content: content,
                         marker: m,
                         backgroundColor: m.backgroundColor,
                         padding: '4px',
@@ -1163,6 +1168,15 @@ angular.module('deviceList').component('deviceList', {
                     });
                     m.labelWindow = infoWindow;
                     infoWindow.open();
+                    // var selector = "#offtext-" + m.id;
+                    // if(m.gpsStatus == 'Off') {
+                    //     console.log("voy a poner off: ", offText);
+                    //     // m.labelWindow.setContent(m.labelWindow.getContent() + "(" + offText + ")");
+                    //     // console.log("en un off: ", selector);
+                    //     $(selector).html("(" + offText + ")");
+                    // } else {
+                    //     $(selector).html("");
+                    // }
 
 
                     google.maps.event.addListener(m, 'click', function() {
@@ -1197,17 +1211,25 @@ angular.module('deviceList').component('deviceList', {
                         var m = $localStorage.markers[imei];
                         if(m != undefined) {
                             var lastUpdate;
+                            var offText = "";
                             if(data.mdvr_number) {
                                 lastUpdate = data.date;
                                 var momentDate = moment(lastUpdate, "YYYY-MM-DD HH:mm:s.S")
                                 lastUpdate = momentDate.format("DD/MM/YYYY HH:mm:ss");
+                                offText = self.getOffText(momentDate);
                             } else {
                                 lastUpdate = self.getDateByHex(data.date);
                             }
                             m.setPosition(new google.maps.LatLng( data.latitude,data.longitude));
                             m.speed = data.speed;
                             m.orientation = data.orientation_plain;
-                            m.gpsStatus = data.gps_status == 0 ? 'On' : 'Off';
+                            m.gpsStatus = data.gps_status == 1 ? 'Off' : 'On';
+                            var selector = "#offtext-" + m.id;
+                            if(m.gpsStatus == 'Off') {
+                                $(selector).html(" - " + offText);
+                            } else {
+                                $(selector).html("");
+                            }
                             m.lastUpdate = lastUpdate;
                             self.rotateMarker(m, data.orientation_plain);
                             self.updateMarkerColor(m);
@@ -1315,6 +1337,17 @@ angular.module('deviceList').component('deviceList', {
                 } else {
                     return "";
                 }
+            };
+
+            self.getOffText = function getOffText(momentDate){
+
+                var offText = momentDate.fromNow();
+                offText = offText.replace("hace", "Off")
+                    .replace("horas", "Hrs")
+                    .replace("hora", "Hr")
+                    .replace("en", "Off")
+                ;
+                return offText;
             };
 
             self.menuCameraClick = function menuCameraClick(id) {
