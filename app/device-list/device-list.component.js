@@ -579,11 +579,11 @@ angular.module('deviceList').component('deviceList', {
                     let lastId = 0;
                     for(var j = 0; j < devices.length; j++) {
                         if(lastId == devices[j].id) {
-                            console.log("DEVICE: ", devices[j]);
                             root.nodes[root.nodes.length - 1].nodes.push({
                                 text: devices[j].camera_name + "<i class='fa fa-ellipsis-v float-right px-1 test-toolbar' id-camera='" + devices[j].id_camera + "' url-camera='" + devices[j].url_camera + "' data-toolbar='camera-menu-options' id='" + devices[j].id + "' data-toolbar-style='dark' device-model = '" + devices[j].device_model + "' id-device = '" + devices[j].id + "' imei = '" + devices[j].auth_device + "'></i>",
                                 url_camera: devices[j].url_camera,
-                                name: devices[j].camera_name
+                                name: devices[j].camera_name,
+                                class: 'camera-for-' + devices[j].id
                             });
                             lastId = devices[j].id;
                             continue;
@@ -606,7 +606,8 @@ angular.module('deviceList').component('deviceList', {
                             elem.nodes = [{
                                 text: devices[j].camera_name + "<i class='fa fa-ellipsis-v float-right px-1 test-toolbar' id-camera='" + devices[j].id_camera + "' url-camera='" + devices[j].url_camera + "' data-toolbar='camera-menu-options' id='" + devices[j].id + "' data-toolbar-style='dark' device-model = '" + devices[j].device_model + "' id-device = '" + devices[j].id + "' imei = '" + devices[j].auth_device + "'></i>",
                                 url_camera: devices[j].url_camera,
-                                name: devices[j].camera_name
+                                name: devices[j].camera_name,
+                                class: 'camera-for-' + devices[j].id
                             }];
                         }
                         root.nodes.push(elem);
@@ -983,6 +984,16 @@ angular.module('deviceList').component('deviceList', {
                                 $(".video-option").removeAttr("data-toggle");
                                 $(".video-backup-option").hide();
                             } else {
+                                self.currentCameras = [];
+                                jQuery(".camera-for-" + idDevice).each(function() {
+                                    let idCamera = $(this).find("i").attr("id-camera");
+                                    let urlCamera = $(this).find("i").attr("url-camera");
+                                    let camera = {
+                                        idCamera: idCamera,
+                                        urlCamera: urlCamera
+                                    };
+                                    self.currentCameras.push(camera);
+                                });
                                 $(".video-option, .video-backup-option").show();
                                 $(".video-option").attr("data-toggle", "modal");
                             }
@@ -1000,8 +1011,13 @@ angular.module('deviceList').component('deviceList', {
                                         var urlCamera = result.data.url;
                                         window.open(urlCamera, '_blank');
                                     });
-                                } else
-                                    self.menuCameraClick(self.currentIdDevice, self.currentUrlCamera, self.currentIdCamera);
+                                } else {
+                                    if(jQuery(itemClicked).attr("id") == "menu-device-camera") {
+                                        self.menuCameraClickAll(self.currentIdDevice, self.currentCameras);
+                                        window.open('#!device/' + self.currentIdDevice + '/cameras', '_blank');
+                                    } else
+                                        self.menuCameraClick(self.currentIdDevice, self.currentUrlCamera, self.currentIdCamera);
+                                }
                             } else if(jQuery(itemClicked).attr("id") == "menu-device-video") {
                                 self.menuVideoClick(self.currentIdDevice);
                             } else if(jQuery(itemClicked).attr("id") == "menu-device-obd") {
@@ -1397,6 +1413,16 @@ angular.module('deviceList').component('deviceList', {
                     id: id,
                     urlCamera: urlCamera,
                     idCamera: idCamera
+                });
+            };
+
+            self.menuCameraClickAll = function menuCameraClickAll(id, cameras) {
+                self.cameraChannel.publish({
+                    type: 'start-streaming',
+                    message: 'enviado desde la web',
+                    id: id,
+                    cameras: cameras,
+                    multiple: true
                 });
             };
 

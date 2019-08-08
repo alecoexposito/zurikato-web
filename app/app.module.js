@@ -15,5 +15,6 @@ angular.module('phonecatApp', [
   'deviceAlarm',
   'ngStorage',
   'ngCookies',
-  'sharedVideo'
+  'sharedVideo',
+  'deviceCameras'
 ]);

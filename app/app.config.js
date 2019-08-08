@@ -36,6 +36,9 @@ angular.
         when('/device/:deviceId/charts', {
             template: '<device-charts></device-charts>'
         }).
+      when('/device/:deviceId/cameras', {
+          template: '<device-cameras></device-cameras>'
+      }).
         otherwise('/devices');
     }
   ]).run(run);
