@@ -159,7 +159,7 @@ angular.module('deviceList').component('deviceList', {
                             }
                         });
 
-                    }, 10000);
+                    }, 6000);
 
                     self.playlistChannel = socket.subscribe(playlistName + '_channel');
                     self.playlistChannel.watch(function(data) {
