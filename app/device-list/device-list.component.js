@@ -126,40 +126,9 @@ angular.module('deviceList').component('deviceList', {
                         idCamera: idCamera
                     });
 
-                    setTimeout(function() {
-                        if(self.noVideo == true) {
-                            self.noVideo = false;
-                            // jQuery("#video1").hide();
-                            return;
-                        }
-                        jQuery("#waitingVideo").fadeOut();
-                        var cameraFullUrl = window.__env.cameraUrl + self.currentIdDevice  + "/" + self.playlistName;
-
-                        self.downloadUrl = cameraFullUrl + "/download.mp4";
-                        jQuery("#no-video-message").fadeOut();
-                        jQuery("#video1 source").attr("src", cameraFullUrl + "/playlist.m3u8");
-                        jQuery("#video1").show();
-
-                        var player = videojs("video1", {
-                            plugins: {
-                                alecoRangeslider: {
-                                    downloadUrl: cameraFullUrl,
-                                    downloadCallback: function(minTime, maxTime) {
-                                        console.log("begin download");
-                                        self.cameraChannel.publish({
-                                            id: id,
-                                            type: 'begin-download',
-                                            message: 'enviado desde la web',
-                                            initialTime: minTime,
-                                            endTime: maxTime,
-                                            playlistName: playlistName
-                                        });
-                                    }
-                                }
-                            }
-                        });
-
-                    }, 6000);
+                    // setTimeout(function() {
+                    //
+                    // }, 6000);
 
                     self.playlistChannel = socket.subscribe(playlistName + '_channel');
                     self.playlistChannel.watch(function(data) {
@@ -182,6 +151,38 @@ angular.module('deviceList').component('deviceList', {
                             link.target = "_blank";
                             link.click();
                             console.log(self.downloadUrl);
+                        } else if(data.type == "backup-initialized") {
+                            if(self.noVideo == true) {
+                                self.noVideo = false;
+                                // jQuery("#video1").hide();
+                                return;
+                            }
+                            jQuery("#waitingVideo").fadeOut();
+                            var cameraFullUrl = window.__env.cameraUrl + self.currentIdDevice  + "/" + self.playlistName;
+
+                            self.downloadUrl = cameraFullUrl + "/download.mp4";
+                            jQuery("#no-video-message").fadeOut();
+                            jQuery("#video1 source").attr("src", cameraFullUrl + "/playlist.m3u8");
+                            jQuery("#video1").show();
+
+                            var player = videojs("video1", {
+                                plugins: {
+                                    alecoRangeslider: {
+                                        downloadUrl: cameraFullUrl,
+                                        downloadCallback: function(minTime, maxTime) {
+                                            console.log("begin download");
+                                            self.cameraChannel.publish({
+                                                id: id,
+                                                type: 'begin-download',
+                                                message: 'enviado desde la web',
+                                                initialTime: minTime,
+                                                endTime: maxTime,
+                                                playlistName: playlistName
+                                            });
+                                        }
+                                    }
+                                }
+                            });
                         }
                     });
 
