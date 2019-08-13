@@ -1435,6 +1435,7 @@ angular.module('deviceList').component('deviceList', {
                 console.log("camera click, device id: ", id);
 
             };
+            
 
             self.makeFullScreen = function(id) {
                 var divObj = document.getElementById(id);
