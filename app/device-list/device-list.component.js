@@ -999,7 +999,8 @@ angular.module('deviceList').component('deviceList', {
                                     };
                                     self.currentCameras.push(camera);
                                 });
-                                $(".video-option, .video-backup-option").show();
+                                $("#menu-camera-camera, #menu-camera-video").show();
+                                $("#menu-device-camera, #menu-device-video").hide();
                                 $(".video-option").attr("data-toggle", "modal");
                             }
                         }
