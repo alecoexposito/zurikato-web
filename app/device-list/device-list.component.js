@@ -1097,7 +1097,6 @@ angular.module('deviceList').component('deviceList', {
                     return false;
                 for (var k = 0; k < $localStorage.devices.length; k++) {
                     var d = $localStorage.devices[k];
-                    console.log(d);
                     if(d.auth_device == imei)
                         return d;
                 }
@@ -1295,7 +1294,7 @@ angular.module('deviceList').component('deviceList', {
                             m.lastUpdate = lastUpdate;
                             self.rotateMarker(m, data.orientation_plain);
                             self.updateMarkerColor(m);
-                            if(self.currentMenuImei == data.device_id){
+                            if(self.currentMenuImei == data.device_id) {
                                 self.map.panTo(new google.maps.LatLng(data.latitude, data.longitude));
                                 self.updateMarkerColor(m);
                                 self.getAddress(data.latitude, data.longitude, true, m.backgroundColor);
@@ -1310,6 +1309,31 @@ angular.module('deviceList').component('deviceList', {
                         self.openAlarm(data);
                     });
                 }
+
+                setInterval(function() {
+                    for(var i = 0; i < devices.length; i++) {
+                        // console.log("imei: ", devices[i].auth_device)
+                        let m = $localStorage.markers[devices[i].auth_device];
+                        // console.log("last update: ", m.lastUpdate)
+                        if(m.lastUpdate == "") {
+                            // console.log("Fecha no valida. Desactivalo...");
+                            m.gpsStatus = 'Off';
+                            self.updateMarkerColor(m);
+                        } else {
+                            var momentDate = moment(m.lastUpdate, "DD/MM/YYYY HH:mm:ss");
+                            // console.log("desde: ", momentDate.fromNow());
+                            // console.log("en segundos: ", moment().diff(momentDate, 'seconds'));
+                            let diffInSeconds = moment().diff(momentDate, 'seconds');
+                            if(diffInSeconds > 60) {
+                                // console.log("Desactivalo...");
+                                m.gpsStatus = 'Off';
+                                self.updateMarkerColor(m);
+                            }
+
+                        }
+                    }
+                    self.updateTreeColors();
+                }, 10000);
             };
 
             self.findImeiByMdvrNumber = function findImeiByMdvrNumber(mdvrNumber) {
