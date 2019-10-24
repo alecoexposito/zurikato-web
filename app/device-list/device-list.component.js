@@ -1333,7 +1333,7 @@ angular.module('deviceList').component('deviceList', {
                         }
                     }
                     self.updateTreeColors();
-                }, 10000);
+                }, 60000);
             };
 
             self.findImeiByMdvrNumber = function findImeiByMdvrNumber(mdvrNumber) {
