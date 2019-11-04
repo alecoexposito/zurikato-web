@@ -232,8 +232,9 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                 }
 
                 var point = [parseFloat(historical[pos].lat), parseFloat(historical[pos].lng)];
-                var day = moment(historical[pos].day, "YYYY-MM-DD HH:mm:ss").format("DD/MM/YYYY");
-                var time = moment(historical[pos].day, "YYYY-MM-DD HH:mm:ss").format("HH:mm:ss")
+                var utcDate = moment.utc(historical[pos].day, "YYYY-MM-DD HH:mm:ss").toDate();
+                var day = moment(utcDate).local().format("DD/MM/YYYY");
+                var time = moment(utcDate).local().format("HH:mm:ss");
                 var pointObj = {
                     day: day,
                     time: time,
