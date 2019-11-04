@@ -1140,12 +1140,12 @@ angular.module('deviceList').component('deviceList', {
                 // imgElem.setAttribute("src", base64Start + data.image);
             });
 
-            self.obdChannel = socket.subscribe('obd_channel');
-            self.obdChannel.watch(function(data) {
-                if(data.type == 'obd-info-response') {
-                    console.log("from python: ", data.message);
-                }
-            });
+            // self.obdChannel = socket.subscribe('obd_channel');
+            // self.obdChannel.watch(function(data) {
+            //     if(data.type == 'obd-info-response') {
+            //         console.log("from python: ", data.message);
+            //     }
+            // });
 
 
             // var socketBB = socketCluster.connect(self.optionsBB);
@@ -1273,13 +1273,19 @@ angular.module('deviceList').component('deviceList', {
                         if(m != undefined) {
                             var lastUpdate;
                             var offText = "";
+                            console.log("***********************************************+")
+                            console.log("***********************************************+")
+                            console.log("data: ", data);
+                            console.log("***********************************************+")
                             if(data.mdvr_number) {
                                 lastUpdate = data.date;
                                 var momentDate = moment(lastUpdate, "YYYY-MM-DD HH:mm:s.S")
                                 lastUpdate = momentDate.format("DD/MM/YYYY HH:mm:ss");
                                 offText = self.getOffText(momentDate);
-                            } else {
+                            } else if(data.date) {
                                 lastUpdate = self.getDateByHex(data.date);
+                            } else {
+                                lastUpdate = moment().format("YYYY-MM-DD HH:mm:ss");
                             }
                             m.setPosition(new google.maps.LatLng( data.latitude,data.longitude));
                             m.speed = data.speed;
@@ -1394,6 +1400,7 @@ angular.module('deviceList').component('deviceList', {
             };
 
             self.refreshDetailWindow = function refreshDetailWindow(m, open) {
+                console.log("en el detail: ", m)
                 var contentDetail = "" +
                     "<p class='' style='font-size: 14px'><strong>" +
                     "" + m.title + "</strong> " +
