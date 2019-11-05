@@ -42,12 +42,12 @@ ng-map {width:100%; height:100%;position: absolute;}
     border-radius: 6px;
 }
 
-#treeMenu li.list-group-item {
-    padding-top: 3px;
-    padding-bottom: 3px;
-    padding-right: 5px;
-    font-size: 13px;
-}
+/*#treeMenu li.list-group-item {*/
+    /*padding-top: 3px;*/
+    /*padding-bottom: 3px;*/
+    /*padding-right: 5px;*/
+    /*font-size: 13px;*/
+/*}*/
 
 #treeMenu li.node-selected {
     color: #fff !important;
@@ -137,3 +137,11 @@ div.daterangepicker {
 /*.modal-header {*/
     /*padding:9px 15px;*/
 /*}*/
+
+#treeMenu li.list-group-item {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-right: 5px;
+    font-size: 13px;
+}
+
