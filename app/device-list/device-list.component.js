@@ -1273,10 +1273,7 @@ angular.module('deviceList').component('deviceList', {
                         if(m != undefined) {
                             var lastUpdate;
                             var offText = "";
-                            console.log("***********************************************+")
-                            console.log("***********************************************+")
-                            console.log("data: ", data);
-                            console.log("***********************************************+")
+
                             if(data.mdvr_number) {
                                 lastUpdate = data.date;
                                 var momentDate = moment(lastUpdate, "YYYY-MM-DD HH:mm:s.S")
@@ -1312,7 +1309,20 @@ angular.module('deviceList').component('deviceList', {
                     });
 
                     alarmsSocket.watch(function(data) {
-                        self.openAlarm(data);
+                        console.log(data);
+                        if(data.imei) {
+                            var alarmData =  {
+                                device_info: 100,
+                                device_id: '1111111113',
+                                latitude: 19.610437416666667,
+                                longitude: -99.23781103333333,
+                                speed: 0,
+                                orientation_plain: 38.4,
+                            };
+                            self.openAlarm(alarmData);
+                        } else {
+                            self.openAlarm(data);
+                        }
                     });
                 }
 
@@ -1400,7 +1410,6 @@ angular.module('deviceList').component('deviceList', {
             };
 
             self.refreshDetailWindow = function refreshDetailWindow(m, open) {
-                console.log("en el detail: ", m)
                 var contentDetail = "" +
                     "<p class='' style='font-size: 14px'><strong>" +
                     "" + m.title + "</strong> " +

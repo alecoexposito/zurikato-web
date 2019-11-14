@@ -130,8 +130,8 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Set how much time this device will stay visible on automatic</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <h5 class="modal-title">Tiempo en segundos en que el dispositivo se quedar&aacute; activo</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -142,14 +142,13 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="$ctrl.setIntervalToMarker()">
-                        <i class="fa fa-check"></i> Set Time
+                        <i class="fa fa-check"></i> Aceptar
                     </button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i> Cerrar</button>
                     <!--<a id="modal-historical" target="_blank" href="" class="btn btn-primary"><i class="fa fa-road"> Watch historical</i></a>-->
                 </div>
             </div>
         </div>
-
     </div>
     <div class="modal fade" id="fencesModal" tabindex="-1" role="dialog" aria-labelledby="deviceGeofencesModal"
          aria-hidden="true">
@@ -190,7 +189,6 @@
         </div>
 
     </div>
-
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
          aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -217,6 +215,35 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+                    <!--<a id="modal-historical" target="_blank" href="" class="btn btn-primary"><i class="fa fa-road"> Watch historical</i></a>-->
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="cameraAutoplay" tabindex="-1" role="dialog" aria-labelledby="cameraAutoplay"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Autom&aacute;tico de c&aacute;mara</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body fow">
+                    <div class="form-group">
+                        <label for="isInAutoplay" style="cursor: pointer;" ><input type="checkbox" id="isInAutoplay"> Incluir esta camara en el autom&aacute;tico </label>
+                    </div>
+                    <div class="form-group">
+                        <label for="cameraShowInterval">Intervalo en el que saldr&aacute; la imagen</label>
+                        <input type="number" id="cameraShowInterval" value=""/>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="$ctrl.setIntervalToMarker()">
+                        <i class="fa fa-check"></i> Aceptar
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i> Cerrar</button>
                     <!--<a id="modal-historical" target="_blank" href="" class="btn btn-primary"><i class="fa fa-road"> Watch historical</i></a>-->
                 </div>
             </div>
@@ -257,6 +284,9 @@
         </a>
         <a href="" id="menu-camera-video" class="video-backup-option" data-id="{{ ctrl.currentIdDevice }}" data-toggle="modal" data-target="#watchVideoBackupModal" >
             <i class="fa fa-video"></i>
+        </a>
+        <a href="" data-toggle="modal" data-target="#cameraAutoplay">
+            <i class="fa fa-clock"></i>
         </a>
         <!--<a href="" id="menu-device-obd" class="obd-menu-item" data-id="{{ ctrl.currentIdDevice }}" >-->
         <!--<i class="fa fa-car"></i>-->
