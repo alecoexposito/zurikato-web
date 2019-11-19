@@ -1311,14 +1311,16 @@ angular.module('deviceList').component('deviceList', {
                     alarmsSocket.watch(function(data) {
                         console.log(data);
                         if(data.imei) {
+                            var m = $localStorage.markers[data.imei.trim()];
                             var alarmData =  {
                                 device_info: 100,
-                                device_id: '1111111113',
-                                latitude: 19.610437416666667,
-                                longitude: -99.23781103333333,
-                                speed: 0,
-                                orientation_plain: 38.4,
+                                device_id: data.imei.trim(),
+                                latitude: m.getPosition().lat(),
+                                longitude: m.getPosition().lng(),
+                                speed: m.speed,
+                                orientation_plain: m.orientation,
                             };
+                            console.log("alarma recibida: ", alarmData)
                             self.openAlarm(alarmData);
                         } else {
                             self.openAlarm(data);
