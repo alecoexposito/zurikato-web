@@ -59,25 +59,12 @@ angular.module('deviceList').component('deviceList', {
                             type: 'feedback',
                             idCamera: self.currentIdCamera
                         });
-
-                        // console.log("camera video in: ", data);
                         let base64Start = "data:image/jpeg;base64, ";
                         var imgElem = document.getElementById("cameraImage");
                         imgElem.setAttribute("src", base64Start + data.image);
                     }
                 });
 
-                // var imgElem = document.getElementById("cameraImage");
-                // imgElem.onload = function() {
-                //     setTimeout(function() {
-                //         if(self.cameraOn == true) {
-                //             imgElem.setAttribute("src", cameraFullUrl + "?" + Math.random());
-                //         }
-                //     }, 1000);
-                // };
-                // setTimeout(function() {
-                //     imgElem.setAttribute("src", cameraFullUrl);
-                // }, 200);
             });
             $('#watchVideoModal').on('hide.bs.modal', function (e) {
                 console.log("deteniendo streaming modal");
@@ -214,10 +201,10 @@ angular.module('deviceList').component('deviceList', {
                 $("#video-modal-body").append(v);
             });
 
-            self.obdMenu = function obdMenu(deviceId) {
-                console.log("device id: ", deviceId);
-                self.obdChannel.publish({ type: 'obd-info', id: deviceId });
-            }
+            // $('#cameraAutoplay').on('hide.bs.modal', function (e) {
+            //     $()
+            // });
+
 
             self.test = function test() {
 
@@ -585,7 +572,7 @@ angular.module('deviceList').component('deviceList', {
                     for(var j = 0; j < devices.length; j++) {
                         if(lastId == devices[j].id) {
                             root.nodes[root.nodes.length - 1].nodes.push({
-                                text: devices[j].camera_name + "<i class='fa fa-ellipsis-v float-right px-1 test-toolbar' id-camera='" + devices[j].id_camera + "' url-camera='" + devices[j].url_camera + "' data-toolbar='camera-menu-options' id='" + devices[j].id + "' data-toolbar-style='dark' device-model = '" + devices[j].device_model + "' id-device = '" + devices[j].id + "' imei = '" + devices[j].auth_device + "'></i>",
+                                text: devices[j].camera_name + "<i class='fa fa-ellipsis-v float-right px-1 test-toolbar' in_autoplay='" + devices[j].camera_in_autoplay + "' autoplay_interval='" + devices[j].camera_autoplay_interval + "' id-camera='" + devices[j].id_camera + "' url-camera='" + devices[j].url_camera + "' data-toolbar='camera-menu-options' id='" + devices[j].id + "' data-toolbar-style='dark' device-model = '" + devices[j].device_model + "' id-device = '" + devices[j].id + "' imei = '" + devices[j].auth_device + "'></i>",
                                 url_camera: devices[j].url_camera,
                                 name: devices[j].camera_name,
                                 class: 'camera-for-' + devices[j].id
@@ -609,7 +596,7 @@ angular.module('deviceList').component('deviceList', {
                         };
                         if(devices[j].url_camera != null) {
                             elem.nodes = [{
-                                text: devices[j].camera_name + "<i class='fa fa-ellipsis-v float-right px-1 test-toolbar' id-camera='" + devices[j].id_camera + "' url-camera='" + devices[j].url_camera + "' data-toolbar='camera-menu-options' id='" + devices[j].id + "' data-toolbar-style='dark' device-model = '" + devices[j].device_model + "' id-device = '" + devices[j].id + "' imei = '" + devices[j].auth_device + "'></i>",
+                                text: devices[j].camera_name + "<i class='fa fa-ellipsis-v float-right px-1 test-toolbar' in_autoplay='" + devices[j].camera_in_autoplay + "' autoplay_interval='" + devices[j].camera_autoplay_interval + "' id-camera='" + devices[j].id_camera + "' url-camera='" + devices[j].url_camera + "' data-toolbar='camera-menu-options' id='" + devices[j].id + "' data-toolbar-style='dark' device-model = '" + devices[j].device_model + "' id-device = '" + devices[j].id + "' imei = '" + devices[j].auth_device + "'></i>",
                                 url_camera: devices[j].url_camera,
                                 name: devices[j].camera_name,
                                 class: 'camera-for-' + devices[j].id
@@ -767,7 +754,9 @@ angular.module('deviceList').component('deviceList', {
                             device_model: data.device_model,
                             url_camera: data.url_camera,
                             camera_name: data.camera_name,
-                            id_camera: data.id_camera
+                            id_camera: data.id_camera,
+                            camera_in_autoplay: data.camera_in_autoplay,
+                            camera_autoplay_interval: data.camera_autoplay_interval
                         });
                         return;
                     }
@@ -785,7 +774,9 @@ angular.module('deviceList').component('deviceList', {
                             device_model: data.device_model,
                             url_camera: data.url_camera,
                             camera_name: data.camera_name,
-                            id_camera: data.id_camera
+                            id_camera: data.id_camera,
+                            camera_in_autoplay: data.camera_in_autoplay,
+                            camera_autoplay_interval: data.camera_autoplay_interval
                         }]
                     });
                 } else
@@ -799,7 +790,9 @@ angular.module('deviceList').component('deviceList', {
                             device_model: data.device_model,
                             url_camera: data.url_camera,
                             camera_name: data.camera_name,
-                            id_camera: data.id_camera
+                            id_camera: data.id_camera,
+                            camera_in_autoplay: data.camera_in_autoplay,
+                            camera_autoplay_interval: data.camera_autoplay_interval
                         }]
                     });
 
@@ -1138,6 +1131,17 @@ angular.module('deviceList').component('deviceList', {
                 // let base64Start = "data:image/jpeg;base64, ";
                 // var imgElem = document.getElementById("cameraImage");
                 // imgElem.setAttribute("src", base64Start + data.image);
+            });
+            self.cameraSingleChannel = socket.subscribe("camera_single_channel");
+            self.cameraSingleChannel.watch(function(data) {
+                if (data.type == "single-camera") {
+                    // let base64Start = "data:image/jpeg;base64, ";
+                    var image = new Image();
+                    image.src = "data:image/jpg;base64," + data.image;
+                    self.openCameraAutoplayWindow(image);
+                    // var imgElem = document.getElementById("cameraImage");
+                    // imgElem.setAttribute("src", base64Start + data.image);
+                }
             });
 
             // self.obdChannel = socket.subscribe('obd_channel');
@@ -1529,6 +1533,28 @@ angular.module('deviceList').component('deviceList', {
                 $(this).closest(".minmaxCon").removeClass("big-z-index");
                 $(this).closest(".min").toggleClass("min");
             });
+
+            self.openCameraAutoplayWindow = function(image) {
+                // var w = window.open(linkUrl, 'newwindow-' + Date.now(), 'width=' + width + ',height=' + height + '  ');
+                // w.device = d;
+                var w = window.open("");
+                w.document.write(image.outerHTML);
+            };
+
+            self.setIntervalToCamera = function setIntervalToCamera() {
+
+                var isInAutoplay = jQuery("#isInAutoplay")[0].checked;
+                if(isInAutoplay) {
+                    var interval = jQuery("#cameraShowInterval").val();
+                    jQuery.post(window.__env.apiUrl + "cameras/" + self.currentIdCamera + "/setAutoplay", {interval: interval}, function(data) {
+                        console.log(data);
+                    });
+                } else {
+                    jQuery.get(window.__env.apiUrl + "cameras/" + self.currentIdCamera + "/removeAutoplay", function (data) {
+                        console.log(data);
+                    });
+                }
+            };
 
         }
     ]
