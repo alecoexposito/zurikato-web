@@ -1151,7 +1151,7 @@ angular.module('deviceList').component('deviceList', {
                     var cameraName = data.name;
                     var image = new Image();
                     image.src = "data:image/jpg;base64," + data.image;
-                    image.style = "width: 100%; padding-botton: 1px";
+                    image.style = "height: 95%; padding-botton: 1px";
                     self.openCameraAutoplayWindow(image, cameraName, vehicle);
                     // var imgElem = document.getElementById("cameraImage");
                     // imgElem.setAttribute("src", base64Start + data.image);
