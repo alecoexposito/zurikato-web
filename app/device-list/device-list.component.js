@@ -1552,7 +1552,7 @@ angular.module('deviceList').component('deviceList', {
                 // w.device = d;
                 var width = (window.screen.width * 25)/100;
                 var height = (window.screen.height * 25)/100;
-
+                console.log("test")
                 var w = window.open("image", 'newwindow-' + Date.now(), 'width=' + width + ',height=' + height + '  ');
 
                 w.document.write("<h1 style='text-align: center;'>Dispositivo: " + imei + "</h1>");
