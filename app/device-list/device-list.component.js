@@ -1550,7 +1550,11 @@ angular.module('deviceList').component('deviceList', {
             self.openCameraAutoplayWindow = function(image, imei, name) {
                 // var w = window.open(linkUrl, 'newwindow-' + Date.now(), 'width=' + width + ',height=' + height + '  ');
                 // w.device = d;
-                var w = window.open("image");
+                var width = (window.screen.width * 25)/100;
+                var height = (window.screen.height * 25)/100;
+
+                var w = window.open("image", 'newwindow-' + Date.now(), 'width=' + width + ',height=' + height + '  ');
+
                 w.document.write("<h1 style='text-align: center;'>Dispositivo: " + imei + "</h1>");
                 w.document.write("<h3 style='text-align: center;'>C&aacute;mara: " + name +"</h3>");
                 w.document.write("<div style='width: 100%; text-align: center;'>" + image.outerHTML + "</div>");
