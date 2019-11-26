@@ -1147,11 +1147,12 @@ angular.module('deviceList').component('deviceList', {
                 if (data.type == "single-camera") {
                     console.log(data);
                     // let base64Start = "data:image/jpeg;base64, ";
-                    var deviceImei = data.imei;
+                    var vehicle = data.vehicle;
                     var cameraName = data.name;
                     var image = new Image();
                     image.src = "data:image/jpg;base64," + data.image;
-                    self.openCameraAutoplayWindow(image, deviceImei, cameraName);
+                    image.style = "width: 100%; padding-botton: 1px";
+                    self.openCameraAutoplayWindow(image, cameraName, vehicle);
                     // var imgElem = document.getElementById("cameraImage");
                     // imgElem.setAttribute("src", base64Start + data.image);
                 }
@@ -1547,16 +1548,15 @@ angular.module('deviceList').component('deviceList', {
                 $(this).closest(".min").toggleClass("min");
             });
 
-            self.openCameraAutoplayWindow = function(image, imei, name) {
+            self.openCameraAutoplayWindow = function(image, name, vehicle) {
                 // var w = window.open(linkUrl, 'newwindow-' + Date.now(), 'width=' + width + ',height=' + height + '  ');
                 // w.device = d;
-                var width = (window.screen.width * 25)/100;
-                var height = (window.screen.height * 25)/100;
+                var width = (window.screen.width * 35)/100;
+                var height = (window.screen.height * 55)/100;
                 console.log("test")
                 var w = window.open("image", 'newwindow-' + Date.now(), 'width=' + width + ',height=' + height + '  ');
 
-                w.document.write("<h1 style='text-align: center;'>Dispositivo: " + imei + "</h1>");
-                w.document.write("<h3 style='text-align: center;'>C&aacute;mara: " + name +"</h3>");
+                w.document.write("<p style='text-align: center;'>Veh&iacute;culo: " + vehicle + " --- C&aacute;mara: " + name +  "</p>");
                 w.document.write("<div style='width: 100%; text-align: center;'>" + image.outerHTML + "</div>");
             };
 
