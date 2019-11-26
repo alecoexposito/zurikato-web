@@ -201,9 +201,17 @@ angular.module('deviceList').component('deviceList', {
                 $("#video-modal-body").append(v);
             });
 
-            // $('#cameraAutoplay').on('hide.bs.modal', function (e) {
-            //     $()
-            // });
+            $('#cameraAutoplay').on('show.bs.modal', function (e) {
+                var inAutoplay = jQuery("i[id-camera=" + self.currentIdCamera + "]").attr("in_autoplay");
+                var autoplayInterval = jQuery("i[id-camera=" + self.currentIdCamera + "]").attr("autoplay_interval");
+                console.log(inAutoplay, autoplayInterval);
+                if(inAutoplay != "null" && inAutoplay != "false" && inAutoplay != "0")
+                    document.getElementById("isInAutoplay").checked = inAutoplay;
+                else
+                    document.getElementById("isInAutoplay").checked = false;
+
+                document.getElementById("cameraShowInterval").value = autoplayInterval;
+            });
 
 
             self.test = function test() {
@@ -596,7 +604,7 @@ angular.module('deviceList').component('deviceList', {
                         };
                         if(devices[j].url_camera != null) {
                             elem.nodes = [{
-                                text: devices[j].camera_name + "<i class='fa fa-ellipsis-v float-right px-1 test-toolbar' in_autoplay='" + devices[j].camera_in_autoplay + "' autoplay_interval='" + devices[j].camera_autoplay_interval + "' id-camera='" + devices[j].id_camera + "' url-camera='" + devices[j].url_camera + "' data-toolbar='camera-menu-options' id='" + devices[j].id + "' data-toolbar-style='dark' device-model = '" + devices[j].device_model + "' id-device = '" + devices[j].id + "' imei = '" + devices[j].auth_device + "'></i>",
+                                text: devices[j].camera_name + "<i class='fa fa-ellipsis-v float-right px-1 test-toolbar' in_autoplay='" + devices[j].camera_in_autoplay + "' autoplay_interval='" + devices[j].camera_autoplay_interval + "' id-camera='" + devices[j].id_camera + "' url-camera='" + devices[j].url_camera + "' name-camera='" + devices[j].camera_name + "' data-toolbar='camera-menu-options' id='" + devices[j].id + "' data-toolbar-style='dark' device-model = '" + devices[j].device_model + "' id-device = '" + devices[j].id + "' imei = '" + devices[j].auth_device + "'></i>",
                                 url_camera: devices[j].url_camera,
                                 name: devices[j].camera_name,
                                 class: 'camera-for-' + devices[j].id
@@ -969,11 +977,13 @@ angular.module('deviceList').component('deviceList', {
                             var model = jQuery(this).attr("device-model");
                             var urlCamera = jQuery(this).attr("url-camera");
                             var idCamera = jQuery(this).attr("id-camera");
+                            var nameCamera = jQuery(this).attr("name-camera");
                             self.currentIdDevice = idDevice;
                             self.currentImei = imei;
                             self.currentModel = model;
                             self.currentUrlCamera = urlCamera;
                             self.currentIdCamera = idCamera;
+                            self.currentNameCamera = nameCamera;
                             if(model == 'GT06') {
                                 $(".video-option, .video-backup-option").hide();
                                 $(".video-option").attr("data-toggle", "modal");
@@ -1135,10 +1145,13 @@ angular.module('deviceList').component('deviceList', {
             self.cameraSingleChannel = socket.subscribe("camera_single_channel");
             self.cameraSingleChannel.watch(function(data) {
                 if (data.type == "single-camera") {
+                    console.log(data);
                     // let base64Start = "data:image/jpeg;base64, ";
+                    var deviceImei = data.imei;
+                    var cameraName = data.name;
                     var image = new Image();
                     image.src = "data:image/jpg;base64," + data.image;
-                    self.openCameraAutoplayWindow(image);
+                    self.openCameraAutoplayWindow(image, deviceImei, cameraName);
                     // var imgElem = document.getElementById("cameraImage");
                     // imgElem.setAttribute("src", base64Start + data.image);
                 }
@@ -1534,26 +1547,37 @@ angular.module('deviceList').component('deviceList', {
                 $(this).closest(".min").toggleClass("min");
             });
 
-            self.openCameraAutoplayWindow = function(image) {
+            self.openCameraAutoplayWindow = function(image, imei, name) {
                 // var w = window.open(linkUrl, 'newwindow-' + Date.now(), 'width=' + width + ',height=' + height + '  ');
                 // w.device = d;
-                var w = window.open("");
-                w.document.write(image.outerHTML);
+                var w = window.open("image");
+                w.document.write("<h1 style='text-align: center;'>Dispositivo: " + imei + "</h1>");
+                w.document.write("<h3 style='text-align: center;'>C&aacute;mara: " + name +"</h3>");
+                w.document.write("<div style='width: 100%; text-align: center;'>" + image.outerHTML + "</div>");
             };
 
             self.setIntervalToCamera = function setIntervalToCamera() {
 
                 var isInAutoplay = jQuery("#isInAutoplay")[0].checked;
+                var interval = null;
                 if(isInAutoplay) {
-                    var interval = jQuery("#cameraShowInterval").val();
+                    interval = jQuery("#cameraShowInterval").val();
                     jQuery.post(window.__env.apiUrl + "cameras/" + self.currentIdCamera + "/setAutoplay", {interval: interval}, function(data) {
-                        console.log(data);
+                        self.cameraSingleChannel.publish({
+                            type: 'load-camera-autoplay',
+                        });
                     });
                 } else {
                     jQuery.get(window.__env.apiUrl + "cameras/" + self.currentIdCamera + "/removeAutoplay", function (data) {
-                        console.log(data);
+                        self.cameraSingleChannel.publish({
+                            type: 'load-camera-autoplay',
+                        });
+
                     });
                 }
+
+                jQuery("i[id-camera=" + self.currentIdCamera + "]").attr("in_autoplay", isInAutoplay);
+                jQuery("i[id-camera=" + self.currentIdCamera + "]").attr("autoplay_interval", interval);
             };
 
         }
