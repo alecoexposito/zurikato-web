@@ -25,7 +25,9 @@
                             automatic_imeis: response.automatic_imeis,
                             fences: response.fences,
                             company_name: response.company_name,
-                            fencesArray: []
+                            fencesArray: [],
+                            roles: response.roles,
+                            admin_id: response.admin_id
                         };
                         SaveTokenInCookie(response.auth_token);
                         // add jwt token to auth header for all requests made by the $http service

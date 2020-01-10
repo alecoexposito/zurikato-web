@@ -533,11 +533,13 @@ angular.module('deviceList').component('deviceList', {
             };
 
             var groupsQuery = "";
-            if($localStorage.currentUser.username == "admin") {
-                groupsQuery = $http.get(window.__env.apiUrl + 'users/' + $localStorage.currentUser.id + '/groups/' + true);
-
+            console.log("current user: ", $localStorage.currentUser);
+            if($localStorage.currentUser.roles.indexOf("ROLE_ADMIN_USER") >= 0) {
+                groupsQuery = $http.get(window.__env.apiUrl + 'users/' + $localStorage.currentUser.id + '/groups/' + false + "/" + true);
+            }else if($localStorage.currentUser.username == "admin") {
+                groupsQuery = $http.get(window.__env.apiUrl + 'users/' + $localStorage.currentUser.id + '/groups/' + true + "/" + false);
             } else {
-                groupsQuery = $http.get(window.__env.apiUrl + 'users/' + $localStorage.currentUser.id + '/groups/' + false);
+                groupsQuery = $http.get(window.__env.apiUrl + 'users/' + $localStorage.currentUser.id + '/groups/' + false + "/" + false);
             }
 
             groupsQuery.then(function(result) {
@@ -810,10 +812,12 @@ angular.module('deviceList').component('deviceList', {
                 NgMap.getMap().then(function (map) {
                     self.map = map;
                     var devicesUrl = "";
-                    if($localStorage.currentUser.username == "admin") {
-                        devicesUrl = window.__env.apiUrl + 'users/' + $localStorage.currentUser.id + '/devices/' + true;
+                    if($localStorage.currentUser.roles.indexOf("ROLE_ADMIN_USER") >= 0) {
+                        devicesUrl = window.__env.apiUrl + 'users/' + $localStorage.currentUser.id + '/devices/' + false + "/" + true;
+                    } else if($localStorage.currentUser.username == "admin") {
+                        devicesUrl = window.__env.apiUrl + 'users/' + $localStorage.currentUser.id + '/devices/' + true + '/' + false;
                     } else {
-                        devicesUrl = window.__env.apiUrl + 'users/' + $localStorage.currentUser.id + '/devices/' + false;
+                        devicesUrl = window.__env.apiUrl + 'users/' + $localStorage.currentUser.id + '/devices/' + false + '/' + false;
                     }
                     $http.get(devicesUrl).then(result => {
                         var devices = result.data;
