@@ -162,7 +162,7 @@ angular.module('sharedScreen').component('sharedScreen', {
                     var local = moment.utc(device.peripheral_gps_data[0].updatedAt).toDate();
                     var lastUpdate = moment(local).format("DD/MM/YYYY HH:mm:ss");
                     var speed = device.peripheral_gps_data[0].speed;
-                    var gpsStatus = device.peripheral_gps_data[0].gps_status == 0 ? 'On' : 'Off';
+                    var gpsStatus = device.peripheral_gps_data[0].gps_status == 1 ? 'Off' : 'On';
                     // var image = "http://127.0.0.1:8000/img/car-marker48.png";
                     var rotation = parseInt(device.peripheral_gps_data[0].orientation_plain);
                     var car = "M17.402,0H5.643C2.526,0,0,3.467,0,6.584v34.804c0,3.116,2.526,5.644,5.643,5.644h11.759c3.116,0,5.644-2.527,5.644-5.644 V6.584C23.044,3.467,20.518,0,17.402,0z M22.057,14.188v11.665l-2.729,0.351v-4.806L22.057,14.188z M20.625,10.773 c-1.016,3.9-2.219,8.51-2.219,8.51H4.638l-2.222-8.51C2.417,10.773,11.3,7.755,20.625,10.773z M3.748,21.713v4.492l-2.73-0.349 V14.502L3.748,21.713z M1.018,37.938V27.579l2.73,0.343v8.196L1.018,37.938z M2.575,40.882l2.218-3.336h13.771l2.219,3.336H2.575z M19.328,35.805v-7.872l2.729-0.355v10.048L19.328,35.805z";
@@ -225,22 +225,39 @@ angular.module('sharedScreen').component('sharedScreen', {
 
                     self.markers[device.auth_device] = m;
 
-                    var g = socket.subscribe(devices[i].auth_device);
+                    var g = socket.subscribe(device.auth_device);
                     g.watch(function(data) {
                         var m = self.markers[data.device_id];
                         if(m != undefined) {
                             m.setPosition(new google.maps.LatLng( data.latitude,data.longitude));
                             m.speed = data.speed;
                             m.orientation = data.orientation_plain;
-                            m.gpsStatus = data.gps_status == 0 ? 'On' : 'Off';
-                            m.lastUpdate = self.getDateByHex(data.date);
+                            m.gpsStatus = data.gps_status == 1 ? 'Off' : 'On';
+
+                            if(data.mdvr_number) {
+                                lastUpdate = data.date;
+                                var momentDate = moment(lastUpdate, "YYYY-MM-DD HH:mm:s.S")
+                                lastUpdate = momentDate.format("DD/MM/YYYY HH:mm:ss");
+                                // offText = self.getOffText(momentDate);
+                            } else if(data.date) {
+                                lastUpdate = self.getDateByHex(data.date);
+                            } else {
+                                lastUpdate = moment().format("YYYY-MM-DD HH:mm:ss");
+                            }
+
+                            m.setPosition(new google.maps.LatLng( data.latitude,data.longitude));
+                            m.speed = data.speed;
+                            m.orientation = data.orientation_plain;
+                            m.gpsStatus = data.gps_status == 1 ? 'Off' : 'On';
+                            m.lastUpdate = lastUpdate;
+
                             self.rotateMarker(m, data.orientation_plain);
-                            if(self.currentMenuImei == data.device_id){
+                            // if(self.currentMenuImei == data.device_id){
                                 self.map.panTo(new google.maps.LatLng(data.latitude, data.longitude));
                                 self.updateMarkerColor(m);
                                 self.getAddress(data.latitude, data.longitude, true, m.backgroundColor);
                                 self.refreshDetailWindow(m);
-                            }
+                            // }
                         }
                     });
 
@@ -260,7 +277,7 @@ angular.module('sharedScreen').component('sharedScreen', {
                 else if(m.speed == 0)
                     backgroundColor = '#248DFD'; // blue for stopped '#E1B300';
                 m.backgroundColor = backgroundColor;
-                if(m.labelWindow != undefined && m.alarmed == false){
+                if(m.labelWindow != undefined && (m.alarmed == undefined || m.alarmed == false)){
                     m.labelWindow._opts.backgroundColor = backgroundColor;
                 }
             };
@@ -309,15 +326,18 @@ angular.module('sharedScreen').component('sharedScreen', {
                 // }
             };
             self.getDateByHex = function getDateByHex(str) {
-                var year = parseInt(str.substr(0, 2), 16).toString();
-                var month = parseInt(str.substr(2, 2), 16).toString();
-                var day = parseInt(str.substr(4, 2), 16).toString();
-                var hour = parseInt(str.substr(6, 2), 16).toString();
-                var min = parseInt(str.substr(8, 2), 16).toString();
-                var sec = parseInt(str.substr(10, 2), 16).toString();
-                var dateStr = year + "/" + month + "/" + day + " " + hour + ":" + min + ":" + sec;
-                var dateFormatted = moment(dateStr, "YY/M/D H:m:s").format("DD/MM/YYYY HH:mm:ss");
-                return dateFormatted;
+                if(str !== undefined) {
+                    var year = parseInt(str.substr(0, 2), 16).toString();
+                    var month = parseInt(str.substr(2, 2), 16).toString();
+                    var day = parseInt(str.substr(4, 2), 16).toString();
+                    var hour = parseInt(str.substr(6, 2), 16).toString();
+                    var min = parseInt(str.substr(8, 2), 16).toString();
+                    var sec = parseInt(str.substr(10, 2), 16).toString();
+                    var dateStr = year + "/" + month + "/" + day + " " + hour + ":" + min + ":" + sec;
+                    var dateFormatted = moment(dateStr, "YY/M/D H:m:s").format("DD/MM/YYYY HH:mm:ss");
+                    return dateFormatted;
+                }
+                return str;
             };
 
         }
