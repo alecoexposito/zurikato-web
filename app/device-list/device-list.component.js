@@ -1350,6 +1350,29 @@ angular.module('deviceList').component('deviceList', {
                     });
                 }
 
+                for(var i = 0; i < devices.length; i++) {
+                    // console.log("imei: ", devices[i].auth_device)
+                    let m = $localStorage.markers[devices[i].auth_device];
+                    // console.log("last update: ", m.lastUpdate)
+                    if(m.lastUpdate == "") {
+                        // console.log("Fecha no valida. Desactivalo...");
+                        m.gpsStatus = 'Off';
+                        self.updateMarkerColor(m);
+                    } else {
+                        var momentDate = moment(m.lastUpdate, "DD/MM/YYYY HH:mm:ss");
+                        // console.log("desde: ", momentDate.fromNow());
+                        // console.log("en segundos: ", moment().diff(momentDate, 'seconds'));
+                        let diffInSeconds = moment().diff(momentDate, 'seconds');
+                        if(diffInSeconds > 60) {
+                            // console.log("Desactivalo...");
+                            m.gpsStatus = 'Off';
+                            self.updateMarkerColor(m);
+                        }
+
+                    }
+                }
+                self.updateTreeColors();
+
                 setInterval(function() {
                     for(var i = 0; i < devices.length; i++) {
                         // console.log("imei: ", devices[i].auth_device)
