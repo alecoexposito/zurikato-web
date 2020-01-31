@@ -1282,6 +1282,7 @@ angular.module('deviceList').component('deviceList', {
                     var alarmsSocket = null;
                     if(devices[i].mdvr_number == null) {
                         g = socket.subscribe(devices[i].auth_device);
+                        console.log("subscribing to: ", "alarms_" + devices[i].auth_device);
                         alarmsSocket = socket.subscribe("alarms_" + devices[i].auth_device);
                     } else {
                         g = socket.subscribe(devices[i].mdvr_number);
@@ -1330,13 +1331,13 @@ angular.module('deviceList').component('deviceList', {
                         }
                     });
 
-                    alarmsSocket.watch(function(data) {
-                        console.log(data);
-                        if(data.imei) {
-                            var m = $localStorage.markers[data.imei.trim()];
+                    alarmsSocket.watch(function(dataAlarm) {
+                        console.log(dataAlarm);
+                        if(dataAlarm.imei) {
+                            var m = $localStorage.markers[dataAlarm.imei.trim()];
                             var alarmData =  {
                                 device_info: 100,
-                                device_id: data.imei.trim(),
+                                device_id: dataAlarm.imei.trim(),
                                 latitude: m.getPosition().lat(),
                                 longitude: m.getPosition().lng(),
                                 speed: m.speed,
@@ -1345,7 +1346,7 @@ angular.module('deviceList').component('deviceList', {
                             console.log("alarma recibida: ", alarmData)
                             self.openAlarm(alarmData);
                         } else {
-                            self.openAlarm(data);
+                            self.openAlarm(dataAlarm);
                         }
                     });
                 }
