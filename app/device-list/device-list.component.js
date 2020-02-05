@@ -142,7 +142,7 @@ angular.module('deviceList').component('deviceList', {
                             if(self.noVideo == true) {
                                 self.noVideo = false;
                                 // jQuery("#video1").hide();
-                                return;
+                                // return;
                             }
                             jQuery("#waitingVideo").fadeOut();
                             var cameraFullUrl = window.__env.cameraUrl + self.currentIdDevice  + "/" + self.playlistName;
