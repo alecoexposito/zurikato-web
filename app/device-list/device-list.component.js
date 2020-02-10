@@ -44,6 +44,7 @@ angular.module('deviceList').component('deviceList', {
             //     self.editPolygonInfo();
             // });
             self.features = null;
+            self.addressLastUpdate = 0;
 
             $('#watchVideoModal').on('show.bs.modal', function (e) {
                 console.log("levantando modal");
@@ -1155,7 +1156,8 @@ angular.module('deviceList').component('deviceList', {
                     var cameraName = data.name;
                     var image = new Image();
                     image.src = "data:image/jpg;base64," + data.image;
-                    image.style = "height: 95%; padding-botton: 1px";
+                    image.style = "height: 75%; padding-botton: 1px";
+                    self.singleImageOld = data.old;
                     self.openCameraAutoplayWindow(image, cameraName, vehicle);
                     // var imgElem = document.getElementById("cameraImage");
                     // imgElem.setAttribute("src", base64Start + data.image);
@@ -1323,6 +1325,7 @@ angular.module('deviceList').component('deviceList', {
                             if(self.currentMenuImei == data.device_id) {
                                 self.map.panTo(new google.maps.LatLng(data.latitude, data.longitude));
                                 self.updateMarkerColor(m);
+
                                 self.getAddress(data.latitude, data.longitude, true, m.backgroundColor);
                                 self.refreshDetailWindow(m);
                                 self.updateTreeColors();
@@ -1437,24 +1440,27 @@ angular.module('deviceList').component('deviceList', {
                 var latlng = new google.maps.LatLng(latitude, longitude);
                 if(backgroundColor)
                     jQuery("#address-control div").css("background-color", backgroundColor);
-                jQuery("#address-p").html('<i class="fa fa-spinner fa-spin"></i> cargando...');
-                self.geocoder.geocode({
-                    'latLng': latlng
-                }, function (results, status) {
-                    if (status === google.maps.GeocoderStatus.OK) {
-                        if (results[0]) {
-                            if(showOnMap) {
-                                jQuery("#address-p").html(results[0].formatted_address);
-                                jQuery("#address-control").show("fast");
+                if((moment().unix() - self.addressLastUpdate) >= 3) {
+                    self.addressLastUpdate = moment().unix();
+                    // jQuery("#address-p").html('<i class="fa fa-spinner fa-spin"></i> cargando...');
+                    self.geocoder.geocode({
+                        'latLng': latlng
+                    }, function (results, status) {
+                        if (status === google.maps.GeocoderStatus.OK) {
+                            if (results[0]) {
+                                if(showOnMap) {
+                                    jQuery("#address-p").html(results[0].formatted_address);
+                                    jQuery("#address-control").show("fast");
+                                }
+                                return results[0];
+                            } else {
+                                return false;
                             }
-                            return results[0];
                         } else {
                             return false;
                         }
-                    } else {
-                        return false;
-                    }
-                });
+                    });
+                }
             };
 
             self.refreshDetailWindow = function refreshDetailWindow(m, open) {
@@ -1581,10 +1587,12 @@ angular.module('deviceList').component('deviceList', {
                 // w.device = d;
                 var width = (window.screen.width * 35)/100;
                 var height = (window.screen.height * 55)/100;
-                console.log("test")
                 var w = window.open("image", 'newwindow-' + Date.now(), 'width=' + width + ',height=' + height + '  ');
 
                 w.document.write("<p style='text-align: center;'>Veh&iacute;culo: " + vehicle + " --- C&aacute;mara: " + name +  "</p>");
+                if(self.singleImageOld)
+                    w.document.write("<p style='text-align: center; color: #dc3545'>Imagen desactualizada por problemas de conexi&oacute;n con la camara</p>");
+
                 w.document.write("<div style='width: 100%; text-align: center;'>" + image.outerHTML + "</div>");
             };
 
