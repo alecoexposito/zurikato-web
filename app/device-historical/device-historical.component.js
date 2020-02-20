@@ -86,7 +86,7 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                         }
                         var latLngForAddress = new google.maps.LatLng(self.coordinates[i].lat, self.coordinates[i].lng);
                         var address = "por ver";
-                        lastDay = self.coordinates[i].day
+                        lastDay = self.coordinates[i].day;
                         pdfCoordinates.push(consec + "- Hora: " + self.coordinates[i].time + "     Velocidad: " +  self.coordinates[i].speed + " ");
                         var linkToMap = 'http://www.google.com/maps/place/' + self.coordinates[i].lat + ',' + self.coordinates[i].lng;
                         pdfCoordinates.push({text: ' Ver en mapa \n', link: linkToMap});
@@ -248,7 +248,10 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                     let lngBefore = parseFloat(historical[pos - 1].lng);
                     let latNow = parseFloat(historical[pos].lat);
                     let lngNow = parseFloat(historical[pos].lng);
-                    if(latBefore != latNow || lngBefore != lngNow) {
+                    // if(latBefore != latNow || lngBefore != lngNow) {
+                    //     self.coordinatesShape.push(pointObj);
+                    // }
+                    if(historical[pos - 1].day !== historical[pos].day) {
                         self.coordinatesShape.push(pointObj);
                     }
                 }

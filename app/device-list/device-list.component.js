@@ -43,7 +43,7 @@ angular.module('deviceList').component('deviceList', {
             //     console.log("estoy aki");
             //     self.editPolygonInfo();
             // });
-            self.features = null;
+            self.features = {};
             self.addressLastUpdate = 0;
 
             $('#watchVideoModal').on('show.bs.modal', function (e) {
@@ -351,9 +351,13 @@ angular.module('deviceList').component('deviceList', {
             };
             self.getGeoJson = function getGeoJson() {
                 // self.map.data.toGeoJson(function(data){
+                //     console.log("data features: ", data);
                 //     self.features = data;
                 // });
-                self.features.features.length = 0;
+                if(!self.features) {
+                    self.features = {};
+                }
+                self.features.features = [];
                 for(var i = 0; i < self.fences.length; i++) {
                     var polygon = self.fences[i];
                     var geoJson = self.getGeoJsonFromFence(polygon, false);

@@ -124,20 +124,37 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                         console.log("waiting to change title: ", self.alarmType);
                         if(self.alarmType == '000') {
                             jQuery("#upperTitle").html("Exceso de velocidad");
-                        } else if (self.alarmType == "enter-fence") {
+                        } else if (self.alarmType === "enter-fence") {
                             jQuery("#upperTitle").html("Entrada a zona restringida");
+                        } else if (self.alarmType.trim() === "exit-fence") {
+                            console.log("entro en el if");
+                            jQuery("#upperTitle").html("Salida de zona restringida");
                         } else {
+                            console.log("entro en el else");
                             jQuery("#upperTitle").html("Botón de Pánico Activado");
                         }
                     }
                     var g = self.socket.subscribe(self.device.auth_device);
                     g.watch(function (data) {
                         if (self.m != null) {
+                            var lastUpdate;
+
+                            if(data.mdvr_number) {
+                                lastUpdate = data.date;
+                                var momentDate = moment(lastUpdate, "YYYY-MM-DD HH:mm:s.S")
+                                lastUpdate = momentDate.format("DD/MM/YYYY HH:mm:ss");
+                            } else if(data.date) {
+                                lastUpdate = self.getDateByHex(data.date);
+                            } else {
+                                lastUpdate = moment().format("YYYY-MM-DD HH:mm:ss");
+                            }
+
+
                             self.m.setPosition(new google.maps.LatLng(data.latitude, data.longitude));
                             self.m.speed = data.speed;
                             self.m.orientation = data.orientation_plain;
                             self.m.gpsStatus = data.gps_status == 0 ? 'On' : 'Off';
-                            self.m.lastUpdate = self.getDateByHex(data.date);
+                            self.m.lastUpdate = lastUpdate;
                             self.rotateMarker(self.m, data.orientation_plain);
                             self.map.panTo(new google.maps.LatLng(data.latitude, data.longitude));
                             self.updateColor();
@@ -150,15 +167,18 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                 });
             };
             self.getDateByHex = function getDateByHex(str) {
-                var year = parseInt(str.substr(0, 2), 16).toString();
-                var month = parseInt(str.substr(2, 2), 16).toString();
-                var day = parseInt(str.substr(4, 2), 16).toString();
-                var hour = parseInt(str.substr(6, 2), 16).toString();
-                var min = parseInt(str.substr(8, 2), 16).toString();
-                var sec = parseInt(str.substr(10, 2), 16).toString();
-                var dateStr = year + "/" + month + "/" + day + " " + hour + ":" + min + ":" + sec;
-                var dateFormatted = moment(dateStr, "YY/M/D H:m:s").format("YYYY/MM/DD HH:mm:ss");
-                return dateFormatted;
+                if(str) {
+                    var year = parseInt(str.substr(0, 2), 16).toString();
+                    var month = parseInt(str.substr(2, 2), 16).toString();
+                    var day = parseInt(str.substr(4, 2), 16).toString();
+                    var hour = parseInt(str.substr(6, 2), 16).toString();
+                    var min = parseInt(str.substr(8, 2), 16).toString();
+                    var sec = parseInt(str.substr(10, 2), 16).toString();
+                    var dateStr = year + "/" + month + "/" + day + " " + hour + ":" + min + ":" + sec;
+                    var dateFormatted = moment(dateStr, "YY/M/D H:m:s").format("YYYY/MM/DD HH:mm:ss");
+                    return dateFormatted;
+                }
+                return "";
             };
             self.refreshDetailWindow = function refreshDetailWindow(m) {
                 var contentDetail = "" +
@@ -185,13 +205,14 @@ angular.module('deviceAlarm').component('deviceAlarm', {
                 }, function (results, status) {
                     if (status === google.maps.GeocoderStatus.OK) {
                         if (results[0]) {
-                            console.log(results[0]);
                             if(showOnMap) {
                                 jQuery("#address-p").html(results[0].formatted_address);
                                 if(self.alarmType == '000') {
                                     jQuery("#upperTitle").html("Exceso de velocidad");
                                 } else if (self.alarmType == "enter-fence") {
                                     jQuery("#upperTitle").html("Entrada a zona restringida");
+                                }else if (self.alarmType == "exit-fence") {
+                                    jQuery("#upperTitle").html("Salida de zona restringida");
                                 } else {
                                     jQuery("#upperTitle").html("Botón de Pánico Activado");
                                 }
