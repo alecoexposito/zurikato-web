@@ -29,6 +29,7 @@
     "video.js": "^7.4.1"
   },
   "resolutions": {
-    "jquery": "~2.2.4"
+    "jquery": "~2.2.4",
+
   }
 }
