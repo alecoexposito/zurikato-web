@@ -142,6 +142,7 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                 }, 5000);
             };
 
+            self.closestMarkers = [];
             self.shapeClick = function shapeClick(event ){
                 var minDist = Number.MAX_VALUE;
                 var index = -1;
@@ -160,22 +161,57 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                         return false;
                     }
                 });
-                for (var i=0; i<this.getPath().getLength(); i++){
+                var closestFive = [];
+                for (let i=0; i<this.getPath().getLength(); i++){
                     var distance = google.maps.geometry.spherical.computeDistanceBetween(event.latLng, this.getPath().getAt(i));
-                    if (distance < minDist) {
+                    if ((distance < minDist)) {
                         minDist = distance;
                         index = i;
+                        closestFive = self.addClosestFive(closestFive,  index);
                     }
                 }
-                var content = "<p style='white-space: nowrap; margin-bottom: 3px;'>Velocidad: " + self.coordinates[index].speed + " </p>" +
-                    "<p style='white-space: nowrap; margin-bottom: 3px; mx-1'>Fecha y hora: " + self.coordinates[index].day + " " + self.coordinates[index].time + "</p>" +
-                    "<p id='address-info'><i class='fa fa-spinner fa-spin'></i> cargando...</p>";
-                self.infoWindow.setContent(content);
-                self.infoWindow.setPosition(event.latLng);
-                self.infoWindow.setMap(self.map);
-                self.infoWindow.open();
-
+                var polyline = this;
+                self.openClosestMarkers(closestFive, polyline);
             };
+
+            self.clearClosestMarkers = function clearClosestMarkers() {
+              for (let i = 0; i < self.closestMarkers.length; i++) {
+                let element = self.closestMarkers[i];
+                element.setMap(null);
+              }
+              self.closestMarkers = [];
+              self.infoWindow.close();
+            }
+            self.openClosestMarkers = function openClosestMarkers(closestFive, polyline) {
+              self.clearClosestMarkers();
+              for(let i = 0; i < closestFive.length; i++) {
+                var closestMarker = new google.maps.Marker({
+                  position: polyline.getPath().getAt(closestFive[i]),
+                  map: self.map,
+                  // label: 'C',
+                  index: closestFive[i]
+                });
+                closestMarker.addListener('mouseover', function() {
+                  let index = this.index;
+                  var content = "<p style='white-space: nowrap; margin-bottom: 3px;'>Velocidad: " + self.coordinatesShape[index].speed + " </p>" +
+                      "<p style='white-space: nowrap; margin-bottom: 3px; mx-1'>Fecha y hora: " + self.coordinatesShape[index].day + " " + self.coordinatesShape[index].time + "</p>" +
+                      "<p id='address-info'><i class='fa fa-spinner fa-spin'></i> cargando...</p>";
+                  self.infoWindow.setContent(content);
+                  self.infoWindow.setPosition(this.getPosition());
+                  self.infoWindow.setMap(self.map);
+                  self.infoWindow.open();
+                });
+                self.closestMarkers.push(closestMarker);
+              }
+            }
+
+            self.addClosestFive = function addClosestFive(closestFive, element) {
+              if(closestFive.length == 5) {
+                closestFive.shift();
+              }
+              closestFive.push(element);
+              return closestFive;
+            }
 
             self.infoWindow = new SnazzyInfoWindow({
                 content: 'Nothing to show',
@@ -193,7 +229,12 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                 // wrapperClass: 'label-window label-' + m.imei
                 // disableAutoPan: true
                 position: null,
-                map: self.map
+                map: self.map,
+                callbacks: {
+                  afterClose: function() {
+                    self.clearClosestMarkers();
+                  }
+                }
             });
 
 
@@ -242,6 +283,7 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                     lng: parseFloat(historical[pos].lng),
                     speed: historical[pos].speed + ' Km/h'
                 };
+                // console.log("point: ", pointObj);
                 self.coordinates.push(pointObj);
                 if(pos > 0) {
                     let latBefore = parseFloat(historical[pos - 1].lat);
