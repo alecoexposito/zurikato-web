@@ -24,6 +24,9 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                     //     map: map,
                     //     suppressMarkers: true
                     // });
+                    self.map.addListener('click', function() {
+                        self.clearClosestMarkers();
+                    })
                     return map;
                 });
             };
