@@ -8,7 +8,10 @@ angular.module('deviceHistorical').component('deviceHistorical', {
             var self = this;
             var map = null;
             var pos = null;
+            self.directionsService = new google.maps.DirectionsService;
+
             self.coordinates = [];
+            self.showDirections = false;
             self.coordinatesShape = [];
             this.googleMapsUrl = "https://maps.googleapis.com/maps/api/js?key=AIzaSyBHsRJFKmB3_E_DGrluQKMRIYNdT8v8CwI";
             self.geocoder = new google.maps.Geocoder();
@@ -26,55 +29,11 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                     // });
                     self.map.addListener('click', function() {
                         self.clearClosestMarkers();
-                    })
+                    });
                     return map;
                 });
             };
-
-            self.getAllAddresses = function getAllAddresses() {
-                var addresses = [];
-                var counter = 0;
-                for(var i = 0; i < 100; i++) {
-                    if(i > 0 && self.coordinates[i].lat == self.coordinates[i-1].lat && self.coordinates[i].lng == self.coordinates[i-1].lng) {
-                        addresses.push(addresses[addresses.length - 1]);
-                        continue;
-                    }
-
-                    var latLng = new google.maps.LatLng(parseFloat(self.coordinates[i].lat),parseFloat(self.coordinates[i].lng));
-                    var address = self.getAddressByLocation(latLng);
-                    addresses.push(address);
-                }
-                return addresses;
-            };
-            self.getAddressByLocation = function getAddressByLocation(latLng) {
-                console.log("get address for: ", latLng);
-                return new Promise(function(resolve, reject) {
-                    self.geocoder.geocode({
-                        'latLng': latLng
-                    }, function (results, status) {
-                        if (status === google.maps.GeocoderStatus.OK) {
-                            if (results[0]) {
-                                resolve(results[0]);
-                            } else {
-                                reject(new Error('Couldn\'t find the location '));
-                            }
-                        } else {
-                            console.log(status);
-                            reject(new Error('Couldn\'t find the location '));
-                        }
-                    });
-                });
-
-            };
-
-            self.setAddressesToCoordinates = function setAddressesToCoordinates() {
-                var addresses = self.getAllAddresses();
-                Promise.all(addresses).then(function(values) {
-                    console.log("promesas: ", values);
-                });
-            }
-
-             self.exportToPdf = function exportToPdf() {
+            self.exportToPdf = function exportToPdf() {
                 self.drawPoints();
                  $("#pdf-loader").removeClass("fa-file-pdf").addClass("fa-spinner fa-spin");
                  $("#historicControls").hide();
@@ -82,16 +41,16 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                     var pdfCoordinates = [];
                     var lastDay = null;
                     var consec = 1;
-                    for(var i = 0; i < self.coordinates.length; i++) {
-                        if(lastDay == null || lastDay != self.coordinates[i].day){
-                            pdfCoordinates.push("\nFecha: " + self.coordinates[i].day + "\n--------------------------------\n");
+                    for(var i = 0; i < self.coordinatesShape.length; i++) {
+                        if(lastDay == null || lastDay != self.coordinatesShape[i].day){
+                            pdfCoordinates.push("\nFecha: " + self.coordinatesShape[i].day + "\n--------------------------------\n");
                             consec = 1;
                         }
-                        var latLngForAddress = new google.maps.LatLng(self.coordinates[i].lat, self.coordinates[i].lng);
+                        var latLngForAddress = new google.maps.LatLng(self.coordinatesShape[i].lat, self.coordinatesShape[i].lng);
                         var address = "por ver";
-                        lastDay = self.coordinates[i].day;
-                        pdfCoordinates.push(consec + "- Hora: " + self.coordinates[i].time + "     Velocidad: " +  self.coordinates[i].speed + " ");
-                        var linkToMap = 'http://www.google.com/maps/place/' + self.coordinates[i].lat + ',' + self.coordinates[i].lng;
+                        lastDay = self.coordinatesShape[i].day;
+                        pdfCoordinates.push(consec + "- Hora: " + self.coordinatesShape[i].time + "     Velocidad: " +  self.coordinatesShape[i].speed + " ");
+                        var linkToMap = 'http://www.google.com/maps/place/' + self.coordinatesShape[i].lat + ',' + self.coordinatesShape[i].lng;
                         pdfCoordinates.push({text: ' Ver en mapa \n', link: linkToMap});
                         consec++;
                     }
@@ -287,17 +246,16 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                     speed: historical[pos].speed + ' Km/h'
                 };
                 // console.log("point: ", pointObj);
-                self.coordinates.push(pointObj);
+                // self.coordinates.push(pointObj);
                 if(pos > 0) {
                     let latBefore = parseFloat(historical[pos - 1].lat);
                     let lngBefore = parseFloat(historical[pos - 1].lng);
                     let latNow = parseFloat(historical[pos].lat);
                     let lngNow = parseFloat(historical[pos].lng);
-                    // if(latBefore != latNow || lngBefore != lngNow) {
-                    //     self.coordinatesShape.push(pointObj);
-                    // }
                     if(historical[pos - 1].day !== historical[pos].day) {
-                        self.coordinatesShape.push(pointObj);
+                        let utcDateAnterior = moment.utc(historical[pos - 1].day, "YYYY-MM-DD HH:mm:ss").toDate();
+                        if((utcDate - utcDateAnterior) >= 5000)
+                            self.coordinatesShape.push(pointObj);
                     }
                 }
 
@@ -416,15 +374,15 @@ angular.module('deviceHistorical').component('deviceHistorical', {
                 // self.setAddressesToCoordinates();
             });
             self.pointWindows = [];
-                self.drawPoints = function drawPoints() {
+            self.drawPoints = function drawPoints() {
                 var bounds = new google.maps.LatLngBounds();
-                var everyCount = parseInt(self.coordinates.length / 100);
+                var everyCount = parseInt(self.coordinatesShape.length / 100);
                 if(everyCount <= 2) {
-                    bounds.extend(new google.maps.LatLng(self.coordinates[0]));
-                    bounds.extend(new google.maps.LatLng(self.coordinates[self.coordinates.length - 1]));
+                    bounds.extend(new google.maps.LatLng(self.coordinatesShape[0]));
+                    bounds.extend(new google.maps.LatLng(self.coordinatesShape[self.coordinatesShape.length - 1]));
                 } else {
-                    for(var i = 0; i < self.coordinates.length; i+=everyCount) {
-                        var latLng = new google.maps.LatLng(self.coordinates[i]);
+                    for(var i = 0; i < self.coordinatesShape.length; i+=everyCount) {
+                        var latLng = new google.maps.LatLng(self.coordinatesShape[i]);
                         // var marker = new google.maps.Marker({
                         //     position: latLng,
                         //     map: self.map,
@@ -466,6 +424,74 @@ angular.module('deviceHistorical').component('deviceHistorical', {
 
                 self.map.fitBounds(bounds);
             };
+
+            self.getWaypoints = function getWaypoints(begin, end) {
+              let amount = end - begin;
+              let index = Math.floor(amount / 25)
+              if(index <= 0 )
+                return;
+              let waypoints = [];
+              for (let i = begin + 1; i < end; i+=index) {
+                waypoints.push({
+                  location: new google.maps.LatLng(parseFloat(self.historics[i].lat), parseFloat(self.historics[i].lng)),
+                  stopover: false
+                });
+              }
+              return waypoints;
+            }
+
+
+            self.displaySubroute = function displaySubroute(begining, end, renderer) {
+              let waypoints = self.getWaypoints(begining, end);
+              console.log("waypoints: ", waypoints);
+              self.directionsService.route({
+                origin: new google.maps.LatLng(parseFloat(self.historics[begining].lat), parseFloat(self.historics[begining].lng)) ,
+                destination: new google.maps.LatLng(parseFloat(self.historics[end].lat), parseFloat(self.historics[end].lng)),
+                waypoints: waypoints,
+                optimizeWaypoints: true,
+                travelMode: 'DRIVING',
+                provideRouteAlternatives: false
+              }, function(response, status) {
+                console.log("respuesta del servicio", response);
+                if (status === 'OK') {
+                  renderer.setDirections(response);
+                  // var route = response.routes[0];
+                  // var summaryPanel = document.getElementById('directions-panel');
+                  // summaryPanel.innerHTML = '';
+                  // // For each route, display summary information.
+                  // for (var i = 0; i < route.legs.length; i++) {
+                  //   var routeSegment = i + 1;
+                  //   summaryPanel.innerHTML += '<b>Route Segment: ' + routeSegment +
+                  //       '</b><br>';
+                  //   summaryPanel.innerHTML += route.legs[i].start_address + ' to ';
+                  //   summaryPanel.innerHTML += route.legs[i].end_address + '<br>';
+                  //   summaryPanel.innerHTML += route.legs[i].distance.text + '<br><br>';
+                  // }
+                } else {
+                  console.log('Directions request failed due to ' + status);
+                }
+
+              })
+
+            };
+            self.showUsingDirections = async function showUsingDirections() {
+              self.showDirections = true;
+              console.log(self.showDirections);
+              let lastIndex = 0;
+              for (let i = 0; i < self.historics.length; i+=100) {
+                let directionsRenderer = new google.maps.DirectionsRenderer({
+                  suppressMarkers: true,
+                  map: self.map,
+                  preserveViewport: true,
+                });
+
+                console.log("mostrando desde " + i);
+                lastIndex = i;
+                self.displaySubroute(lastIndex, lastIndex + 100, directionsRenderer);
+                await new Promise(r => setTimeout(r, 800));
+              }
+            }
+
         }
     ]
 });
