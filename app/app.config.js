@@ -22,6 +22,9 @@ angular.
         when('/device/alarm/:latitude/:longitude/:speed/:alarmType', {
             template: '<device-alarm></device-alarm>'
         }).
+        when('/device/:deviceId/streetview/:latitude/:longitude/:rotation', {
+          template: '<device-streetview></device-streetview>'
+        }).
         when('/sharedscreen/:shareid/:urlhash', {
             template: '<shared-screen></shared-screen>'
         }).
