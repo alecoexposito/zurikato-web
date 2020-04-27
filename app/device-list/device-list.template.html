@@ -277,6 +277,9 @@
         <a href="" id="menu-device-video" class="video-backup-option" data-id="{{ ctrl.currentIdDevice }}" data-toggle="modal" data-target="#watchVideoBackupModal" >
             <i class="fa fa-video"></i>
         </a>
+        <a href="" id="menu-device-streetview" class="" ng-click="$ctrl.menuStreetviewOption()">
+          <i class="fa fa-image"></i>
+        </a>
         <!--<a href="" id="menu-device-obd" class="obd-menu-item" data-id="{{ ctrl.currentIdDevice }}" >-->
             <!--<i class="fa fa-car"></i>-->
         <!--</a>-->
@@ -364,7 +367,7 @@
                     drawingControl="false"
                     drawingMode="null"
                     markerOptions="{icon:'www.example.com/icon'}"
-                    polygonOptions="{fillColor: 'red', strokeWeight: 1, editable: true, draggable: true}",
+                    polygonOptions="{fillColor: 'red', strokeWeight: 1, editable: true, draggable: true}"
             </drawing-manager>
 
         </ng-map>

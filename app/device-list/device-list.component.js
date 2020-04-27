@@ -1230,7 +1230,8 @@ angular.module('deviceList').component('deviceList', {
                         icon: icon,
                         speed: speed,
                         lastUpdate: lastUpdate,
-                        gpsStatus: gpsStatus
+                        gpsStatus: gpsStatus,
+                        orientation: rotation
                     });
                     self.updateMarkerColor(m);
 
@@ -1625,6 +1626,20 @@ angular.module('deviceList').component('deviceList', {
             };
 
             self.menuObdOption = function menuObdOption(idDevice) {
+
+            }
+
+            self.menuStreetviewOption = function menuStreetviewOption() {
+              console.log("id: ", self.currentImei);
+              const marker = self.findMarkerByImei(self.currentImei);
+              const position = marker.getPosition();
+              const orientation = marker.orientation;
+              console.log("marker: ", marker);
+              console.log(position.lng());
+              var linkUrl = '#!/device/' + self.currentImei + '/streetview/' + position.lat() + '/' + position.lng() + '/' + orientation;
+              var width = (window.screen.width * 25)/100;
+              var height = (window.screen.height * 25)/100;
+              window.open(linkUrl, 'newwindow-' + Date.now(), 'width=' + width + ',height=' + height + '  ');
 
             }
 
