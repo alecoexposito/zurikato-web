@@ -933,8 +933,8 @@ angular.module('deviceList').component('deviceList', {
                     "startDate": moment().hour('00').minute('00'),
                     "endDate": moment().hour('23').minute('00')
                 }, function(start, end, label) {
-                    self.start = start;
-                    self.end = end;
+                    self.start = start.utc();
+                    self.end = end.utc();
                     window.open('#!device/' + self.currentIdDevice + '/historical/' + self.start.format("YYYY-MM-DD HH:mm") + '/' + self.end.format("YYYY-MM-DD HH:mm"),'_blank');
                     // $("#modal-historical").attr("href", '#!device/' + self.currentIdDevice + '/historical/' + self.start.format("YYYY-MM-DD H:mm") + '/' + self.end.format("YYYY-MM-DD H:mm"));
                     $('#myModal').modal('hide');
@@ -1168,12 +1168,12 @@ angular.module('deviceList').component('deviceList', {
                 }
             });
 
-            // self.obdChannel = socket.subscribe('obd_channel');
-            // self.obdChannel.watch(function(data) {
-            //     if(data.type == 'obd-info-response') {
-            //         console.log("from python: ", data.message);
-            //     }
-            // });
+            self.obdChannel = socket.subscribe('obd_channel');
+            self.obdChannel.watch(function(data) {
+                if(data.type == 'obd-info-response') {
+                    console.log("from python: ", data.message);
+                }
+            });
 
 
             // var socketBB = socketCluster.connect(self.optionsBB);
@@ -1623,6 +1623,10 @@ angular.module('deviceList').component('deviceList', {
                 jQuery("i[id-camera=" + self.currentIdCamera + "]").attr("in_autoplay", isInAutoplay);
                 jQuery("i[id-camera=" + self.currentIdCamera + "]").attr("autoplay_interval", interval);
             };
+
+            self.menuObdOption = function menuObdOption(idDevice) {
+
+            }
 
         }
     ]
