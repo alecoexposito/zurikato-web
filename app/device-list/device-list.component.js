@@ -1637,8 +1637,8 @@ angular.module('deviceList').component('deviceList', {
               console.log("marker: ", marker);
               console.log(position.lng());
               var linkUrl = '#!/device/' + self.currentImei + '/streetview/' + position.lat() + '/' + position.lng() + '/' + orientation;
-              var width = 200; //(window.screen.width * 25)/100;
-              var height = 200; //(window.screen.height * 25)/100;
+              var width =  (window.screen.width * 25)/100;
+              var height = (window.screen.height * 25)/100;
               window.open(linkUrl, 'newwindow-' + Date.now(), 'width=' + width + ',height=' + height + '  ');
 
             }
