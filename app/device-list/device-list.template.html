@@ -78,6 +78,7 @@
             </div>
         </div>
     </div>
+    <device-obd></device-obd>
     <div class="modal fade" id="createShareLink" tabindex="-1" role="dialog" aria-labelledby="createShareLink"
          aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -194,21 +195,21 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Select date range</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Selecciona el rango de fechas</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <button ng-click="$ctrl.historicalRangeClick('today')" class="btn btn-small btn-primary"><i
-                            class="fa fa-calendar-check"></i> Today
+                            class="fa fa-calendar-check"></i> Hoy
                     </button>
                     <button ng-click="$ctrl.historicalRangeClick('yesterday')" class="btn btn-small btn-primary"
-                            href=""><i class="fa fa-calendar"></i> Yesterday
+                            href=""><i class="fa fa-calendar"></i> Ayer
                     </button>
                     <button id="historical-custom" class="btn btn-small btn-primary"
                             ng-click="$ctrl.historicalCustomClick()">
-                        <i class="fa fa-road"></i> Custom
+                        <i class="fa fa-road"></i> Escoger
                     </button>
 
                     <input id="historical-dates" type="text" class="form-control mt-1" style="display: none;"/>
@@ -266,6 +267,9 @@
         </a>
         <a id="device-charts" href="/device/{{ ctrl.currentIdDevice }}/charts">
             <i class="fa fa-chart-line"></i>
+        </a>
+        <a id="device-obd" href="" data-toggle="modal" data-target="#obdModal">
+            <i class="fa fa-car"></i>
         </a>
         <a href="" id="menu-device-camera" class="video-option" data-id="{{ ctrl.currentIdDevice }}" >
             <i class="fa fa-camera"></i>
