@@ -145,3 +145,65 @@ div.daterangepicker {
     font-size: 13px;
 }
 
+
+/* styles for timebar */
+
+/*.timeline-bar {*/
+    /*height: 2px;*/
+    /*width: 100%;*/
+    /*background: #000;*/
+    /*position: relative;*/
+/*}*/
+
+/*.steps-bar {*/
+    /*position: absolute;*/
+    /*left: 0;*/
+    /*width: 100%;*/
+    /*height: 50px;*/
+    /*cursor: pointer;*/
+    /*display: table;*/
+/*}*/
+
+/*.step {*/
+    /*!*float: left;*!*/
+    /*width: 1.996%;*/
+    /*margin-top: 29px;*/
+    /*text-align: center;*/
+    /*position: relative;*/
+    /*display: table-cell;*/
+/*}*/
+
+/*.step:nth-child(10n+1) .step-border {*/
+    /*height: 20px;*/
+    /*width: 2px;*/
+    /*background: #000;*/
+    /*margin-top: -10px;*/
+/*}*/
+/*.step:first-child .step-border {*/
+    /*height: 20px;*/
+    /*width: 2px;*/
+    /*background: #000;*/
+    /*margin-top: -10px;*/
+/*}*/
+/*.step-border {*/
+    /*height: 10px;*/
+    /*width: 2px;*/
+    /*background: #999;*/
+    /*margin-left: 1.5%;*/
+    /*display: block;*/
+/*}*/
+
+/*.time-instant {*/
+    /*position: absolute;*/
+    /*top: -30px;*/
+    /*left: -17px;*/
+/*}*/
+
+.tool-container {
+    z-index: 2000 !important;
+}
+
+
+.steps-bar {
+    background-color: green;
+}

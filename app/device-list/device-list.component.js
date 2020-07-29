@@ -45,6 +45,10 @@ angular.module('deviceList').component('deviceList', {
             // });
             self.features = {};
             self.addressLastUpdate = 0;
+            self.zoomCurrent = 0;
+            self.currentPlayTime = moment();
+            self.continuePlayingInterval = null;
+            self.noVideoIntervals = [];
 
             $('#watchVideoModal').on('show.bs.modal', function (e) {
                 console.log("levantando modal");
@@ -69,6 +73,7 @@ angular.module('deviceList').component('deviceList', {
             });
             $('#watchVideoModal').on('hide.bs.modal', function (e) {
                 console.log("deteniendo streaming modal");
+
                 self.cameraOn = false;
                 self.cameraChannel.publish({ type: 'stop-streaming', message: 'enviado desde la web', id: self.currentIdDevice, idCamera: self.currentIdCamera });
                 var imgElem = document.getElementById("cameraImage");
@@ -78,11 +83,13 @@ angular.module('deviceList').component('deviceList', {
 
             $('#watchVideoBackupModal').on('shown.bs.modal', function (e) {
                 jQuery("#video-dates-div").fadeIn();
+                jQuery("#video-bar-component").addClass("hidden");
                 $('#video-dates').daterangepicker({
                     opens: "center",
-                    timePicker: true,
-                    timePicker24Hour: true,
-                    timePickerSeconds: true,
+                    // timePicker: false,
+                    // timePicker24Hour: true,
+                    // timePickerSeconds: true,
+                    singleDatePicker: true,
                     autoApply: true,
                     // autoUpdateInput: false,
                     locale: {
@@ -91,99 +98,37 @@ angular.module('deviceList').component('deviceList', {
                         cancelLabel: '<i class="fa fa-times"></i> Cancelar'
                     },
                     alwaysShowCalendars: true,
-                    startDate: moment(),
-                    endDate: moment()
+                    // startDate: moment(),
+                    // endDate: moment()
                 }, function(start, end, label) {
 
                 });
                 $('#video-dates').on('apply.daterangepicker', function(ev, picker) {
-                    var start = picker.startDate;
+                    var start = picker.startDate.set({hour:0,minute:0,second:0,millisecond:0});
                     var end = picker.endDate;
                     var playlistName = moment().valueOf();
                     self.playlistName = playlistName;
 
+                    self.currentPlayTime = moment(start);
+                    jQuery('#currentDay').html(self.currentPlayTime.format('DD/MM/YYYY'));
+
                     var id = self.currentIdDevice;
                     var idCamera = self.currentIdCamera;
-                    self.cameraChannel.publish({
-                        type: 'start-video-backup',
-                        message: 'enviado desde la web',
-                        id: id,
-                        initialDate: start.format("YYYY-MM-DD_HH-mm-ss") + "_hls.ts",
-                        endDate: end.format("YYYY-MM-DD_HH-mm-ss") + "_hls.ts",
-                        playlistName: playlistName,
-                        idCamera: idCamera
-                    });
 
-                    // setTimeout(function() {
-                    //
-                    // }, 6000);
+                    self.getNoVideoInterval(idCamera, start.format("DD/MM/YYYY"), id, playlistName);
 
-                    self.playlistChannel = socket.subscribe(playlistName + '_channel');
-                    self.playlistChannel.watch(function(data) {
-                        console.log("enviado en el playlist channel: ", data);
-                        if(data.type == "no-video-available") {
-                            self.noVideo = true;
-                            jQuery("#waitingVideo").fadeOut();
-                            // jQuery("#video1").hide();
-                            jQuery("#video-dates-div").fadeIn();
-                            jQuery("#no-video-message").fadeIn();
-                        } else if (data.type == "play-recorded-video") {
-                            console.log('play-recorded-video');
-                            // jQuery(".vjs-download-button").removeClass("download-hidden");
-                        } else if(data.type == "download-ready") {
-                            jQuery(".vjs-download-button span").removeClass("fa-spinner fa-spin").addClass("fa-download");
-
-                            var link = document.createElement('a');
-                            link.download = "video.mp4";
-                            link.href = self.downloadUrl;
-                            link.target = "_blank";
-                            link.click();
-                            console.log(self.downloadUrl);
-                        } else if(data.type == "backup-initialized") {
-                            if(self.noVideo == true) {
-                                self.noVideo = false;
-                                // jQuery("#video1").hide();
-                                // return;
-                            }
-                            jQuery("#waitingVideo").fadeOut();
-                            var cameraFullUrl = window.__env.cameraUrl + self.currentIdDevice  + "/" + self.playlistName;
-
-                            self.downloadUrl = cameraFullUrl + "/download.mp4";
-                            jQuery("#no-video-message").fadeOut();
-                            jQuery("#video1 source").attr("src", cameraFullUrl + "/playlist.m3u8");
-                            jQuery("#video1").show();
-
-                            var player = videojs("video1", {
-                                plugins: {
-                                    alecoRangeslider: {
-                                        downloadUrl: cameraFullUrl,
-                                        downloadCallback: function(minTime, maxTime) {
-                                            console.log("begin download");
-                                            self.cameraChannel.publish({
-                                                id: id,
-                                                type: 'begin-download',
-                                                message: 'enviado desde la web',
-                                                initialTime: minTime,
-                                                endTime: maxTime,
-                                                playlistName: playlistName
-                                            });
-                                        }
-                                    }
-                                }
-                            });
-                        }
-                    });
+                    self.sendVideoToPlay(id, idCamera, start, playlistName, true);
+                    self.initPlaylist();
 
                     jQuery("#waitingVideo").show();
-                    jQuery("#video-dates-div").fadeOut();
-                    // setTimeout(function(){
-                    //     jQuery("#waitingVideo").fadeOut();
-                    //     jQuery("#video1 source").attr("src", "http://187.162.125.161:3009/cameras/" + id + "/video/" + playlistName + "/playlist.m3u8");
-                    //     jQuery("#video1").show();
-                    //     var player = videojs("video1");fa-downloadfa-download
-                    //     // player.src({ type: 'application/x-mpegURL', src: "http://187.162.125.161:3009/cameras/" + id + "/video/" + playlistName + "/playlist.m3u8" });
-                    // }, 3000);
-                    // player.stop();
+                    // jQuery("#video-dates-div").fadeOut();
+                    jQuery("#video-bar-component").removeClass("hidden");
+                    jQuery("#video1").removeAttr("style");
+
+                    self.initTimebar();
+                    self.zoomCurrent = 0;
+
+                    console.log("voy a inicializar el toolbar");
                 })
                 var drp = $('#video-dates').data('daterangepicker');
                 self.start = drp.startDate;
@@ -194,12 +139,11 @@ angular.module('deviceList').component('deviceList', {
             $('#watchVideoBackupModal').on('hide.bs.modal', function (e) {
                 jQuery("#no-video-message").fadeOut();
                 jQuery("#waitingVideo").fadeOut();
+                jQuery("#video-bar-component").addClass("hidden");
+
                 self.cameraChannel.publish({ type: 'stop-video-backup', message: 'enviado desde la web', id: self.currentIdDevice, playlistName: self.playlistName });
-                var player = videojs('video1');
-                player.dispose();
-                var v = $("#videoToClone").clone();
-                v.attr("id", "video1");
-                $("#video-modal-body").append(v);
+                self.resetPlayer();
+                clearInterval(self.currentPlayTime);
             });
 
             $('#cameraAutoplay').on('show.bs.modal', function (e) {
@@ -1154,7 +1098,6 @@ angular.module('deviceList').component('deviceList', {
             self.cameraSingleChannel = socket.subscribe("camera_single_channel");
             self.cameraSingleChannel.watch(function(data) {
                 if (data.type == "single-camera") {
-                    console.log(data);
                     // let base64Start = "data:image/jpeg;base64, ";
                     var vehicle = data.vehicle;
                     var cameraName = data.name;
@@ -1194,7 +1137,7 @@ angular.module('deviceList').component('deviceList', {
                 console.log("devices en el initialize markers: ", devices);
                 self.markersInitialized = true;
 
-                for(var i = 0; i < devices.length; i++) {
+                for(let i = 0; i < devices.length; i++) {
                     var device = devices[i];
                         if(device.peripheral_gps_data[0] == undefined)
                         continue;
@@ -1340,7 +1283,6 @@ angular.module('deviceList').component('deviceList', {
                     });
 
                     alarmsSocket.watch(function(dataAlarm) {
-                        console.log(dataAlarm);
                         if(dataAlarm.imei) {
                             var m = $localStorage.markers[dataAlarm.imei.trim()];
                             var alarmData =  {
@@ -1359,7 +1301,7 @@ angular.module('deviceList').component('deviceList', {
                     });
                 }
 
-                for(var i = 0; i < devices.length; i++) {
+                for(let i = 0; i < devices.length; i++) {
                     // console.log("imei: ", devices[i].auth_device)
                     let m = $localStorage.markers[devices[i].auth_device];
                     // console.log("last update: ", m.lastUpdate)
@@ -1630,12 +1572,9 @@ angular.module('deviceList').component('deviceList', {
             }
 
             self.menuStreetviewOption = function menuStreetviewOption() {
-              console.log("id: ", self.currentImei);
               const marker = self.findMarkerByImei(self.currentImei);
               const position = marker.getPosition();
               const orientation = marker.orientation;
-              console.log("marker: ", marker);
-              console.log(position.lng());
               var linkUrl = '#!/device/' + self.currentImei + '/streetview/' + position.lat() + '/' + position.lng() + '/' + orientation;
               var width =  (window.screen.width * 25)/100;
               var height = (window.screen.height * 25)/100;
@@ -1643,6 +1582,252 @@ angular.module('deviceList').component('deviceList', {
 
             }
 
+            self.initTimebar = (timePlusSecondsBegin = 0, timePlusSecondsEnd = 0) => {
+                jQuery("#timelineId").html('');
+                const timebar = jQuery("#timelineId").timebar({
+                    totalTimeInSecond: (86400 - (timePlusSecondsBegin + timePlusSecondsEnd)),
+                    // totalTimeInSecond: 120,
+                    cuepoints: [],
+                    width: '710px',
+                    multiSelect: true,
+                    globalPageX: 0,
+                    timePlusSecondsBegin: timePlusSecondsBegin,
+                    timePlusSecondsEnd: timePlusSecondsEnd,
+                    barClicked(time) {
+                        const selectedTime = timebar.formatTime(time);
+
+                        console.log("already clicked: ", self.alreadyClicked);
+                        if (self.alreadyClicked) {
+                            self.alreadyClicked = false; // reset
+
+                            clearTimeout(self.alreadyclickedTimeout); // prevent this from happening
+                            console.log("double click: ", time)
+                            self.zoomIn(time);
+                        }else{
+                            self.alreadyClicked = true;
+                            self.alreadyclickedTimeout = setTimeout(function(){
+                                self.alreadyClicked = false; // reset when it happens
+                                console.log("single click: ", time)
+                                if (!jQuery(".step[data-time=" + time + "]").hasClass('no-video')) {
+                                    self.currentPlayTime.set({hour:0,minute:0,second:0,millisecond:0});
+                                    self.currentPlayTime.add(time, 'seconds');
+                                    self.playlistName = moment().valueOf();
+                                    self.resetPlayer();
+                                    self.initPlaylist();
+                                    self.sendVideoToPlay(self.currentIdDevice, self.currentIdCamera, self.currentPlayTime, self.playlistName);
+                                }
+                            },300); // <-- dblclick tolerance here
+                        }
+
+                    },
+                    // barDoubleClicked(time) {
+                    //     const selectedTime = timebar.formatTime(time);
+                    //     console.log("double click: ", selectedTime);
+                    //     // self.zoomIn();
+                    //     // $("#duration").text(selectedTime);
+                    // },
+                    pointerClicked(time) {
+                        const selectedTime = timebar.formatTime(time);
+                        console.log(selectedTime);
+                        // $("#duration").text(selectedTime);
+                        // $('#add-input').val(time);
+                    }
+                });
+            }
+
+            self.zoomIn = (seconds) => {
+                console.log("zoom current: ", this.zoomCurrent);
+                if (seconds) {
+                    this.zoomCurrent = seconds;
+                    self.initTimebar(seconds - 120, 0);
+                } else if (this.zoomCurrent < 84600) {
+                    // this.zoomCurrent = this.zoomCurrent >= 900 ? this.zoomCurrent - 900 : 900 - this.zoomCurrent;
+                    this.zoomCurrent += 900;
+                    self.initTimebar(this.zoomCurrent, 0);
+                }
+                self.addNoVideoIntervalsToTimebar();
+            }
+
+            self.zoomOut = () => {
+                if (this.zoomCurrent > 0) {
+                    this.zoomCurrent = this.zoomCurrent >= 900 ? this.zoomCurrent - 900 : 900 - this.zoomCurrent;
+                    self.initTimebar(this.zoomCurrent, 0);
+                    self.addNoVideoIntervalsToTimebar();
+                }
+            }
+
+            self.resetZoom = () => {
+                this.zoomCurrent = 0;
+                self.initTimebar(this.zoomCurrent, 0);
+                self.addNoVideoIntervalsToTimebar();
+            }
+
+            self.sendVideoToPlay = (id, idCamera, start, playlistName, isFirstTime = false) => {
+
+                let startDate = start;
+                if (isFirstTime) {
+                    let startDate = start.set({hour:0,minute:0,second:0,millisecond:0});
+                }
+                self.cameraChannel.publish({
+                    type: 'start-video-backup',
+                    message: 'enviado desde la web',
+                    id: id,
+                    initialDate: startDate.format("YYYY-MM-DD_HH-mm-ss") + "_hls.ts",
+                    endDate: startDate.add(1, 'minutes').format("YYYY-MM-DD_HH-mm-ss") + "_hls.ts",
+                    playlistName: playlistName,
+                    idCamera: idCamera,
+                });
+
+            }
+
+            self.nextDay = () => {
+                self.currentPlayTime.add(1, 'days').set({hour:0,minute:0,second:0,millisecond:0});
+                jQuery('#currentDay').html(self.currentPlayTime.format('DD/MM/YYYY'));
+                jQuery("#waitingVideo").fadeIn();
+                self.resetPlayer();
+                jQuery("#waitingVideo").fadeOut();
+                self.sendVideoToPlay(self.currentIdDevice, self.currentIdCamera, self.currentPlayTime, self.playlistName);
+                self.initTimebar();
+                self.getNoVideoInterval(self.currentIdCamera, self.currentPlayTime.format('DD/MM/YYYY'), self.currentIdDevice, self.playlistName);
+            }
+            self.previousDay = () => {
+                self.currentPlayTime.subtract(1, 'days').set({hour:0,minute:0,second:0,millisecond:0});
+                jQuery('#currentDay').html(self.currentPlayTime.format('DD/MM/YYYY'));
+                jQuery("#waitingVideo").fadeIn();
+                self.resetPlayer();
+                jQuery("#waitingVideo").fadeOut();
+                self.sendVideoToPlay(self.currentIdDevice, self.currentIdCamera, self.currentPlayTime, self.playlistName);
+                self.initTimebar();
+                self.getNoVideoInterval(self.currentIdCamera, self.currentPlayTime.format('DD/MM/YYYY'), self.currentIdDevice, self.playlistName);
+            }
+
+            self.resetPlayer = () => {
+                let player = videojs('video1');
+                player.dispose();
+                let v = $("#videoToClone").clone();
+                v.attr("id", "video1");
+                console.log(v);
+                $("#video-div").append(v);
+                v.css('display', 'block');
+            }
+
+            self.addNoVideoIntervalsToTimebar = () => {
+                jQuery(".steps-bar .step").each(function() {
+                    let t = jQuery(this).data('time');
+                    if (t === 0) {
+                        console.log("resultado con valor 0", self.isDateInNoVideoIntervals(t));
+                    }
+                    if (self.isDateInNoVideoIntervals(t)) {
+                        jQuery(this).css('background-color', 'grey').addClass('no-video');
+                    } else {
+                        jQuery(this).css('background-color', 'green').removeClass('no-video');
+                    }
+                });
+
+            }
+
+            self.isDateInNoVideoIntervals = (seconds) => {
+                let secondsDate = moment(self.currentPlayTime.set({hour:0,minute:0,second:0,millisecond:0}));
+                secondsDate.add(seconds, 'seconds');
+                if (seconds === 0) {
+                    secondsDate.add(1, 'seconds');
+                } else if (seconds === 86400) {
+                    secondsDate.subtract(1, 'seconds');
+                }
+                for (let i = 0; i < self.noVideoIntervals.length; i++) {
+                    let interval = self.noVideoIntervals[i];
+                    // console.log("between: ", seconds, moment(interval.begin, 'YYYY-MM-DD HH:mm:ss'), moment(interval.end, 'YYYY-MM-DD HH:mm:ss'));
+                    return secondsDate.isBetween(moment(interval.begin, 'YYYY-MM-DD HH:mm:ss'), moment(interval.end, 'YYYY-MM-DD HH:mm:ss'), '[]');
+                }
+                return false;
+            }
+
+            self.getNoVideoInterval = (idCamera, initialDate, id, playlistName) => {
+                self.cameraChannel.publish({
+                    type: 'get-no-video-intervals',
+                    idCamera: idCamera,
+                    initialDate: initialDate,
+                    id: id,
+                    playlistName: playlistName
+                });
+            }
+
+            self.initPlaylist = () => {
+                self.playlistChannel = socket.subscribe(self.playlistName + '_channel');
+                self.playlistChannel.watch(function(data) {
+                    console.log("enviado en el playlist channel: ", data);
+                    if(data.type == "no-video-available") {
+                        self.noVideo = true;
+                        jQuery("#waitingVideo").fadeOut();
+                        // jQuery("#video1").hide();
+                        jQuery("#video-dates-div").fadeIn();
+                        // jQuery("#no-video-message").fadeIn();
+                        jQuery("#video1").show();
+                    } else if (data.type == "play-recorded-video") {
+                        console.log('play-recorded-video');
+                        // jQuery(".vjs-download-button").removeClass("download-hidden");
+                    } else if(data.type == "download-ready") {
+                        jQuery(".vjs-download-button span").removeClass("fa-spinner fa-spin").addClass("fa-download");
+
+                        var link = document.createElement('a');
+                        link.download = "video.mp4";
+                        link.href = self.downloadUrl;
+                        link.target = "_blank";
+                        link.click();
+                        console.log(self.downloadUrl);
+                    } else if(data.type == "backup-initialized") {
+                        if(self.noVideo == true) {
+                            self.noVideo = false;
+                            // jQuery("#video1").hide();
+                            // return;
+                        }
+                        jQuery("#waitingVideo").fadeOut();
+                        var cameraFullUrl = window.__env.cameraUrl + self.currentIdDevice  + "/" + self.playlistName;
+
+                        self.downloadUrl = cameraFullUrl + "/download.mp4";
+                        jQuery("#no-video-message").fadeOut();
+                        jQuery("#video1 source").attr("src", cameraFullUrl + "/playlist.m3u8");
+                        jQuery("#video1").show();
+
+                        var player = videojs("video1", {
+                            plugins: {
+                                alecoRangeslider: {
+                                    downloadUrl: cameraFullUrl,
+                                    downloadCallback: function(minTime, maxTime) {
+                                        console.log("begin download");
+                                        self.cameraChannel.publish({
+                                            id: id,
+                                            type: 'begin-download',
+                                            message: 'enviado desde la web',
+                                            initialTime: minTime,
+                                            endTime: maxTime,
+                                            playlistName: playlistName
+                                        });
+                                    }
+                                }
+                            }
+                        });
+
+                        self.continuePlayingInterval = setInterval(() => {
+                            self.sendVideoToPlay(self.currentIdDevice, self.currentIdCamera, self.currentPlayTime, self.playlistName);
+                            console.log('fetching more videos');
+                            player.vhs.playlists.start();
+                            // setTimeout(() => {
+                            //     console.log("en el timeout pidiendo el playlist");
+                            //     player.vhs.playlists.media();
+                            // }, 10000);
+                        }, 30000);
+                        // player.on('ended', () => {
+                        //
+                        // });
+                        // window.player = player;
+                    } else if (data.type === "no-video-intervals") {
+                        self.noVideoIntervals = data.data;
+                        self.addNoVideoIntervalsToTimebar();
+                    }
+                });
+
+            }
         }
     ]
 });

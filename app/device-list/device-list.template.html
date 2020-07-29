@@ -42,7 +42,7 @@
     <div class="minmaxCon">
         <div class="modal fade mymodal" id="watchVideoBackupModal" tabindex="-1" role="dialog" aria-labelledby="watchVideoBackupModal"
              aria-hidden="true">
-            <div class="modal-dialog" role="document">
+            <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Grabaci&oacute;n</h5>
@@ -57,7 +57,7 @@
                             <h3>No hay grabaciones en el rango de fecha especificado</h3>
                         </div>
                         <div id="video-dates-div" class="col-12 pb-2">
-                            <button id="video-dates" type="text" class="btn btn-primary mt-1">Escoger rango de fechas</button>
+                            <button id="video-dates" type="text" class="btn btn-primary mt-1">Escoger d&iacute;a</button>
                         </div>
 
                         <div id="waitingVideo" class="col-12 text-center" style="display: none;">
@@ -67,9 +67,35 @@
                             <source src="" type="application/x-mpegURL">
                         </video>
 
-                        <video id="video1" class="video-js vjs-default-skin" width="540" height="360" controls preload="auto" style="display: none;" >
-                            <source src="" type="application/x-mpegURL">
-                        </video>
+                        <div id="video-div" class="col-12 d-flex justify-content-center">
+                            <video id="video1" class="video-js vjs-default-skin" width="540" height="360" controls preload="auto" style="display: none">
+                                <source src="" type="application/x-mpegURL">
+                            </video>
+                        </div>
+                        <div id="video-bar-component" class="col-12 hidden">
+
+                            <div class="video-bar-day mt-3">
+                                <h6 id="currentDay">D&iacute;a: {{ $ctrl.currentPlayTime.format('DD/MM/YYYY') }}</h6>
+                            </div>
+                            <div class="col-12 text-center">
+                                <div class="btn-group btn-group-sm">
+                                    <button type="button" class="btn btn-primary" ng-click="$ctrl.zoomOut()"><i class="fas fa-search-minus"></i></button>
+                                    <button type="button" class="btn btn-primary" ng-click="$ctrl.zoomIn()"><i class="fas fa-search-plus"></i></button>
+                                    <button type="button" class="btn btn-primary" ng-click="$ctrl.resetZoom()"><i class="fas fa-times"></i> Resetear Zoom</button>
+                                </div>
+                            </div>
+                            <div id='timelineId' class="w-100">
+                            </div>
+                            <div class="video-bar-options d-flex justify-content-center">
+                                <div class="btn-group">
+                                    <button id="dayBefore" type="button" class="btn btn-sm border-primary btn-outline-primary" ng-click="$ctrl.previousDay()"><i class="fa fa-arrow-left"></i> D&iacute;a Anterior</button>
+                                    <button type="button" class="btn btn-sm border-primary btn-outline-primary" ng-click="$ctrl.nextDay()">D&iacute;a Siguiente <i class="fa fa-arrow-right"></i></button>
+                                </div>
+                            </div>
+
+                        </div>
+
+
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"></i> Cerrar</button>
@@ -301,6 +327,7 @@
     </div>
 
 
+
     <!--<div id="beforeMap">-->
         <!--<h4>Probando esto</h4>-->
     <!--</div>-->
@@ -373,6 +400,13 @@
         </ng-map>
     </div>
 
-
 </div>
 <!--</div>-->
+<div id="time-bar-options" data-container="body" class="toolbar-icons hidden">
+    <a href="">
+        <i class="fa fa-search-plus"></i>
+    </a>
+    <a href="" >
+        <i class="fa fa-search-minus"></i>
+    </a>
+</div>
