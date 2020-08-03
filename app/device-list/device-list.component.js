@@ -1762,8 +1762,10 @@ angular.module('deviceList').component('deviceList', {
                 }
                 for (let i = 0; i < self.noVideoIntervals.length; i++) {
                     let interval = self.noVideoIntervals[i];
-                    // console.log("between: ", seconds, moment(interval.begin, 'YYYY-MM-DD HH:mm:ss'), moment(interval.end, 'YYYY-MM-DD HH:mm:ss'));
-                    return secondsDate.isBetween(moment(interval.begin, 'YYYY-MM-DD HH:mm:ss'), moment(interval.end, 'YYYY-MM-DD HH:mm:ss'), '[]');
+                    console.log("between: ", secondsDate, interval.begin, interval.end, secondsDate.isBetween(moment(interval.begin, 'YYYY-MM-DD HH:mm:ss'), moment(interval.end, 'YYYY-MM-DD HH:mm:ss'), '[]'));
+                    if (secondsDate.isBetween(moment(interval.begin, 'YYYY-MM-DD HH:mm:ss'), moment(interval.end, 'YYYY-MM-DD HH:mm:ss'), '[]')) {
+                        return true;
+                    }
                 }
                 return false;
             }
