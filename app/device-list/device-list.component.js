@@ -1633,6 +1633,14 @@ angular.module('deviceList').component('deviceList', {
                         // $('#add-input').val(time);
                     }
                 });
+
+                $('.tooltip').remove();
+
+                $('[data-toggle="tooltip"]').tooltip({
+                    delay: 0,
+                    trigger: 'hover'
+                });
+
             }
 
             self.zoomIn = (seconds) => {
@@ -1762,7 +1770,6 @@ angular.module('deviceList').component('deviceList', {
                 }
                 for (let i = 0; i < self.noVideoIntervals.length; i++) {
                     let interval = self.noVideoIntervals[i];
-                    console.log("between: ", secondsDate, interval.begin, interval.end, secondsDate.isBetween(moment(interval.begin, 'YYYY-MM-DD HH:mm:ss'), moment(interval.end, 'YYYY-MM-DD HH:mm:ss'), '[]'));
                     if (secondsDate.isBetween(moment(interval.begin, 'YYYY-MM-DD HH:mm:ss'), moment(interval.end, 'YYYY-MM-DD HH:mm:ss'), '[]')) {
                         return true;
                     }

@@ -207,3 +207,8 @@ div.daterangepicker {
 .steps-bar {
     background-color: green;
 }
+
+
+.tooltip {
+    z-index: 9999 !important;
+}

@@ -227,7 +227,7 @@
 
             // mark bars
             for (let i = 0; i <= this.stepBars; i++) {
-                $(".steps-bar").append(`<div class="step" data-toggle="tooltip" title="${moment(timeTooltip).add(time, 'seconds').format('HH:mm')}" data-time=${time}><span class="step-border"></span></div>`);
+                $(".steps-bar").append(`<div class="step" data-toggle="tooltip" data-placement="bottom" title="${moment(timeTooltip).add(time, 'seconds').format('HH:mm')}" data-time=${time}><span class="step-border"></span></div>`);
                 time = time + timeDivison;
             }
 
