@@ -211,4 +211,5 @@ div.daterangepicker {
 
 .tooltip {
     z-index: 9999 !important;
+    font-size: 1rem;
 }
