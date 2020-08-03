@@ -1646,6 +1646,19 @@ angular.module('deviceList').component('deviceList', {
                     self.initTimebar(this.zoomCurrent, 0);
                 }
                 self.addNoVideoIntervalsToTimebar();
+
+                $("#draggable").css({
+                    display: 'none'
+                });
+
+                setTimeout(() => {
+                    $("#draggable").css({
+                        left: '0px',
+                        display: 'block'
+                    });
+                    $('#timebar-selected-time').html('')
+                }, 300);
+
             }
 
             self.zoomOut = () => {
@@ -1653,6 +1666,19 @@ angular.module('deviceList').component('deviceList', {
                     this.zoomCurrent = this.zoomCurrent >= 900 ? this.zoomCurrent - 900 : 900 - this.zoomCurrent;
                     self.initTimebar(this.zoomCurrent, 0);
                     self.addNoVideoIntervalsToTimebar();
+
+                    $("#draggable").css({
+                        display: 'none'
+                    });
+
+                    setTimeout(() => {
+                        $("#draggable").css({
+                            left: '0px',
+                            display: 'block'
+                        });
+                        $('#timebar-selected-time').html('')
+                    }, 300);
+
                 }
             }
 

@@ -86,11 +86,18 @@
             $(this.element).on('click', '.step', function (event) {
                 self.setSelectedTime($(this).data("time"));
                 self.barClicked.call(this, self.getSelectedTime());
+                let time = $(this).data('time');
+                console.log("time: ", $(element));
+                let timeTooltip = moment().set({hour:0,minute:0,second:0,millisecond:0});
+
+                $('#timebar-selected-time').html(moment(timeTooltip).add(time, 'seconds').format('HH:mm'));
+
             });
 
             // Listen to events
             $(this.element).on('click', '.steps-bar', function (event) {
                 self._barClicked(this, event, self);
+
             });
 
             $(this.element).on("click", '.pointer', function () {
@@ -204,7 +211,7 @@
         // Main method.
         timebar.prototype.init = function () {
             let data = `<div class='timeline-cover'>
-                            <div id='draggable'></div>
+                            <div id='draggable'><span id="timebar-selected-time" style="position: relative; top: -20px; left: -20px; color: red">00:00</span></div>
                             <div class='timeline-bar'>
                                 <div class='steps-bar clearfix'></div>
                             </div>
@@ -216,10 +223,11 @@
 
             let timeDivison = this.totalTimeInSecond / this.stepBars;
             let time = 0 + (this.timePlusSecondsBegin);
+            let timeTooltip = moment().set({hour:0,minute:0,second:0,millisecond:0});
 
             // mark bars
             for (let i = 0; i <= this.stepBars; i++) {
-                $(".steps-bar").append(`<div class="step" data-time=${time}><span class="step-border"></span></div>`);
+                $(".steps-bar").append(`<div class="step" data-toggle="tooltip" title="${moment(timeTooltip).add(time, 'seconds').format('HH:mm')}" data-time=${time}><span class="step-border"></span></div>`);
                 time = time + timeDivison;
             }
 
@@ -271,6 +279,7 @@
             const offsetLeft = (event.pageX - offset.left);
 
             $('.pointer').removeClass("pointerSelected");
+            let timeTooltip = moment().set({hour:0,minute:0,second:0,millisecond:0});
 
             $("#draggable").css({
                 left: `${offsetLeft}px`
