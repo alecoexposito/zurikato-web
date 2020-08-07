@@ -1,9 +1,10 @@
-var express = require('express');  
+var express = require('express');
 var app = express();
 // var bodyParser = require('body-parser');
 var net = require('net');
 
 app.use(express.static("app"));
+app.use(express.static("node_modules"));
 // app.use(bodyParser.json());
 // app.use(bodyParser.urlencoded({extended: true}) );
 
@@ -41,7 +42,7 @@ app.get('/api/alert-c5', function(req, res) {
         console.log("partial response: ", data.toString());
         c5Response += data.toString();
     });
-    
+
     client.once('end', function (data) {
         console.log("complete response: ", c5Response);
         c5Response = "";
@@ -54,6 +55,6 @@ app.get('/', function (req, res) {
 });
 
 
-  
+
 app.listen(8000, '0.0.0.0');
 console.log("Zurikato web is listening on port 8000");
