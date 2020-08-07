@@ -77,8 +77,8 @@
                             <div class="video-bar-day mt-3">
                                 <h6 id="currentDay">D&iacute;a: {{ $ctrl.currentPlayTime.format('DD/MM/YYYY') }}</h6>
                             </div>
-                            <div id="downloadMessage" style="display: none;" class="col-12 alert alert-info alert-dismissible fade show">
-                                La descarga se est&aacute; procesando, este proceso puede demorar varios minutos.
+                            <div id="downloadMessage" style="display: none;" class="download-message col-12 alert alert-info alert-dismissible fade show">
+                                <span id="message-text"></span>
                                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
@@ -90,10 +90,11 @@
                                     <button type="button" class="btn btn-primary" ng-click="$ctrl.resetZoom()"><i class="fas fa-times"></i> Resetear Zoom</button>
                                 </div>
                                 <div class="btn-group btn-group-sm">
-                                    <button class="btn btn-primary" ng-click="$ctrl.setupDownloadMode()"><i class="fas fa-download"></i> Modo Descarga</button>
+                                    <button class="btn btn-primary" ng-if="!$ctrl.downloadMode" title="Encender Modo Descarga" ng-click="$ctrl.setupDownloadMode()"><i class="fas fa-download"></i> Modo Descarga</button>
+                                    <button class="btn btn-dark" ng-if="$ctrl.downloadMode" title="Quitar Modo Descarga" ng-click="$ctrl.outOfDownloadMode()"><i class="fas fa-download"></i> Modo Descarga</button>
                                 </div>
                                 <div class="btn-group btn-group-sm">
-                                    <button id="downloadButton" class="btn btn-primary" ng-click="$ctrl.download()"><i class="fas fa-cloud-download-alt"></i> Descargar</button>
+                                    <button ng-if="$ctrl.downloadMode" id="downloadButton" class="btn btn-primary" ng-click="$ctrl.download()"><i class="fas fa-cloud-download-alt"></i> Descargar</button>
                                 </div>
                             </div>
                             <div id='timelineId' class="w-100 pt-5">

@@ -50,6 +50,8 @@ angular.module('deviceList').component('deviceList', {
             self.continuePlayingInterval = null;
             self.noVideoIntervals = [];
 
+            self.downloadMode = false;
+
             $('#watchVideoModal').on('show.bs.modal', function (e) {
                 console.log("levantando modal");
 
@@ -87,6 +89,7 @@ angular.module('deviceList').component('deviceList', {
             });
 
             $('#watchVideoBackupModal').on('shown.bs.modal', function (e) {
+                self.outOfDownloadMode();
                 jQuery("#video-dates-div").fadeIn();
                 jQuery("#video-bar-component").addClass("hidden");
                 $('#video-dates').daterangepicker({
@@ -1794,6 +1797,32 @@ angular.module('deviceList').component('deviceList', {
                 return false;
             }
 
+            self.areDatesInNoVideoIntervals = (secondsBegin, secondsEnd) => {
+                let secondsBeginDate = moment(self.currentPlayTime.set({hour: 0, minute: 0, second: 0, millisecond: 0}));
+                let secondsEndDate = moment(self.currentPlayTime.set({hour: 0, minute: 0, second: 0, millisecond: 0}));
+                secondsBeginDate.add(secondsBegin, 'seconds');
+                secondsEndDate.add(secondsEnd, 'seconds');
+                if (secondsBegin === 0) {
+                    secondsBeginDate.add(1, 'seconds');
+                } else if (secondsBegin === 86400) {
+                    secondsBeginDate.subtract(1, 'seconds');
+                }
+                if (secondsEnd === 0) {
+                    secondsEndDate.add(1, 'seconds');
+                } else if (secondsEnd === 86400) {
+                    secondsEndDate.subtract(1, 'seconds');
+                }
+
+                for (let i = 0; i < self.noVideoIntervals.length; i++) {
+                    let interval = self.noVideoIntervals[i];
+                    if (secondsBeginDate.isBetween(moment(interval.begin, 'YYYY-MM-DD HH:mm:ss'), moment(interval.end, 'YYYY-MM-DD HH:mm:ss'), '[]')
+                        && secondsEndDate.isBetween(moment(interval.begin, 'YYYY-MM-DD HH:mm:ss'), moment(interval.end, 'YYYY-MM-DD HH:mm:ss'), '[]')) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
             self.getNoVideoInterval = (idCamera, initialDate, id, playlistName) => {
                 self.cameraChannel.publish({
                     type: 'get-no-video-intervals',
@@ -1883,6 +1912,7 @@ angular.module('deviceList').component('deviceList', {
             }
 
             self.setupDownloadMode = () => {
+                self.downloadMode = true;
                 jQuery("#draggable").hide();
 
                 jQuery(".download").show();
@@ -1893,8 +1923,12 @@ angular.module('deviceList').component('deviceList', {
             }
 
             self.outOfDownloadMode = () => {
+                self.downloadMode = false;
+                jQuery(".download-message").hide();
                 jQuery(".download").hide();
-                self.timebar.showHideCuepoints('false');
+                if (self.timebar) {
+                    self.timebar.showHideCuepoints('false');
+                }
                 $(".download-bar-end").hide();
                 jQuery("#draggable").show();
             }
@@ -1903,6 +1937,15 @@ angular.module('deviceList').component('deviceList', {
                 let dayDate =  moment(self.currentPlayTime).set({hour: 0, minute: 0, second: 0, millisecond: 0});
                 const beginTime = $('.download-pointer-begin').data().time;
                 const endTime = $('.download-pointer-end').data().time;
+                if (self.areDatesInNoVideoIntervals(beginTime, endTime)) {
+                    self.showDownloadMessage("El intervalo escogido no tiene video grabado.", 'danger');
+                    return;
+                } else if (endTime - beginTime > 60*60) {
+                    self.showDownloadMessage("El tiempo de descarga no debe exeder los 60 segundos.", 'danger');
+                    return;
+                } else {
+                    $("#downloadMessage").fadeOut();
+                }
                 let startDate = moment(dayDate).add(beginTime, 'seconds');
                 let endDate = moment(dayDate).add(endTime, 'seconds');
                 let playlistName = moment().valueOf();
@@ -1911,7 +1954,7 @@ angular.module('deviceList').component('deviceList', {
                 self.downloadPlaylistChannel = socket.subscribe(playlistName + '_channel');
                 self.downloadPlaylist = playlistName;
                 jQuery("#downloadButton i").addClass("fa-spinner fa-spin").removeClass("fa-cloud-download-alt");
-                jQuery("#downloadMessage").fadeIn();
+                self.showDownloadMessage("La descarga se est&aacute; procesando, puede demorar varios minutos.", 'info');
                 self.downloadPlaylistChannel.watch(function(data) {
                     console.log("entrando en el download ready");
                     var cameraFullUrl = window.__env.cameraUrl + self.currentIdDevice + "/" + self.downloadPlaylist;
@@ -1948,6 +1991,11 @@ angular.module('deviceList').component('deviceList', {
                 //     endTime: maxTime,
                 //     playlistName: playlistName
                 // });
+            }
+
+            self.showDownloadMessage = (message, type) => {
+                jQuery("#downloadMessage").removeClass("alert-warning alert-danger alert-info").addClass("alert-" + type).find("span#message-text").html(message);
+                $("#downloadMessage").fadeIn();
             }
         }
     ]
