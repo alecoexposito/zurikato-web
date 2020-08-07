@@ -33,7 +33,6 @@
         timeIntervals: 6,
         // events
         barClicked: null,
-        barDoubleClicked: null,
         cuepointClicked: null,
         timePlusSecondsBegin: 0,
         timePlusSecondsEnd: 0,
@@ -88,7 +87,7 @@
                 self.barClicked.call(this, self.getSelectedTime());
                 let time = $(this).data('time');
                 console.log("time: ", $(element));
-                let timeTooltip = moment().set({hour:0,minute:0,second:0,millisecond:0});
+                let timeTooltip = moment().set({hour: 0, minute: 0, second: 0, millisecond: 0});
 
                 $('#timebar-selected-time').html(moment(timeTooltip).add(time, 'seconds').format('HH:mm'));
 
@@ -211,7 +210,9 @@
         // Main method.
         timebar.prototype.init = function () {
             let data = `<div class='timeline-cover'>
-                            <div id='draggable'><span id="timebar-selected-time" style="position: relative; top: -20px; left: -20px; color: red">00:00</span></div>
+                                <div id='draggable'><span id="timebar-selected-time" style="position: relative; top: -20px; left: -20px; color: red">00:00</span></div>
+                                <div class='download download-bar download-bar-begin' style="display: none;"><span id="download-bar-begin-text" style="position: relative; top: -20px; left: -20px; color: blue">00:00</span></div>
+                                <div class='download download-bar download-bar-end' style="display: none;"><span id="download-bar-end-text" style="position: relative; top: -20px; left: -20px; color: blue">00:00</span></div>                            
                             <div class='timeline-bar'>
                                 <div class='steps-bar clearfix'></div>
                             </div>
@@ -223,7 +224,7 @@
 
             let timeDivison = this.totalTimeInSecond / this.stepBars;
             let time = 0 + (this.timePlusSecondsBegin);
-            let timeTooltip = moment().set({hour:0,minute:0,second:0,millisecond:0});
+            let timeTooltip = moment().set({hour: 0, minute: 0, second: 0, millisecond: 0});
 
             // mark bars
             for (let i = 0; i <= this.stepBars; i++) {
@@ -269,18 +270,64 @@
             const cuepointArr = Array.isArray(cuepoints) ? cuepoints : [cuepoints];
 
             $.each(cuepointArr, function (i, time) {
-                const animateLeft = (time * 100) / options.totalTimeInSecond;
-                $(".timeline-bar").append(`<div class="pointer" style="left:${animateLeft}%" data-time="${time}"></div>`);
+                const animateLeft = (time * 100) / 86400; // options.totalTimeInSecond;
+                if (i === 0) {
+                    $(".timeline-bar").append(`<div class="pointer download download-pointer-begin draggable" style="left:${animateLeft}%" data-time="${time}"></div>`);
+                } else {
+                    $(".timeline-bar").append(`<div class="pointer download download-pointer-end draggable" style="left:${animateLeft}%" data-time="${time}"></div>`);
+                }
             });
+
+            $(".download-pointer-begin.draggable").draggable({
+                axis: "x",
+                drag: function (event) {
+                    const offsetLeft = (event.pageX - $(".steps-bar").offset().left);
+                    $(".download-bar-begin").show().css({
+                        left: `${offsetLeft}px`
+                    });
+
+                    $(".step").each(function () {
+                        let left = $(this).offset().left - $(".steps-bar").offset().left;
+                        let op = Math.trunc(left) - Math.trunc(offsetLeft);
+                        if (op >= -10 && op <= 10) {
+                            let timeTooltip = moment().set({hour: 0, minute: 0, second: 0, millisecond: 0});
+                            let time = $(this).data('time');
+                            $('.download-pointer-begin').data('time', time);
+                            $('#download-bar-begin-text').html(moment(timeTooltip).add(time, 'seconds').format('HH:mm'));
+                            return false;
+                        }
+                    })
+                },
+            });
+
+            $(".download-pointer-end.draggable").draggable({
+                axis: "x",
+                drag: function (event) {
+                    const offsetLeft = (event.pageX - $(".steps-bar").offset().left);
+                    $(".download-bar-end").show().css({
+                        left: `${offsetLeft}px`
+                    });
+
+                    $(".step").each(function () {
+                        let left = $(this).offset().left - $(".steps-bar").offset().left;
+                        let op = Math.trunc(left) - Math.trunc(offsetLeft);
+                        if (op >= -10 && op <= 10) {
+                            let timeTooltip = moment().set({hour: 0, minute: 0, second: 0, millisecond: 0});
+                            let time = $(this).data('time');
+                            $('.download-pointer-end').data('time', time);
+                            $('#download-bar-end-text').html(moment(timeTooltip).add(time, 'seconds').format('HH:mm'));
+                            return false;
+                        }
+                    })
+                },
+            });
+
         }
 
         timebar.prototype._barClicked = function (element, event, self) {
             const offset = $(element).offset();
             const offsetLeft = (event.pageX - offset.left);
-
             $('.pointer').removeClass("pointerSelected");
-            let timeTooltip = moment().set({hour:0,minute:0,second:0,millisecond:0});
-
             $("#draggable").css({
                 left: `${offsetLeft}px`
             });
@@ -289,6 +336,7 @@
             $(element).hasClass("pointerSelected") ? $(element).removeClass("pointerSelected") : $(element).addClass("pointerSelected");
 
             self.setSelectedTime($(element).data("time"));
+            console.log($(element).data("time"));
 
             if (typeof self.pointerClicked === 'function') {
                 self.pointerClicked.call(element, self.getSelectedTime());

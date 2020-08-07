@@ -12,9 +12,9 @@ angular.module('deviceList').component('deviceList', {
             self.currentIdDevice = null;
             self.currentImei = null;
             self.currentModel = null;
-            self.todayStart = moment().set({hour:0,minute:0,second:0,millisecond:0});
-            self.yesterdayStart = moment().subtract(1, 'days').set({hour:0,minute:0,second:0,millisecond:0});
-            self.yesterdayEnd = moment().subtract(1, 'days').set({hour:23,minute:59,second:0,millisecond:0});
+            self.todayStart = moment().set({hour: 0, minute: 0, second: 0, millisecond: 0});
+            self.yesterdayStart = moment().subtract(1, 'days').set({hour: 0, minute: 0, second: 0, millisecond: 0});
+            self.yesterdayEnd = moment().subtract(1, 'days').set({hour: 23, minute: 59, second: 0, millisecond: 0});
             this.googleMapsUrl = "https://maps.googleapis.com/maps/api/js?key=AIzaSyBHsRJFKmB3_E_DGrluQKMRIYNdT8v8CwI";
             self.geocoder = new google.maps.Geocoder();
             self.groups = [];
@@ -53,13 +53,13 @@ angular.module('deviceList').component('deviceList', {
             $('#watchVideoModal').on('show.bs.modal', function (e) {
                 console.log("levantando modal");
 
-                var cameraFullUrl = window.__env.cameraUrl + self.currentIdDevice  + "/camera.jpg";
+                var cameraFullUrl = window.__env.cameraUrl + self.currentIdDevice + "/camera.jpg";
                 console.log("url", cameraFullUrl);
                 self.cameraOn = true;
 
                 self.cameraVideoChannel = socket.subscribe("camera_" + self.currentIdDevice + "_channel");
-                self.cameraVideoChannel.watch(function(data) {
-                    if(data.image && data.idCamera == self.currentIdCamera) {
+                self.cameraVideoChannel.watch(function (data) {
+                    if (data.image && data.idCamera == self.currentIdCamera) {
                         self.cameraVideoChannel.publish({
                             type: 'feedback',
                             idCamera: self.currentIdCamera
@@ -75,7 +75,12 @@ angular.module('deviceList').component('deviceList', {
                 console.log("deteniendo streaming modal");
 
                 self.cameraOn = false;
-                self.cameraChannel.publish({ type: 'stop-streaming', message: 'enviado desde la web', id: self.currentIdDevice, idCamera: self.currentIdCamera });
+                self.cameraChannel.publish({
+                    type: 'stop-streaming',
+                    message: 'enviado desde la web',
+                    id: self.currentIdDevice,
+                    idCamera: self.currentIdCamera
+                });
                 var imgElem = document.getElementById("cameraImage");
                 imgElem.setAttribute("src", "");
                 self.cameraVideoChannel.unsubscribe("camera_" + self.currentIdDevice + "_channel");
@@ -100,11 +105,11 @@ angular.module('deviceList').component('deviceList', {
                     alwaysShowCalendars: true,
                     // startDate: moment(),
                     // endDate: moment()
-                }, function(start, end, label) {
+                }, function (start, end, label) {
 
                 });
-                $('#video-dates').on('apply.daterangepicker', function(ev, picker) {
-                    var start = picker.startDate.set({hour:0,minute:0,second:0,millisecond:0});
+                $('#video-dates').on('apply.daterangepicker', function (ev, picker) {
+                    var start = picker.startDate.set({hour: 0, minute: 0, second: 0, millisecond: 0});
                     var end = picker.endDate;
                     var playlistName = moment().valueOf();
                     self.playlistName = playlistName;
@@ -141,7 +146,12 @@ angular.module('deviceList').component('deviceList', {
                 jQuery("#waitingVideo").fadeOut();
                 jQuery("#video-bar-component").addClass("hidden");
 
-                self.cameraChannel.publish({ type: 'stop-video-backup', message: 'enviado desde la web', id: self.currentIdDevice, playlistName: self.playlistName });
+                self.cameraChannel.publish({
+                    type: 'stop-video-backup',
+                    message: 'enviado desde la web',
+                    id: self.currentIdDevice,
+                    playlistName: self.playlistName
+                });
                 self.resetPlayer();
                 clearInterval(self.currentPlayTime);
             });
@@ -150,7 +160,7 @@ angular.module('deviceList').component('deviceList', {
                 var inAutoplay = jQuery("i[id-camera=" + self.currentIdCamera + "]").attr("in_autoplay");
                 var autoplayInterval = jQuery("i[id-camera=" + self.currentIdCamera + "]").attr("autoplay_interval");
                 console.log(inAutoplay, autoplayInterval);
-                if(inAutoplay != "null" && inAutoplay != "false" && inAutoplay != "0")
+                if (inAutoplay != "null" && inAutoplay != "false" && inAutoplay != "0")
                     document.getElementById("isInAutoplay").checked = inAutoplay;
                 else
                     document.getElementById("isInAutoplay").checked = false;
@@ -168,13 +178,15 @@ angular.module('deviceList').component('deviceList', {
                     // var imageFoo = document.createElement('img');
                     // imageFoo.src = dataUrl;
                     // $("#beforeMap").append(imageFoo);
-                    var docDefinition = { content: [
-                        'Pdf text',
+                    var docDefinition = {
+                        content: [
+                            'Pdf text',
                             {
                                 image: dataUrl,
                                 width: '500'
                             }
-                        ] };
+                        ]
+                    };
 
                     pdfMake.createPdf(docDefinition).open();
                 });
@@ -194,14 +206,14 @@ angular.module('deviceList').component('deviceList', {
                     ids: ids
                 });
 
-                saveShareQuery.then(function(result) {
+                saveShareQuery.then(function (result) {
                     jQuery("#load-link").hide("fast");
                     jQuery("#shared-link").val(window.__env.webUrl + 'sharedscreen/' + result.data.id + '/' + result.data.url_hash);
                     jQuery("#show-link").show("fast");
                 });
 
             };
-            jQuery("#copy-button").click(function() {
+            jQuery("#copy-button").click(function () {
                 jQuery("#shared-link")[0].select();
                 document.execCommand("copy");
             });
@@ -226,36 +238,36 @@ angular.module('deviceList').component('deviceList', {
                 });
                 // console.log($localStorage.devices);
 
-                for(var i = 0; i < $localStorage.devices.length; i++) {
+                for (var i = 0; i < $localStorage.devices.length; i++) {
                     var d = $localStorage.devices[i];
                     var opt = jQuery("<option></option>").val(d.idDevice).html(d.label);
-                    if(self.currentImei == d.auth_device)
+                    if (self.currentImei == d.auth_device)
                         opt.attr("selected", true);
                     jQuery("#chosenDevices").append(opt);
                 }
                 jQuery("#chosenDevices").select2();
             });
             self.enableFenceEditionMode = function enableFenceEditionMode() {
-                self.map.mapDrawingManager[0].setOptions({drawingControl:true});
-                self.fences.forEach(function(elem) {
+                self.map.mapDrawingManager[0].setOptions({drawingControl: true});
+                self.fences.forEach(function (elem) {
                     elem.setMap(self.map);
                 });
                 $("#enableFenceEditionButton").hide();
                 $(".fence-edit-btn").show();
             };
             self.disableFenceEditionMode = function disableFenceEditionMode() {
-                self.map.mapDrawingManager[0].setOptions({drawingControl:false});
-                self.fences.forEach(function(elem) {
+                self.map.mapDrawingManager[0].setOptions({drawingControl: false});
+                self.fences.forEach(function (elem) {
                     elem.setMap(null);
                 });
                 $("#enableFenceEditionButton").show();
                 $(".fence-edit-btn").hide();
             };
             self.logOutOption = function logOutOption() {
-                self.map.data.forEach(function(feat) {
+                self.map.data.forEach(function (feat) {
                     self.map.data.remove(feat);
                 });
-                self.fences.forEach(function(fence) {
+                self.fences.forEach(function (fence) {
                     fence.setMap(null);
                 });
                 delete self.fences;
@@ -266,26 +278,26 @@ angular.module('deviceList').component('deviceList', {
                 var fences2 = self.getGeoJson();
                 jQuery("#saveFencesIcon").removeClass("fa-check").addClass("fa-spinner fa-spin");
                 var fencesUpdate = $http.put(window.__env.apiUrl + 'users/' + $localStorage.currentUser.id + '/updfences', {fences: fences2});
-                fencesUpdate.then(function(result) {
+                fencesUpdate.then(function (result) {
                     jQuery("#saveFencesIcon").removeClass("fa-spinner fa-spin").addClass("fa-check");
                     $localStorage.currentUser.fences = fences2;
                     self.disableFenceEditionMode();
 
                 });
             };
-            jQuery("body").on("click", ".clear-radios-button", function() {
+            jQuery("body").on("click", ".clear-radios-button", function () {
                 self.clearRadiosRow(this);
             });
             self.clearRadiosRow = function clearRadiosRow(elem) {
                 jQuery(elem).parent().find("label.active").removeClass("active");
             };
             self.setDevicesToFences = function setDevicesToFences() {
-                jQuery("ul#fence-list li").each(function(index) {
+                jQuery("ul#fence-list li").each(function (index) {
                     var imei = self.currentImei;
                     var pos = jQuery(this).attr("fence-index");
                     var arr = jQuery(this).find("label.active input");
-                    if(arr.length > 0) {
-                        if(arr.hasClass('enter-alarm')) {
+                    if (arr.length > 0) {
+                        if (arr.hasClass('enter-alarm')) {
                             self.addDeviceToFence(self.fences[pos], imei, true);
                         } else {
                             self.addDeviceToFence(self.fences[pos], imei, false);
@@ -298,11 +310,11 @@ angular.module('deviceList').component('deviceList', {
                 //     console.log("data features: ", data);
                 //     self.features = data;
                 // });
-                if(!self.features) {
+                if (!self.features) {
                     self.features = {};
                 }
                 self.features.features = [];
-                for(var i = 0; i < self.fences.length; i++) {
+                for (var i = 0; i < self.fences.length; i++) {
                     var polygon = self.fences[i];
                     var geoJson = self.getGeoJsonFromFence(polygon, false);
 
@@ -333,7 +345,7 @@ angular.module('deviceList').component('deviceList', {
                     description: fence.description,
                     devices: JSON.stringify(fence.devices)
                 };
-                if(withHeader) {
+                if (withHeader) {
                     var headerGeoJson = {
                         type: "FeatureCollection",
                         features: [geoJson]
@@ -358,27 +370,27 @@ angular.module('deviceList').component('deviceList', {
 
             };
             self.alarmFenceMarker = function alarmFenceMarker(m) {
-                for(var i = 0; i < self.fences.length; i++) {
+                for (var i = 0; i < self.fences.length; i++) {
                     var f = self.fences[i];
-                    var d = f.devices.find(function(elem) {
-                        if(elem.imei == m.imei)
+                    var d = f.devices.find(function (elem) {
+                        if (elem.imei == m.imei)
                             return elem;
                     });
-                    if(d == undefined)
+                    if (d == undefined)
                         continue;
                     var isContained = google.maps.geometry.poly.containsLocation(m.getPosition(), f);
-                    if(d.alarmOnEntering) {
-                        if(isContained && !d.alreadyAlarmed){
+                    if (d.alarmOnEntering) {
+                        if (isContained && !d.alreadyAlarmed) {
                             d.alreadyAlarmed = true;
                             self.alarmFence(f, m, true);
-                        } else if(!isContained && d.alreadyAlarmed){
+                        } else if (!isContained && d.alreadyAlarmed) {
                             d.alreadyAlarmed = false;
                         }
-                    }else {
-                        if(!isContained && !d.alreadyAlarmed) {
+                    } else {
+                        if (!isContained && !d.alreadyAlarmed) {
                             d.alreadyAlarmed = true;
                             self.alarmFence(f, m, false);
-                        } else if(isContained && d.alreadyAlarmed) {
+                        } else if (isContained && d.alreadyAlarmed) {
                             d.alreadyAlarmed = false;
                         }
                     }
@@ -394,8 +406,8 @@ angular.module('deviceList').component('deviceList', {
                 var linkUrl = '#!device/alarm/' + latitude + "/" + longitude + "/" + speed + "/" + alarmType;
                 var d = self.findDeviceByImei(marker.imei);
                 // self.alarmMarker(m, alarmType, false);
-                var width = (window.screen.width * 25)/100;
-                var height = (window.screen.height * 25)/100;
+                var width = (window.screen.width * 25) / 100;
+                var height = (window.screen.height * 25) / 100;
                 self.openAlarmWindow(linkUrl, width, height, d, geoJson);
 
             };
@@ -408,7 +420,7 @@ angular.module('deviceList').component('deviceList', {
                 //     type: 'polygon',
                 //     shape: polygon
                 // };
-                google.maps.event.addListener(polygon, 'click', function(e) {
+                google.maps.event.addListener(polygon, 'click', function (e) {
                     self.fenceClick(e, this);
                 });
                 self.fences.push(polygon);
@@ -425,7 +437,7 @@ angular.module('deviceList').component('deviceList', {
                 self.polygonInfoWindow.close();
             };
             self.clickedPolygon = null;
-            self.fenceClick = function fenceClick(e, polygon){
+            self.fenceClick = function fenceClick(e, polygon) {
                 self.clickedPolygon = polygon;
                 var content = "<div class='mr-3'>" +
                     "<h5 class='' style='white-space: nowrap' id='titleLabel'>" +
@@ -443,10 +455,10 @@ angular.module('deviceList').component('deviceList', {
                     "<button type='button' class='btn btn-sm btn-outline-secondary float-right infoEdit' id='infoEdit'><i class='fa fa-cog'> Editar</i></button>" +
                     "<button type='button' class='btn btn-sm btn-outline-secondary float-right infoSave' id='infoSave' style='display: none'><i class='fa fa-check'> Guardar</i></button>" +
                     "</div>";
-                var a = $(content).find(".infoEdit").click(function() {
+                var a = $(content).find(".infoEdit").click(function () {
                     self.editPolygonInfo();
                 }).parent();
-                a = $(a).find(".infoSave").click(function() {
+                a = $(a).find(".infoSave").click(function () {
                     self.savePolygonInfo();
                 }).parent();
 
@@ -462,11 +474,11 @@ angular.module('deviceList').component('deviceList', {
              * @param Boolean alarmOnEntering
              */
             self.addDeviceToFence = function addDeviceToFence(polygon, imei, alarmOnEntering) {
-                var d = polygon.devices.find(function(elem) {
-                    if(elem.imei == imei)
+                var d = polygon.devices.find(function (elem) {
+                    if (elem.imei == imei)
                         return elem;
                 });
-                if(d == undefined) {
+                if (d == undefined) {
                     var device = self.findDeviceByImei(imei);
 
                     d = {
@@ -483,23 +495,23 @@ angular.module('deviceList').component('deviceList', {
 
             var groupsQuery = "";
             console.log("current user: ", $localStorage.currentUser);
-            if($localStorage.currentUser.roles.indexOf("ROLE_ADMIN_USER") >= 0) {
+            if ($localStorage.currentUser.roles.indexOf("ROLE_ADMIN_USER") >= 0) {
                 groupsQuery = $http.get(window.__env.apiUrl + 'users/' + $localStorage.currentUser.id + '/groups/' + false + "/" + true);
-            }else if($localStorage.currentUser.username == "admin") {
+            } else if ($localStorage.currentUser.username == "admin") {
                 groupsQuery = $http.get(window.__env.apiUrl + 'users/' + $localStorage.currentUser.id + '/groups/' + true + "/" + false);
             } else {
                 groupsQuery = $http.get(window.__env.apiUrl + 'users/' + $localStorage.currentUser.id + '/groups/' + false + "/" + false);
             }
 
-            groupsQuery.then(function(result) {
+            groupsQuery.then(function (result) {
                 // self.groups = result.data;
-                for(var i = 0; i < result.data.length; i++) {
+                for (var i = 0; i < result.data.length; i++) {
                     self.addToGroups(result.data[i]);
                 }
                 // self.generateMenu();
             });
             self.hideMenu = function hideMenu() {
-                $timeout(function() {
+                $timeout(function () {
                     $("#left-menu").hide("fast");
                 }, 1000);
             };
@@ -507,10 +519,10 @@ angular.module('deviceList').component('deviceList', {
                 console.log("updating colors");
                 var nodes = $('#treeMenu').treeview('getNodes');
                 var l = Object.keys(nodes).length;
-                for(var i = 0; i < l; i++) {
-                    if(nodes[i].level == 2) {
+                for (var i = 0; i < l; i++) {
+                    if (nodes[i].level == 2) {
                         var m = self.findMarkerByImei(nodes[i].dataAttr.imei);
-                        if(m.backgroundColor != undefined)
+                        if (m.backgroundColor != undefined)
                             jQuery("li.node-treeMenu[data-imei='" + nodes[i].dataAttr.imei + "']").css('color', m.backgroundColor);
                     }
                 }
@@ -518,18 +530,18 @@ angular.module('deviceList').component('deviceList', {
             self.generateMenu = function generateMenu() {
                 console.log("generarting menu");
                 var data2 = [];
-                for(var i = 0; i < self.groups.length; i++) {
+                for (var i = 0; i < self.groups.length; i++) {
                     var root = {
                         text: self.groups[i].group_label,
                         nodes: []
                     }
                     var devices = self.groups[i].devices;
                     var imeis = $localStorage.currentUser.automatic_imeis;
-                    if(imeis == undefined)
+                    if (imeis == undefined)
                         imeis = "";
                     let lastId = 0;
-                    for(var j = 0; j < devices.length; j++) {
-                        if(lastId == devices[j].id) {
+                    for (var j = 0; j < devices.length; j++) {
+                        if (lastId == devices[j].id) {
                             root.nodes[root.nodes.length - 1].nodes.push({
                                 text: devices[j].camera_name + "<i class='fa fa-ellipsis-v float-right px-1 test-toolbar' in_autoplay='" + devices[j].camera_in_autoplay + "' autoplay_interval='" + devices[j].camera_autoplay_interval + "' id-camera='" + devices[j].id_camera + "' url-camera='" + devices[j].url_camera + "' data-toolbar='camera-menu-options' id='" + devices[j].id + "' data-toolbar-style='dark' device-model = '" + devices[j].device_model + "' id-device = '" + devices[j].id + "' imei = '" + devices[j].auth_device + "'></i>",
                                 url_camera: devices[j].url_camera,
@@ -553,7 +565,7 @@ angular.module('deviceList').component('deviceList', {
                                 device_model: devices[j].device_model
                             }
                         };
-                        if(devices[j].url_camera != null) {
+                        if (devices[j].url_camera != null) {
                             elem.nodes = [{
                                 text: devices[j].camera_name + "<i class='fa fa-ellipsis-v float-right px-1 test-toolbar' in_autoplay='" + devices[j].camera_in_autoplay + "' autoplay_interval='" + devices[j].camera_autoplay_interval + "' id-camera='" + devices[j].id_camera + "' url-camera='" + devices[j].url_camera + "' name-camera='" + devices[j].camera_name + "' data-toolbar='camera-menu-options' id='" + devices[j].id + "' data-toolbar-style='dark' device-model = '" + devices[j].device_model + "' id-device = '" + devices[j].id + "' imei = '" + devices[j].auth_device + "'></i>",
                                 url_camera: devices[j].url_camera,
@@ -580,24 +592,24 @@ angular.module('deviceList').component('deviceList', {
                     // showTags: true,
                     // tagsClass: 'tag tag-pill bg-primary float-right ml-1 p-1',
                     //events
-                    onNodeSelected: function(event, data) {
+                    onNodeSelected: function (event, data) {
                         var imei = data.dataAttr.imei;
                         self.currentImei = imei;
-                        self.currentIdDevice =  data.dataAttr.device_id;
+                        self.currentIdDevice = data.dataAttr.device_id;
                         self.currentModel = data.dataAttr.device_model;
                         self.markerOptionClick(imei);
                     },
-                    onNodeChecked: function(event, data) {
+                    onNodeChecked: function (event, data) {
                         self.addMarkerToAutomatic(data.dataAttr.imei);
                         self.updateImeis();
 
                     },
-                    onNodeUnchecked: function(event, data) {
+                    onNodeUnchecked: function (event, data) {
                         self.removeMarkerFromAutomatic(data.dataAttr.imei);
                         self.updateImeis();
                     },
-                    onRendered: function(event, nodes) {
-                        $timeout(function() {
+                    onRendered: function (event, nodes) {
+                        $timeout(function () {
                             self.checkAutomatedMarkers();
                             self.updateTreeColors();
                         }, 300);
@@ -606,14 +618,14 @@ angular.module('deviceList').component('deviceList', {
             };
             self.checkAutomatedMarkers = function checkAutomatedMarkers() {
                 var imeis = $localStorage.currentUser.automatic_imeis;
-                if(imeis == undefined)
+                if (imeis == undefined)
                     imeis = "";
                 var nodes = $('#treeMenu').treeview('getNodes');
                 var l = Object.keys(nodes).length;
 
-                for(var i = 0; i < l; i++) {
-                    if(nodes[i].level == 2 && imeis.indexOf(nodes[i].dataAttr.imei) != -1) {
-                        $('#treeMenu').treeview('checkNode', [ nodes[i], { silent: false } ]);
+                for (var i = 0; i < l; i++) {
+                    if (nodes[i].level == 2 && imeis.indexOf(nodes[i].dataAttr.imei) != -1) {
+                        $('#treeMenu').treeview('checkNode', [nodes[i], {silent: false}]);
                     }
                 }
 
@@ -625,29 +637,29 @@ angular.module('deviceList').component('deviceList', {
             self.automaticMarkers = [];
             self.getSelectedImeis = function getSelectedImeis() {
                 var automaticImeis = "";
-                for(var i = 0; i < self.automaticMarkers.length; i++) {
+                for (var i = 0; i < self.automaticMarkers.length; i++) {
                     var imei = self.automaticMarkers[i].imei;
-                    if(automaticImeis != "")
+                    if (automaticImeis != "")
                         automaticImeis = automaticImeis + "," + imei;
                     else
                         automaticImeis = imei;
                 }
                 return automaticImeis;
             },
-            self.updateImeis = function updateImeis() {
-                var imeis = self.getSelectedImeis();
-                var imeisUpdate = $http.put(window.__env.apiUrl + 'users/' + $localStorage.currentUser.id + '/updimeis/' + imeis);
-                imeisUpdate.then(function(result) {
-                    $localStorage.currentUser.automatic_imeis = imeis;
-                });
-            };
+                self.updateImeis = function updateImeis() {
+                    var imeis = self.getSelectedImeis();
+                    var imeisUpdate = $http.put(window.__env.apiUrl + 'users/' + $localStorage.currentUser.id + '/updimeis/' + imeis);
+                    imeisUpdate.then(function (result) {
+                        $localStorage.currentUser.automatic_imeis = imeis;
+                    });
+                };
             self.setIntervalToMarker = function setIntervalToMarker() {
                 var m = self.findMarkerByImei(self.currentImei);
-                if(m)
+                if (m)
                     m.automaticTime = jQuery("#automaticWaitInterval").val() * 1000;
             };
             self.toggleAutomatic = function toggleAutomatic() {
-                if(self.automaticOn){
+                if (self.automaticOn) {
                     self.stopAutomatic();
                 } else {
                     self.startAutomatic();
@@ -667,33 +679,33 @@ angular.module('deviceList').component('deviceList', {
                 self.automaticMarkers.push(m);
             };
             self.removeMarkerFromAutomatic = function removeMarkerFromAutomatic(imei) {
-                for(var i = 0; self.automaticMarkers.length; i++) {
-                    if(self.automaticMarkers[i].imei == imei){
+                for (var i = 0; self.automaticMarkers.length; i++) {
+                    if (self.automaticMarkers[i].imei == imei) {
                         self.automaticMarkers.splice(i, 1);
                         break;
                     }
                 }
             };
             self.playAutomatic = function playAutomatic() {
-                if(!self.automaticOn)
+                if (!self.automaticOn)
                     return;
-                if(self.automaticMarkers.length == 0) {
+                if (self.automaticMarkers.length == 0) {
                     self.stopAutomatic();
                     return;
                 }
-                if(self.automaticPos >= self.automaticMarkers.length) {
+                if (self.automaticPos >= self.automaticMarkers.length) {
                     self.automaticPos = 0;
                 }
                 var marker = self.automaticMarkers[self.automaticPos++];
                 var nextMarkerTime = self.automaticTime;
-                if(marker.automaticTime != undefined && marker.automaticTime != false)
+                if (marker.automaticTime != undefined && marker.automaticTime != false)
                     nextMarkerTime = marker.automaticTime;
 
                 self.updateAddressAndDetail(marker);
                 var position = marker.getPosition();
                 self.map.setZoom(16);
                 self.map.panTo(position);
-                $timeout(function() {
+                $timeout(function () {
                     self.playAutomatic();
                 }, nextMarkerTime);
 
@@ -701,11 +713,11 @@ angular.module('deviceList').component('deviceList', {
 
 
             self.addToGroups = function addToGroups(data) {
-                for(var j = 0; j < self.groups.length; j++) {
+                for (var j = 0; j < self.groups.length; j++) {
                     // console.log("adding to group: ", data);
                     var g = self.groups [j];
                     var groupId = data.group_id != undefined ? data.group_id : -1;
-                    if(g.group_id == groupId) {
+                    if (g.group_id == groupId) {
                         g.devices.push({
                             id: data.device_id,
                             label: data.device_label,
@@ -721,7 +733,7 @@ angular.module('deviceList').component('deviceList', {
                     }
                 }
                 groupId = -1;
-                if(data.group_id != undefined) {
+                if (data.group_id != undefined) {
                     groupId = data.group_id;
                     self.groups.unshift({
                         group_id: groupId,
@@ -761,18 +773,18 @@ angular.module('deviceList').component('deviceList', {
                 NgMap.getMap().then(function (map) {
                     self.map = map;
                     var devicesUrl = "";
-                    if($localStorage.currentUser.roles.indexOf("ROLE_ADMIN_USER") >= 0) {
+                    if ($localStorage.currentUser.roles.indexOf("ROLE_ADMIN_USER") >= 0) {
                         devicesUrl = window.__env.apiUrl + 'users/' + $localStorage.currentUser.id + '/devices/' + false + "/" + true;
-                    } else if($localStorage.currentUser.username == "admin") {
+                    } else if ($localStorage.currentUser.username == "admin") {
                         devicesUrl = window.__env.apiUrl + 'users/' + $localStorage.currentUser.id + '/devices/' + true + '/' + false;
                     } else {
                         devicesUrl = window.__env.apiUrl + 'users/' + $localStorage.currentUser.id + '/devices/' + false + '/' + false;
                     }
                     $http.get(devicesUrl).then(result => {
                         var devices = result.data;
-                        console.log("devices from database2: ",    devices);
+                        console.log("devices from database2: ", devices);
                         $localStorage.devices = devices;
-                        if($localStorage.devices.length > 0 && self.markersInitialized == false) {
+                        if ($localStorage.devices.length > 0 && self.markersInitialized == false) {
                             self.initializeMarkers($localStorage.devices);
                         }
 
@@ -784,7 +796,7 @@ angular.module('deviceList').component('deviceList', {
                     google.maps.event.addListener(self.map.data, 'addfeature', function (event) {
                         if (event.feature.getGeometry().getType() === 'Polygon') {
                             var posExists = false;
-                            if(self.fenceIds.indexOf(event.feature.getProperty("id")) != -1) {
+                            if (self.fenceIds.indexOf(event.feature.getProperty("id")) != -1) {
                                 posExists = true;
                             } else {
                                 posExists = false;
@@ -803,7 +815,7 @@ angular.module('deviceList').component('deviceList', {
                             //     console.log("fence id: ", fence.id);
                             //     return (fence.id != undefined && fence.id == event.feature.getProperty("id"));
                             // });
-                            if(posExists)
+                            if (posExists)
                                 return;
                             var polyPath = event.feature.getGeometry().getAt(0).getArray();
                             var poly = new google.maps.Polygon({
@@ -819,7 +831,7 @@ angular.module('deviceList').component('deviceList', {
                             });
 
                             // poly.setMap(self.map);
-                            google.maps.event.addListener(poly, 'click', function(e) {
+                            google.maps.event.addListener(poly, 'click', function (e) {
                                 self.fenceClick(e, this);
                             });
 
@@ -827,7 +839,7 @@ angular.module('deviceList').component('deviceList', {
                             self.fenceIds.push(poly.id);
                         }
                     });
-                    google.maps.event.addListener(self.map, 'click', function() {
+                    google.maps.event.addListener(self.map, 'click', function () {
                         self.hideMenu();
                     });
                     var fs = $localStorage.currentUser.fences;
@@ -835,11 +847,11 @@ angular.module('deviceList').component('deviceList', {
                         visible: false
                     });
 
-                    self.map.data.forEach(function(feat) {
+                    self.map.data.forEach(function (feat) {
                         self.map.data.remove(feat);
                     });
                     self.map.data.addGeoJson(JSON.parse(fs));
-                    self.map.data.toGeoJson(function(data){
+                    self.map.data.toGeoJson(function (data) {
                         self.features = data;
                     });
 
@@ -876,10 +888,10 @@ angular.module('deviceList').component('deviceList', {
                     "alwaysShowCalendars": true,
                     "startDate": moment().hour('00').minute('00'),
                     "endDate": moment().hour('23').minute('00')
-                }, function(start, end, label) {
+                }, function (start, end, label) {
                     self.start = start.utc();
                     self.end = end.utc();
-                    window.open('#!device/' + self.currentIdDevice + '/historical/' + self.start.format("YYYY-MM-DD HH:mm") + '/' + self.end.format("YYYY-MM-DD HH:mm"),'_blank');
+                    window.open('#!device/' + self.currentIdDevice + '/historical/' + self.start.format("YYYY-MM-DD HH:mm") + '/' + self.end.format("YYYY-MM-DD HH:mm"), '_blank');
                     // $("#modal-historical").attr("href", '#!device/' + self.currentIdDevice + '/historical/' + self.start.format("YYYY-MM-DD H:mm") + '/' + self.end.format("YYYY-MM-DD H:mm"));
                     $('#myModal').modal('hide');
                 });
@@ -892,12 +904,22 @@ angular.module('deviceList').component('deviceList', {
             self.showRangeModal = function showRangeModal() {
             };
             self.historicalRangeClick = function historicalRangeClick(range) {
-                if(range == "today"){
-                    self.start = moment().set({hour:0,minute:0,second:0,millisecond:0}).utc();
+                if (range == "today") {
+                    self.start = moment().set({hour: 0, minute: 0, second: 0, millisecond: 0}).utc();
                     self.end = moment().utc();
-                }else {
-                    self.start = moment().subtract(1, 'days').set({hour:0,minute:0,second:0,millisecond:0}).utc();
-                    self.end = moment().subtract(1, 'days').set({hour:23,minute:59,second:0,millisecond:0}).utc();
+                } else {
+                    self.start = moment().subtract(1, 'days').set({
+                        hour: 0,
+                        minute: 0,
+                        second: 0,
+                        millisecond: 0
+                    }).utc();
+                    self.end = moment().subtract(1, 'days').set({
+                        hour: 23,
+                        minute: 59,
+                        second: 0,
+                        millisecond: 0
+                    }).utc();
                 }
                 var linkUrl = '#!device/' + self.currentIdDevice + '/historical/' + moment(self.start).utc().format("YYYY-MM-DD HH:mm") + '/' + moment(self.end).utc().format("YYYY-MM-DD HH:mm");
                 $('#myModal').modal('hide');
@@ -909,7 +931,7 @@ angular.module('deviceList').component('deviceList', {
             };
             self.displayHideMenu = function displayHideMenu() {
                 console.log("begininig function displayHideMenu");
-                if(jQuery("#treeMenu ul").length == 0) {
+                if (jQuery("#treeMenu ul").length == 0) {
                     self.generateMenu();
                     $('i[data-toolbar="device-menu-options"]').toolbar({
                         content: '#device-menu-options',
@@ -924,7 +946,7 @@ angular.module('deviceList').component('deviceList', {
                         hideOnClick: true
                     });
                     jQuery('i[data-toolbar="device-menu-options"], i[data-toolbar="camera-menu-options"]').on('toolbarShown',
-                        function( event ) {
+                        function (event) {
                             var idDevice = jQuery(this).attr("id-device");
                             var imei = jQuery(this).attr("imei");
                             var model = jQuery(this).attr("device-model");
@@ -937,16 +959,16 @@ angular.module('deviceList').component('deviceList', {
                             self.currentUrlCamera = urlCamera;
                             self.currentIdCamera = idCamera;
                             self.currentNameCamera = nameCamera;
-                            if(model == 'GT06') {
+                            if (model == 'GT06') {
                                 $(".video-option, .video-backup-option").hide();
                                 $(".video-option").attr("data-toggle", "modal");
-                            } else if(model == "MDVR") {
+                            } else if (model == "MDVR") {
                                 $(".video-option").show();
                                 $(".video-option").removeAttr("data-toggle");
                                 $(".video-backup-option").hide();
                             } else {
                                 self.currentCameras = [];
-                                jQuery(".camera-for-" + idDevice).each(function() {
+                                jQuery(".camera-for-" + idDevice).each(function () {
                                     let idCamera = $(this).find("i").attr("id-camera");
                                     let urlCamera = $(this).find("i").attr("url-camera");
                                     let camera = {
@@ -962,27 +984,27 @@ angular.module('deviceList').component('deviceList', {
                         }
                     );
                     jQuery('i[data-toolbar="device-menu-options"], i[data-toolbar="camera-menu-options"]').on('toolbarItemClick',
-                        function( event, itemClicked ) {
-                            if(jQuery(itemClicked).attr("id") == "device-charts") {
+                        function (event, itemClicked) {
+                            if (jQuery(itemClicked).attr("id") == "device-charts") {
                                 window.open('#!device/' + self.currentIdDevice + '/charts', '_blank');
-                            } else if(jQuery(itemClicked).attr("id") == "menu-device-camera" || jQuery(itemClicked).attr("id") == "menu-camera-camera") {
-                                if(self.currentModel == "MDVR") {
+                            } else if (jQuery(itemClicked).attr("id") == "menu-device-camera" || jQuery(itemClicked).attr("id") == "menu-camera-camera") {
+                                if (self.currentModel == "MDVR") {
                                     var resp = $http.get(window.__env.apiUrl + 'mdvr/video-url/' + self.currentImei);
-                                    resp.then(function(result) {
+                                    resp.then(function (result) {
                                         console.log("respuesta: ", result);
                                         var urlCamera = result.data.url;
                                         window.open(urlCamera, '_blank');
                                     });
                                 } else {
-                                    if(jQuery(itemClicked).attr("id") == "menu-device-camera") {
+                                    if (jQuery(itemClicked).attr("id") == "menu-device-camera") {
                                         self.menuCameraClickAll(self.currentIdDevice, self.currentCameras);
                                         window.open('#!device/' + self.currentIdDevice + '/cameras', '_blank');
                                     } else
                                         self.menuCameraClick(self.currentIdDevice, self.currentUrlCamera, self.currentIdCamera);
                                 }
-                            } else if(jQuery(itemClicked).attr("id") == "menu-device-video") {
+                            } else if (jQuery(itemClicked).attr("id") == "menu-device-video") {
                                 self.menuVideoClick(self.currentIdDevice);
-                            } else if(jQuery(itemClicked).attr("id") == "menu-device-obd") {
+                            } else if (jQuery(itemClicked).attr("id") == "menu-device-obd") {
                                 self.obdMenu(self.currentIdDevice);
                             }
                         }
@@ -1000,9 +1022,9 @@ angular.module('deviceList').component('deviceList', {
                 var longitude = alarm.longitude;
                 var speed = alarm.speed;
                 var orientation_plain = alarm.orientation_plain;
-                if(alarmType == 100 || alarmType == '000') {
+                if (alarmType == 100 || alarmType == '000') {
                     var s;
-                    if(alarmType == 100)
+                    if (alarmType == 100)
                         s = document.getElementById("panicAlarmAudio");
                     else
                         s = document.getElementById("speedAlarmAudio");
@@ -1012,8 +1034,8 @@ angular.module('deviceList').component('deviceList', {
                     var d = self.findDeviceByImei(imei);
                     var m = self.findMarkerByImei(imei);
                     self.alarmMarker(m, alarmType, false);
-                    var width = (window.screen.width * 25)/100;
-                    var height = (window.screen.height * 25)/100;
+                    var width = (window.screen.width * 25) / 100;
+                    var height = (window.screen.height * 25) / 100;
                     self.openAlarmWindow(linkUrl, width, height, d);
                 }
             };
@@ -1022,22 +1044,22 @@ angular.module('deviceList').component('deviceList', {
                 w.device = d;
                 w.company_name = $localStorage.currentUser.company_name;
                 console.log("current user", $localStorage.currentUser);
-                if(geoJson){
+                if (geoJson) {
                     w.geoJson = geoJson;
                 }
             };
             self.alarmMarker = function alarmMarker(m, alarmType, isTimeout) {
-                if(!isTimeout) {
+                if (!isTimeout) {
                     var backgroundColor = "";
-                    if(alarmType == 100) {
+                    if (alarmType == 100) {
                         backgroundColor = '#D93444'; // rojo boton de panico
-                    } else if(alarmType === '000') {
+                    } else if (alarmType === '000') {
                         backgroundColor = '#E1B300'; // amarillo exceso de velocidad
                     }
-                    if(m.labelWindow != undefined){
+                    if (m.labelWindow != undefined) {
                         m.labelWindow._opts.backgroundColor = backgroundColor;
                         m.alarmed = true;
-                        $timeout(function() {
+                        $timeout(function () {
                             self.alarmMarker(m, null, true);
                         }, 60000);
                     }
@@ -1049,18 +1071,18 @@ angular.module('deviceList').component('deviceList', {
                 }
             };
             self.findDeviceByImei = function findDeviceByImei(imei) {
-                if($localStorage.devices == undefined)
+                if ($localStorage.devices == undefined)
                     return false;
                 for (var k = 0; k < $localStorage.devices.length; k++) {
                     var d = $localStorage.devices[k];
-                    if(d.auth_device == imei)
+                    if (d.auth_device == imei)
                         return d;
                 }
                 return false;
             };
             self.findMarkerByImei = function findMarkerByImei(imei) {
                 var m = $localStorage.markers[imei];
-                if(m == undefined)
+                if (m == undefined)
                     return false;
                 else
                     return m;
@@ -1079,24 +1101,24 @@ angular.module('deviceList').component('deviceList', {
             socket.on('connect', function () {
                 console.log("socket connected");
             });
-            socket.on('error', function(e) {
+            socket.on('error', function (e) {
                 console.log("error connecting: ", e);
             });
 
             var mdvr = socket.subscribe('mdvr_channel');
-            mdvr.watch(function(data) {
+            mdvr.watch(function (data) {
                 console.log("recibido del tracker: ", data);
             });
 
             self.cameraChannel = socket.subscribe('camera_channel');
-            self.cameraChannel.watch(function(data) {
+            self.cameraChannel.watch(function (data) {
                 console.log("enviado en el camera channel: ", data);
                 // let base64Start = "data:image/jpeg;base64, ";
                 // var imgElem = document.getElementById("cameraImage");
                 // imgElem.setAttribute("src", base64Start + data.image);
             });
             self.cameraSingleChannel = socket.subscribe("camera_single_channel");
-            self.cameraSingleChannel.watch(function(data) {
+            self.cameraSingleChannel.watch(function (data) {
                 if (data.type == "single-camera") {
                     // let base64Start = "data:image/jpeg;base64, ";
                     var vehicle = data.vehicle;
@@ -1112,8 +1134,8 @@ angular.module('deviceList').component('deviceList', {
             });
 
             self.obdChannel = socket.subscribe('obd_channel');
-            self.obdChannel.watch(function(data) {
-                if(data.type == 'obd-info-response') {
+            self.obdChannel.watch(function (data) {
+                if (data.type == 'obd-info-response') {
                     console.log("from python: ", data.message);
                 }
             });
@@ -1137,17 +1159,17 @@ angular.module('deviceList').component('deviceList', {
                 console.log("devices en el initialize markers: ", devices);
                 self.markersInitialized = true;
 
-                for(let i = 0; i < devices.length; i++) {
+                for (let i = 0; i < devices.length; i++) {
                     var device = devices[i];
-                        if(device.peripheral_gps_data[0] == undefined)
+                    if (device.peripheral_gps_data[0] == undefined)
                         continue;
-                    if(self.initialLatitude == null) {
+                    if (self.initialLatitude == null) {
                         self.initialLatitude = device.peripheral_gps_data[0].lat;
                         self.initialLongitude = device.peripheral_gps_data[0].lng;
                     }
                     var local = moment.utc(device.peripheral_gps_data[0].updatedAt).toDate();
                     var lastUpdate = moment(local).format("DD/MM/YYYY HH:mm:ss");
-                    var offText =  moment(local).fromNow();
+                    var offText = moment(local).fromNow();
                     var speed = device.peripheral_gps_data[0].speed;
                     var gpsStatus = device.peripheral_gps_data[0].gps_status == 1 ? 'Off' : 'On';
                     // var image = "http://127.0.0.1:8000/img/car-marker48.png";
@@ -1165,7 +1187,7 @@ angular.module('deviceList').component('deviceList', {
                         // anchor: new google.maps.Point(10, 0) // orig 10,50 back of car, 10,0 front of car, 10,25 center of car
                     };
                     var m = new google.maps.Marker({
-                        position: new google.maps.LatLng(device.peripheral_gps_data[0].lat,device.peripheral_gps_data[0].lng),
+                        position: new google.maps.LatLng(device.peripheral_gps_data[0].lat, device.peripheral_gps_data[0].lng),
                         map: self.map,
                         title: device.label,
                         id: device.idDevice,
@@ -1179,7 +1201,7 @@ angular.module('deviceList').component('deviceList', {
                     self.updateMarkerColor(m);
 
                     var content = "<p style='white-space: nowrap'>" + device.label + "<span id='offtext-" + device.idDevice + "'></span></p>";
-                    if(m.gpsStatus == "Off") {
+                    if (m.gpsStatus == "Off") {
                         var offText = self.getOffText(moment.utc(device.peripheral_gps_data[0].updatedAt));
                         content = "<p style='white-space: nowrap'>" + device.label + "<span id='offtext-" + device.idDevice + "'> - " + offText + "</span></p>";
                     }
@@ -1212,7 +1234,7 @@ angular.module('deviceList').component('deviceList', {
                     // }
 
 
-                    google.maps.event.addListener(m, 'click', function() {
+                    google.maps.event.addListener(m, 'click', function () {
                         var lat = this.getPosition().lat();
                         var lng = this.getPosition().lng();
                         self.refreshDetailWindow(m);
@@ -1230,7 +1252,7 @@ angular.module('deviceList').component('deviceList', {
                     $localStorage.markers[device.auth_device] = m;
                     var g = null;
                     var alarmsSocket = null;
-                    if(devices[i].mdvr_number == null) {
+                    if (devices[i].mdvr_number == null) {
                         g = socket.subscribe(devices[i].auth_device);
                         console.log("subscribing to: ", "alarms_" + devices[i].auth_device);
                         alarmsSocket = socket.subscribe("alarms_" + devices[i].auth_device);
@@ -1238,31 +1260,31 @@ angular.module('deviceList').component('deviceList', {
                         g = socket.subscribe(devices[i].mdvr_number);
                         alarmsSocket = socket.subscribe("alarms_" + devices[i].mdvr_number);
                     }
-                    g.watch(function(data) {
+                    g.watch(function (data) {
                         var imei = data.device_id;
-                        if(data.mdvr_number != undefined)
+                        if (data.mdvr_number != undefined)
                             imei = self.findImeiByMdvrNumber(data.device_id);
                         var m = $localStorage.markers[imei];
-                        if(m != undefined) {
+                        if (m != undefined) {
                             var lastUpdate;
                             var offText = "";
 
-                            if(data.mdvr_number) {
+                            if (data.mdvr_number) {
                                 lastUpdate = data.date;
                                 var momentDate = moment(lastUpdate, "YYYY-MM-DD HH:mm:s.S")
                                 lastUpdate = momentDate.format("DD/MM/YYYY HH:mm:ss");
                                 offText = self.getOffText(momentDate);
-                            } else if(data.date) {
+                            } else if (data.date) {
                                 lastUpdate = self.getDateByHex(data.date);
                             } else {
                                 lastUpdate = moment().format("YYYY-MM-DD HH:mm:ss");
                             }
-                            m.setPosition(new google.maps.LatLng( data.latitude,data.longitude));
+                            m.setPosition(new google.maps.LatLng(data.latitude, data.longitude));
                             m.speed = data.speed;
                             m.orientation = data.orientation_plain;
                             m.gpsStatus = data.gps_status == 1 ? 'Off' : 'On';
                             var selector = "#offtext-" + m.id;
-                            if(m.gpsStatus == 'Off') {
+                            if (m.gpsStatus == 'Off') {
                                 $(selector).html(" - " + offText);
                             } else {
                                 $(selector).html("");
@@ -1270,7 +1292,7 @@ angular.module('deviceList').component('deviceList', {
                             m.lastUpdate = lastUpdate;
                             self.rotateMarker(m, data.orientation_plain);
                             self.updateMarkerColor(m);
-                            if(self.currentMenuImei == data.device_id) {
+                            if (self.currentMenuImei == data.device_id) {
                                 self.map.panTo(new google.maps.LatLng(data.latitude, data.longitude));
                                 self.updateMarkerColor(m);
 
@@ -1282,10 +1304,10 @@ angular.module('deviceList').component('deviceList', {
                         }
                     });
 
-                    alarmsSocket.watch(function(dataAlarm) {
-                        if(dataAlarm.imei) {
+                    alarmsSocket.watch(function (dataAlarm) {
+                        if (dataAlarm.imei) {
                             var m = $localStorage.markers[dataAlarm.imei.trim()];
-                            var alarmData =  {
+                            var alarmData = {
                                 device_info: 100,
                                 device_id: dataAlarm.imei.trim(),
                                 latitude: m.getPosition().lat(),
@@ -1301,11 +1323,11 @@ angular.module('deviceList').component('deviceList', {
                     });
                 }
 
-                for(let i = 0; i < devices.length; i++) {
+                for (let i = 0; i < devices.length; i++) {
                     // console.log("imei: ", devices[i].auth_device)
                     let m = $localStorage.markers[devices[i].auth_device];
                     // console.log("last update: ", m.lastUpdate)
-                    if(m.lastUpdate == "") {
+                    if (m.lastUpdate == "") {
                         // console.log("Fecha no valida. Desactivalo...");
                         m.gpsStatus = 'Off';
                         self.updateMarkerColor(m);
@@ -1314,7 +1336,7 @@ angular.module('deviceList').component('deviceList', {
                         // console.log("desde: ", momentDate.fromNow());
                         // console.log("en segundos: ", moment().diff(momentDate, 'seconds'));
                         let diffInSeconds = moment().diff(momentDate, 'seconds');
-                        if(diffInSeconds > 60) {
+                        if (diffInSeconds > 60) {
                             // console.log("Desactivalo...");
                             m.gpsStatus = 'Off';
                             self.updateMarkerColor(m);
@@ -1324,12 +1346,12 @@ angular.module('deviceList').component('deviceList', {
                 }
                 self.updateTreeColors();
 
-                setInterval(function() {
-                    for(var i = 0; i < devices.length; i++) {
+                setInterval(function () {
+                    for (var i = 0; i < devices.length; i++) {
                         // console.log("imei: ", devices[i].auth_device)
                         let m = $localStorage.markers[devices[i].auth_device];
                         // console.log("last update: ", m.lastUpdate)
-                        if(m.lastUpdate == "") {
+                        if (m.lastUpdate == "") {
                             // console.log("Fecha no valida. Desactivalo...");
                             m.gpsStatus = 'Off';
                             self.updateMarkerColor(m);
@@ -1338,7 +1360,7 @@ angular.module('deviceList').component('deviceList', {
                             // console.log("desde: ", momentDate.fromNow());
                             // console.log("en segundos: ", moment().diff(momentDate, 'seconds'));
                             let diffInSeconds = moment().diff(momentDate, 'seconds');
-                            if(diffInSeconds > 60) {
+                            if (diffInSeconds > 60) {
                                 // console.log("Desactivalo...");
                                 m.gpsStatus = 'Off';
                                 self.updateMarkerColor(m);
@@ -1351,17 +1373,17 @@ angular.module('deviceList').component('deviceList', {
             };
 
             self.findImeiByMdvrNumber = function findImeiByMdvrNumber(mdvrNumber) {
-                if($localStorage.devices == undefined)
+                if ($localStorage.devices == undefined)
                     return false;
                 for (var k = 0; k < $localStorage.devices.length; k++) {
                     var d = $localStorage.devices[k];
-                    if(d.mdvr_number == mdvrNumber)
+                    if (d.mdvr_number == mdvrNumber)
                         return d.auth_device.toString();
                 }
                 return false;
             };
 
-            self.rotateMarker = function(m, degrees) {
+            self.rotateMarker = function (m, degrees) {
                 var icon2 = m.icon;
                 icon2.rotation = degrees;
                 m.setIcon(icon2);
@@ -1370,12 +1392,12 @@ angular.module('deviceList').component('deviceList', {
                 // if(m.labelWindow != undefined)
                 //     m.labelWindow._opts.backgroundColor = 'blue';
                 var backgroundColor = '#1C9918'; // default for when is moving
-                if(m.gpsStatus === 'Off')
+                if (m.gpsStatus === 'Off')
                     backgroundColor = '#6A7272'; // dark for status off
-                else if(m.speed == 0)
+                else if (m.speed == 0)
                     backgroundColor = '#248DFD'; // blue for stopped '#E1B300';
                 m.backgroundColor = backgroundColor;
-                if(m.labelWindow != undefined && (m.alarmed == undefined || m.alarmed == false)){
+                if (m.labelWindow != undefined && (m.alarmed == undefined || m.alarmed == false)) {
                     m.labelWindow._opts.backgroundColor = backgroundColor;
                 }
             };
@@ -1385,9 +1407,9 @@ angular.module('deviceList').component('deviceList', {
             };
             self.getAddress = function getAddress(latitude, longitude, showOnMap, backgroundColor) {
                 var latlng = new google.maps.LatLng(latitude, longitude);
-                if(backgroundColor)
+                if (backgroundColor)
                     jQuery("#address-control div").css("background-color", backgroundColor);
-                if((moment().unix() - self.addressLastUpdate) >= 3) {
+                if ((moment().unix() - self.addressLastUpdate) >= 3) {
                     self.addressLastUpdate = moment().unix();
                     // jQuery("#address-p").html('<i class="fa fa-spinner fa-spin"></i> cargando...');
                     self.geocoder.geocode({
@@ -1395,7 +1417,7 @@ angular.module('deviceList').component('deviceList', {
                     }, function (results, status) {
                         if (status === google.maps.GeocoderStatus.OK) {
                             if (results[0]) {
-                                if(showOnMap) {
+                                if (showOnMap) {
                                     jQuery("#address-p").html(results[0].formatted_address);
                                     jQuery("#address-control").show("fast");
                                 }
@@ -1423,11 +1445,11 @@ angular.module('deviceList').component('deviceList', {
                 // if(open){
                 jQuery("#detail-control div").html(contentDetail);
                 jQuery("#detail-control").css("background-color", m.backgroundColor).show("fast");
-                    // m.detailWindow.open();
+                // m.detailWindow.open();
                 // }
             };
             self.getDateByHex = function getDateByHex(str) {
-                if(str != undefined) {
+                if (str != undefined) {
                     var year = parseInt(str.substr(0, 2), 16).toString();
                     var month = parseInt(str.substr(2, 2), 16).toString();
                     var day = parseInt(str.substr(4, 2), 16).toString();
@@ -1442,7 +1464,7 @@ angular.module('deviceList').component('deviceList', {
                 }
             };
 
-            self.getOffText = function getOffText(momentDate){
+            self.getOffText = function getOffText(momentDate) {
 
                 var offText = momentDate.fromNow();
                 offText = offText.replace("hace", "Off")
@@ -1479,19 +1501,16 @@ angular.module('deviceList').component('deviceList', {
             };
 
 
-            self.makeFullScreen = function(id) {
+            self.makeFullScreen = function (id) {
                 var divObj = document.getElementById(id);
                 //Use the specification method before using prefixed versions
                 if (divObj.requestFullscreen) {
                     divObj.requestFullscreen();
-                }
-                else if (divObj.msRequestFullscreen) {
+                } else if (divObj.msRequestFullscreen) {
                     divObj.msRequestFullscreen();
-                }
-                else if (divObj.mozRequestFullScreen) {
+                } else if (divObj.mozRequestFullScreen) {
                     divObj.mozRequestFullScreen();
-                }
-                else if (divObj.webkitRequestFullscreen) {
+                } else if (divObj.webkitRequestFullscreen) {
                     divObj.webkitRequestFullscreen();
                 } else {
                     console.log("Fullscreen API is not supported");
@@ -1499,13 +1518,13 @@ angular.module('deviceList').component('deviceList', {
 
             };
 
-        //    code for minimize modal
+            //    code for minimize modal
 
             var $content, $modal, $apnData, $modalCon;
 
             $content = $(".min");
 
-            $(".modalMinimize").on("click", function() {
+            $(".modalMinimize").on("click", function () {
                 $modalCon = $(this).closest(".mymodal").attr("id");
                 $apnData = $(this).closest(".mymodal");
                 $modal = "#" + $modalCon;
@@ -1523,21 +1542,21 @@ angular.module('deviceList').component('deviceList', {
                 }
             });
 
-            $("body").on("click", ".min button.minimize-close", function() {
+            $("body").on("click", ".min button.minimize-close", function () {
                 $(this).closest(".minmaxCon").find(".modalMinimize i").toggleClass('fa-clone').toggleClass('fa-minus');
                 $(this).closest(".minmaxCon").removeClass("big-z-index");
                 $(this).closest(".min").toggleClass("min");
             });
 
-            self.openCameraAutoplayWindow = function(image, name, vehicle) {
+            self.openCameraAutoplayWindow = function (image, name, vehicle) {
                 // var w = window.open(linkUrl, 'newwindow-' + Date.now(), 'width=' + width + ',height=' + height + '  ');
                 // w.device = d;
-                var width = (window.screen.width * 35)/100;
-                var height = (window.screen.height * 55)/100;
+                var width = (window.screen.width * 35) / 100;
+                var height = (window.screen.height * 55) / 100;
                 var w = window.open("image", 'newwindow-' + Date.now(), 'width=' + width + ',height=' + height + '  ');
 
-                w.document.write("<p style='text-align: center;'>Veh&iacute;culo: " + vehicle + " --- C&aacute;mara: " + name +  "</p>");
-                if(self.singleImageOld)
+                w.document.write("<p style='text-align: center;'>Veh&iacute;culo: " + vehicle + " --- C&aacute;mara: " + name + "</p>");
+                if (self.singleImageOld)
                     w.document.write("<p style='text-align: center; color: #dc3545'>Imagen desactualizada por problemas de conexi&oacute;n con la camara</p>");
 
                 w.document.write("<div style='width: 100%; text-align: center;'>" + image.outerHTML + "</div>");
@@ -1547,9 +1566,9 @@ angular.module('deviceList').component('deviceList', {
 
                 var isInAutoplay = jQuery("#isInAutoplay")[0].checked;
                 var interval = null;
-                if(isInAutoplay) {
+                if (isInAutoplay) {
                     interval = jQuery("#cameraShowInterval").val();
-                    jQuery.post(window.__env.apiUrl + "cameras/" + self.currentIdCamera + "/setAutoplay", {interval: interval}, function(data) {
+                    jQuery.post(window.__env.apiUrl + "cameras/" + self.currentIdCamera + "/setAutoplay", {interval: interval}, function (data) {
                         self.cameraSingleChannel.publish({
                             type: 'load-camera-autoplay',
                         });
@@ -1572,29 +1591,33 @@ angular.module('deviceList').component('deviceList', {
             }
 
             self.menuStreetviewOption = function menuStreetviewOption() {
-              const marker = self.findMarkerByImei(self.currentImei);
-              const position = marker.getPosition();
-              const orientation = marker.orientation;
-              var linkUrl = '#!/device/' + self.currentImei + '/streetview/' + position.lat() + '/' + position.lng() + '/' + orientation;
-              var width =  (window.screen.width * 25)/100;
-              var height = (window.screen.height * 25)/100;
-              window.open(linkUrl, 'newwindow-' + Date.now(), 'width=' + width + ',height=' + height + '  ');
+                const marker = self.findMarkerByImei(self.currentImei);
+                const position = marker.getPosition();
+                const orientation = marker.orientation;
+                var linkUrl = '#!/device/' + self.currentImei + '/streetview/' + position.lat() + '/' + position.lng() + '/' + orientation;
+                var width = (window.screen.width * 25) / 100;
+                var height = (window.screen.height * 25) / 100;
+                window.open(linkUrl, 'newwindow-' + Date.now(), 'width=' + width + ',height=' + height + '  ');
 
             }
 
             self.initTimebar = (timePlusSecondsBegin = 0, timePlusSecondsEnd = 0) => {
                 jQuery("#timelineId").html('');
-                const timebar = jQuery("#timelineId").timebar({
+                self.timebar = jQuery("#timelineId").timebar({
                     totalTimeInSecond: (86400 - (timePlusSecondsBegin + timePlusSecondsEnd)),
                     // totalTimeInSecond: 120,
-                    cuepoints: [],
+                    cuepoints: [
+                        0,
+                        86400
+                    ],
+                    showCuepoints: false,
                     width: '710px',
                     multiSelect: true,
                     globalPageX: 0,
                     timePlusSecondsBegin: timePlusSecondsBegin,
                     timePlusSecondsEnd: timePlusSecondsEnd,
                     barClicked(time) {
-                        const selectedTime = timebar.formatTime(time);
+                        const selectedTime = self.timebar.formatTime(time);
 
                         console.log("already clicked: ", self.alreadyClicked);
                         if (self.alreadyClicked) {
@@ -1603,31 +1626,25 @@ angular.module('deviceList').component('deviceList', {
                             clearTimeout(self.alreadyclickedTimeout); // prevent this from happening
                             console.log("double click: ", time)
                             self.zoomIn(time);
-                        }else{
+                        } else {
                             self.alreadyClicked = true;
-                            self.alreadyclickedTimeout = setTimeout(function(){
+                            self.alreadyclickedTimeout = setTimeout(function () {
                                 self.alreadyClicked = false; // reset when it happens
                                 console.log("single click: ", time)
                                 if (!jQuery(".step[data-time=" + time + "]").hasClass('no-video')) {
-                                    self.currentPlayTime.set({hour:0,minute:0,second:0,millisecond:0});
+                                    self.currentPlayTime.set({hour: 0, minute: 0, second: 0, millisecond: 0});
                                     self.currentPlayTime.add(time, 'seconds');
                                     self.playlistName = moment().valueOf();
                                     self.resetPlayer();
                                     self.initPlaylist();
                                     self.sendVideoToPlay(self.currentIdDevice, self.currentIdCamera, self.currentPlayTime, self.playlistName);
                                 }
-                            },300); // <-- dblclick tolerance here
+                            }, 300); // <-- dblclick tolerance here
                         }
 
                     },
-                    // barDoubleClicked(time) {
-                    //     const selectedTime = timebar.formatTime(time);
-                    //     console.log("double click: ", selectedTime);
-                    //     // self.zoomIn();
-                    //     // $("#duration").text(selectedTime);
-                    // },
                     pointerClicked(time) {
-                        const selectedTime = timebar.formatTime(time);
+                        const selectedTime = self.timebar.formatTime(time);
                         console.log(selectedTime);
                         // $("#duration").text(selectedTime);
                         // $('#add-input').val(time);
@@ -1700,7 +1717,7 @@ angular.module('deviceList').component('deviceList', {
 
                 let startDate = start;
                 if (isFirstTime) {
-                    let startDate = start.set({hour:0,minute:0,second:0,millisecond:0});
+                    let startDate = start.set({hour: 0, minute: 0, second: 0, millisecond: 0});
                 }
                 self.cameraChannel.publish({
                     type: 'start-video-backup',
@@ -1715,7 +1732,7 @@ angular.module('deviceList').component('deviceList', {
             }
 
             self.nextDay = () => {
-                self.currentPlayTime.add(1, 'days').set({hour:0,minute:0,second:0,millisecond:0});
+                self.currentPlayTime.add(1, 'days').set({hour: 0, minute: 0, second: 0, millisecond: 0});
                 jQuery('#currentDay').html(self.currentPlayTime.format('DD/MM/YYYY'));
                 jQuery("#waitingVideo").fadeIn();
                 self.resetPlayer();
@@ -1725,7 +1742,7 @@ angular.module('deviceList').component('deviceList', {
                 self.getNoVideoInterval(self.currentIdCamera, self.currentPlayTime.format('DD/MM/YYYY'), self.currentIdDevice, self.playlistName);
             }
             self.previousDay = () => {
-                self.currentPlayTime.subtract(1, 'days').set({hour:0,minute:0,second:0,millisecond:0});
+                self.currentPlayTime.subtract(1, 'days').set({hour: 0, minute: 0, second: 0, millisecond: 0});
                 jQuery('#currentDay').html(self.currentPlayTime.format('DD/MM/YYYY'));
                 jQuery("#waitingVideo").fadeIn();
                 self.resetPlayer();
@@ -1746,7 +1763,7 @@ angular.module('deviceList').component('deviceList', {
             }
 
             self.addNoVideoIntervalsToTimebar = () => {
-                jQuery(".steps-bar .step").each(function() {
+                jQuery(".steps-bar .step").each(function () {
                     let t = jQuery(this).data('time');
                     if (t === 0) {
                         console.log("resultado con valor 0", self.isDateInNoVideoIntervals(t));
@@ -1761,7 +1778,7 @@ angular.module('deviceList').component('deviceList', {
             }
 
             self.isDateInNoVideoIntervals = (seconds) => {
-                let secondsDate = moment(self.currentPlayTime.set({hour:0,minute:0,second:0,millisecond:0}));
+                let secondsDate = moment(self.currentPlayTime.set({hour: 0, minute: 0, second: 0, millisecond: 0}));
                 secondsDate.add(seconds, 'seconds');
                 if (seconds === 0) {
                     secondsDate.add(1, 'seconds');
@@ -1789,9 +1806,9 @@ angular.module('deviceList').component('deviceList', {
 
             self.initPlaylist = () => {
                 self.playlistChannel = socket.subscribe(self.playlistName + '_channel');
-                self.playlistChannel.watch(function(data) {
+                self.playlistChannel.watch(function (data) {
                     console.log("enviado en el playlist channel: ", data);
-                    if(data.type == "no-video-available") {
+                    if (data.type == "no-video-available") {
                         self.noVideo = true;
                         jQuery("#waitingVideo").fadeOut();
                         // jQuery("#video1").hide();
@@ -1801,7 +1818,8 @@ angular.module('deviceList').component('deviceList', {
                     } else if (data.type == "play-recorded-video") {
                         console.log('play-recorded-video');
                         // jQuery(".vjs-download-button").removeClass("download-hidden");
-                    } else if(data.type == "download-ready") {
+                    } else if (data.type == "download-ready") {
+                        console.log("entrando en el download ready");
                         jQuery(".vjs-download-button span").removeClass("fa-spinner fa-spin").addClass("fa-download");
 
                         var link = document.createElement('a');
@@ -1810,14 +1828,14 @@ angular.module('deviceList').component('deviceList', {
                         link.target = "_blank";
                         link.click();
                         console.log(self.downloadUrl);
-                    } else if(data.type == "backup-initialized") {
-                        if(self.noVideo == true) {
+                    } else if (data.type == "backup-initialized") {
+                        if (self.noVideo == true) {
                             self.noVideo = false;
                             // jQuery("#video1").hide();
                             // return;
                         }
                         jQuery("#waitingVideo").fadeOut();
-                        var cameraFullUrl = window.__env.cameraUrl + self.currentIdDevice  + "/" + self.playlistName;
+                        var cameraFullUrl = window.__env.cameraUrl + self.currentIdDevice + "/" + self.playlistName;
 
                         self.downloadUrl = cameraFullUrl + "/download.mp4";
                         jQuery("#no-video-message").fadeOut();
@@ -1828,7 +1846,7 @@ angular.module('deviceList').component('deviceList', {
                             plugins: {
                                 alecoRangeslider: {
                                     downloadUrl: cameraFullUrl,
-                                    downloadCallback: function(minTime, maxTime) {
+                                    downloadCallback: function (minTime, maxTime) {
                                         console.log("begin download");
                                         self.cameraChannel.publish({
                                             id: id,
@@ -1862,6 +1880,71 @@ angular.module('deviceList').component('deviceList', {
                     }
                 });
 
+            }
+
+            self.setupDownloadMode = () => {
+                jQuery("#draggable").hide();
+
+                jQuery(".download").show();
+                self.timebar.showHideCuepoints('true');
+                $(".download-bar-end").show().css({
+                    left: '100%'
+                });
+            }
+
+            self.outOfDownloadMode = () => {
+                jQuery(".download").hide();
+                self.timebar.showHideCuepoints('false');
+                $(".download-bar-end").hide();
+                jQuery("#draggable").show();
+            }
+
+            self.download = () => {
+                let dayDate =  moment(self.currentPlayTime).set({hour: 0, minute: 0, second: 0, millisecond: 0});
+                const beginTime = $('.download-pointer-begin').data().time;
+                const endTime = $('.download-pointer-end').data().time;
+                let startDate = moment(dayDate).add(beginTime, 'seconds');
+                let endDate = moment(dayDate).add(endTime, 'seconds');
+                let playlistName = moment().valueOf();
+                let idCamera = self.currentIdCamera;
+                let id = self.currentIdDevice;
+                self.downloadPlaylistChannel = socket.subscribe(playlistName + '_channel');
+                self.downloadPlaylist = playlistName;
+                self.downloadPlaylistChannel.watch(function(data) {
+                    console.log("entrando en el download ready");
+                    var cameraFullUrl = window.__env.cameraUrl + self.currentIdDevice + "/" + self.downloadPlaylist;
+
+                    self.downloadUrl = cameraFullUrl + "/download.mp4";
+
+                    jQuery(".vjs-download-button span").removeClass("fa-spinner fa-spin").addClass("fa-download");
+
+                    var link = document.createElement('a');
+                    link.download = "video.mp4";
+                    link.href = self.downloadUrl;
+                    link.target = "_blank";
+                    link.click();
+                    console.log(self.downloadUrl);
+                });
+                self.cameraChannel.publish({
+                    type: 'begin-download',
+                    message: 'enviado desde la web',
+                    id: id,
+                    initialDate: startDate.format("YYYY-MM-DD_HH-mm-ss") + "_hls.ts",
+                    endDate: endDate.format("YYYY-MM-DD_HH-mm-ss") + "_hls.ts",
+                    playlistName: playlistName,
+                    idCamera: idCamera,
+                });
+
+
+
+                // self.cameraChannel.publish({
+                //     id: id,
+                //     type: 'begin-download',
+                //     message: 'enviado desde la web',
+                //     initialTime: minTime,
+                //     endTime: maxTime,
+                //     playlistName: playlistName
+                // });
             }
         }
     ]
