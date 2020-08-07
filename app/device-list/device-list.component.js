@@ -1911,6 +1911,7 @@ angular.module('deviceList').component('deviceList', {
                 self.downloadPlaylistChannel = socket.subscribe(playlistName + '_channel');
                 self.downloadPlaylist = playlistName;
                 jQuery("#downloadButton i").addClass("fa-spinner fa-spin").removeClass("fa-cloud-download-alt");
+                jQuery("#downloadMessage").fadeIn();
                 self.downloadPlaylistChannel.watch(function(data) {
                     console.log("entrando en el download ready");
                     var cameraFullUrl = window.__env.cameraUrl + self.currentIdDevice + "/" + self.downloadPlaylist;
@@ -1918,6 +1919,7 @@ angular.module('deviceList').component('deviceList', {
                     self.downloadUrl = cameraFullUrl + "/download.mp4";
 
                     jQuery("#downloadButton i").removeClass('fa-spinner fa-spin').addClass("fa-cloud-download-alt");
+                    jQuery("#downloadMessage").fadeOut();
 
                     var link = document.createElement('a');
                     link.download = "video.mp4";
