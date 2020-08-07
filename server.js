@@ -4,7 +4,6 @@ var app = express();
 var net = require('net');
 
 app.use(express.static("app"));
-app.use(express.static("node_modules"));
 // app.use(bodyParser.json());
 // app.use(bodyParser.urlencoded({extended: true}) );
 
