@@ -1910,13 +1910,14 @@ angular.module('deviceList').component('deviceList', {
                 let id = self.currentIdDevice;
                 self.downloadPlaylistChannel = socket.subscribe(playlistName + '_channel');
                 self.downloadPlaylist = playlistName;
+                jQuery("#downloadButton i").addClass("fa-spinner fa-spin").removeClass("fa-cloud-download-alt");
                 self.downloadPlaylistChannel.watch(function(data) {
                     console.log("entrando en el download ready");
                     var cameraFullUrl = window.__env.cameraUrl + self.currentIdDevice + "/" + self.downloadPlaylist;
 
                     self.downloadUrl = cameraFullUrl + "/download.mp4";
 
-                    jQuery(".vjs-download-button span").removeClass("fa-spinner fa-spin").addClass("fa-download");
+                    jQuery("#downloadButton i").removeClass('fa-spinner fa-spin').addClass("fa-cloud-download-alt");
 
                     var link = document.createElement('a');
                     link.download = "video.mp4";
