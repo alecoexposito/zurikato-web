@@ -211,8 +211,8 @@
         timebar.prototype.init = function () {
             let data = `<div class='timeline-cover'>
                                 <div id='draggable'><span id="timebar-selected-time" style="position: relative; top: -20px; left: -20px; color: red">00:00</span></div>
-                                <div class='download download-bar download-bar-begin' style="display: none;"><span id="download-bar-begin-text" style="position: relative; top: -20px; left: -20px; color: blue">00:00</span></div>
-                                <div class='download download-bar download-bar-end' style="display: none;"><span id="download-bar-end-text" style="position: relative; top: -20px; left: -20px; color: blue">00:00</span></div>                            
+                                <div class='download download-bar download-bar-begin' style="display: none;"><span id="download-bar-begin-text" style="position: relative; top: -20px; left: -40px; color: blue">00:00</span></div>
+                                <div class='download download-bar download-bar-end' style="display: none;"><span id="download-bar-end-text" style="position: relative; top: -20px; left: 0px; color: blue">00:00</span></div>                            
                             <div class='timeline-bar'>
                                 <div class='steps-bar clearfix'></div>
                             </div>
