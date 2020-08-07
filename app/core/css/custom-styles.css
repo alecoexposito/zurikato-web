@@ -213,3 +213,24 @@ div.daterangepicker {
     z-index: 9999 !important;
     font-size: 1rem;
 }
+
+.pointer.draggable {
+    top: 42px;
+}
+
+
+#draggable {
+    float: left;
+    top: -33px;
+}
+.download-bar {
+
+    height: 50px;
+    width: 2px;
+    background: #1824ff;
+    top: -33px;
+    cursor: pointer;
+    z-index: 1000;
+    position: relative;
+    float: left;
+}
