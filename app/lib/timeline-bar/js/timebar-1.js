@@ -103,7 +103,13 @@
                 self._cuepointClicked(this, self);
             });
 
-        };
+        }
+
+        timebar.prototype.timeBetweenPoints = function() {
+            const beginTime = $('.download-pointer-begin').data().time;
+            const endTime = $('.download-pointer-end').data().time;
+            return endTime - beginTime;
+        }
 
         // Method for updating the plugins options.
         timebar.prototype.update = function (options) {
@@ -278,8 +284,10 @@
                 }
             });
 
+            let self = this;
             $(".download-pointer-begin.draggable").draggable({
                 axis: "x",
+                containment: '.steps-bar',
                 drag: function (event) {
                     const offsetLeft = (event.pageX - $(".steps-bar").offset().left);
                     $(".download-bar-begin").show().css({
@@ -296,13 +304,39 @@
                             $('#download-bar-begin-text').html(moment(timeTooltip).add(time, 'seconds').format('HH:mm'));
                             return false;
                         }
-                    })
+                    });
+
+                    if(self.timeBetweenPoints() >= 60 * 60 || self.timeBetweenPoints() < 0 ) {
+                        console.log("aki");
+                        const beginTime = $('.download-pointer-begin').data().time;
+                        let stepElem = self.findStepCloserToTime(beginTime);
+                        const endTime = $(stepElem).data('time');
+                        let timeTooltip = moment().set({hour: 0, minute: 0, second: 0, millisecond: 0});
+                        let offsetLeft = $(stepElem).offset().left - $(".steps-bar").offset().left;
+                        $(".download-bar-end, .download-pointer-end").css({
+                            left: `${offsetLeft}px`
+                        });
+                        $('#download-bar-end-text').html(moment(timeTooltip).add(endTime, 'seconds').format('HH:mm'));
+                    
+                    }
                 },
             });
 
             $(".download-pointer-end.draggable").draggable({
                 axis: "x",
-                drag: function (event) {
+                containment: '.steps-bar',
+                // start: function(event, obj) {
+                //     if (self.timeBetweenPoints() > 60 * 60) {
+                //         self.dontDragEnd = true;
+                //         self.currentEndLeft = obj.position.left;
+                //     }
+                // },
+                drag: function (event, obj) {
+                    console.log("current left: ", self.timeBetweenPoints());
+                    if(self.timeBetweenPoints() >= 60 * 60 && (obj.position.left > self.currentEndLeft)) {
+                        return false;
+                    }
+                    self.currentEndLeft = obj.position.left;
                     const offsetLeft = (event.pageX - $(".steps-bar").offset().left);
                     $(".download-bar-end").show().css({
                         left: `${offsetLeft}px`
@@ -341,10 +375,23 @@
             if (typeof self.pointerClicked === 'function') {
                 self.pointerClicked.call(element, self.getSelectedTime());
             }
-        }
+        };
 
         timebar.prototype.parseBoolean = function (val) {
             return (val.toLowerCase() === 'true');
+        };
+
+        timebar.prototype.findStepCloserToTime = function(val) {
+            let closest = 0;
+            let result = null;
+            $(".step").each(function () {
+                let time = $(this).data('time');
+                if (time > closest && (time - val ) <= 60 * 60) {
+                    closest = time;
+                    result = this;
+                }
+            });
+            return result;
         }
 
         return timebar;
