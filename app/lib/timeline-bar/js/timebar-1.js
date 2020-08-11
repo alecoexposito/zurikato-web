@@ -316,6 +316,7 @@
                         $(".download-bar-end, .download-pointer-end").css({
                             left: `${offsetLeft}px`
                         });
+                        $('.download-pointer-end').data('time', endTime);
                         $('#download-bar-end-text').html(moment(timeTooltip).add(endTime, 'seconds').format('HH:mm'));
                     
                     }

@@ -1941,7 +1941,7 @@ angular.module('deviceList').component('deviceList', {
                     self.showDownloadMessage("El intervalo escogido no tiene video grabado.", 'danger');
                     return;
                 } else if (endTime - beginTime > 60*60) {
-                    self.showDownloadMessage("El tiempo de descarga no debe exeder los 60 segundos.", 'danger');
+                    self.showDownloadMessage("El tiempo de descarga no debe exeder los 60 minutos.", 'danger');
                     return;
                 } else {
                     $("#downloadMessage").fadeOut();
